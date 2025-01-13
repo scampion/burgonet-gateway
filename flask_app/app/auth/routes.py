@@ -1,4 +1,5 @@
-from flask import Blueprint, redirect, url_for, flash, request
+from flask import Blueprint, redirect, url_for, flash, request, current_app
+import logging
 from werkzeug.datastructures import MultiDict
 from flask_login import login_user, logout_user, current_user
 from .. import ldap_manager, login_manager
@@ -39,7 +40,11 @@ def login():
             flash('User details not found')
             return redirect(url_for('main.index'))
 
-        username = ldap_manager.connection.entries[0].uid.values[0] if ldap_manager.connection.entries else None
+        # Get the first value from uid attribute (LDAP returns lists)
+        entry = ldap_manager.connection.entries[0]
+        current_app.logger.debug(f"LDAP Entry: {entry}")
+        username = entry.uid.value if ldap_manager.connection.entries else None
+        current_app.logger.debug(f"Extracted username: {username}")
         # Get group details
         gid = ldap_manager.connection.entries[0].gidNumber.values[0]
         group_filter = f'(&(gidNumber={gid}){app.config["LDAP_GROUP_OBJECT_FILTER"]})'
