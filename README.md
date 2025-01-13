@@ -70,7 +70,7 @@ Sébastien Campion - sebastien.campion@foss4.eu
 ## Name origin 
 
 
-The [burgonet](https://en.wikipedia.org/wiki/Burgonet) is helmet, it's a protection for the brain.
+The [burgonet](https://en.wikipedia.org/wiki/Burgonet) is an ancient helmet, it's a protection for the brain.
 Protect your knowledge 
 
 
