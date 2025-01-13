@@ -59,7 +59,10 @@ red:set_timeout(1000)
 
 local ok, err = red:connect("redis", 6379)
 if ok then
-    apikey, err = red:get("api:deepseek:v3:key")
+    local model_name = ngx.var.access_model_name or "deepseek"
+    local model_version = ngx.var.access_model_version or "v3"
+    local redis_key = string.format("api:%s:%s:key", model_name, model_version)
+    apikey, err = red:get(redis_key)
     if not apikey then
         ngx.log(ngx.ERR, "failed to get redis key: ", err)
     end
