@@ -17,10 +17,6 @@ def create_app():
     ldap_manager.init_app(app)
     login_manager.init_app(app)
     
-    # Configure LDAP search DNs
-    ldap_manager.full_user_search_dn = f'{app.config["LDAP_USER_DN"]},{app.config["LDAP_BASE_DN"]}'
-    ldap_manager.full_group_search_dn = f'{app.config["LDAP_GROUP_DN"]},{app.config["LDAP_BASE_DN"]}'
-    
     # Register blueprints
     from flask_app.app.auth.routes import auth_bp
     from flask_app.app.admin.routes import admin_bp
