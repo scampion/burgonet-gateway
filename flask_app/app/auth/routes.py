@@ -1,4 +1,5 @@
 from flask import Blueprint, redirect, url_for, flash, request
+from werkzeug.datastructures import MultiDict
 from flask_login import login_user, logout_user, current_user
 from .. import ldap_manager, login_manager
 
