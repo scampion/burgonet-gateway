@@ -49,7 +49,7 @@ def get_redis_connection():
 @login_required
 def redis_keys():
     print(current_user.gid)
-    if current_user.gid != 1001:  # Assuming 1001 is the admin group ID
+    if current_user.gid != 1000:  # Assuming 1001 is the admin group ID
         flash('Access denied')
         return redirect(url_for('main.index'))
     
