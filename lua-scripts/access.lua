@@ -60,7 +60,3 @@ if not authenticated then
     ngx.say('401 Access Denied')
     return ngx.exit(ngx.HTTP_UNAUTHORIZED)
 end
-
--- Explicitly return 200 for successful authentication
-ngx.status = ngx.HTTP_OK
-return ngx.exit(ngx.HTTP_OK)
