@@ -45,6 +45,47 @@ def nginx_config():
 def get_redis_connection():
     return redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB)
 
+@admin_bp.route('/admin/apikeys/add', methods=['POST'])
+@login_required
+def add_key():
+    if current_user.gid != ADMIN_GROUP:
+        flash('Access denied')
+        return redirect(url_for('main.index'))
+    
+    model = request.form.get('model')
+    version = request.form.get('version')
+    value = request.form.get('value')
+    
+    if not all([model, version, value]):
+        flash('All fields are required')
+        return redirect(url_for('admin.redis_keys'))
+    
+    r = get_redis_connection()
+    key = f"{REDIS_API_KEY_PREFIX}{model}:{version}"
+    
+    if r.exists(key):
+        flash('Key already exists')
+    else:
+        r.set(key, value)
+        flash('Key added successfully')
+    
+    return redirect(url_for('admin.redis_keys'))
+
+@admin_bp.route('/admin/apikeys/delete/<key>', methods=['POST'])
+@login_required
+def delete_key(key):
+    if current_user.gid != ADMIN_GROUP:
+        flash('Access denied')
+        return redirect(url_for('main.index'))
+    
+    r = get_redis_connection()
+    if r.delete(key):
+        flash('Key deleted successfully')
+    else:
+        flash('Key not found')
+    
+    return redirect(url_for('admin.redis_keys'))
+
 @admin_bp.route('/admin/apikeys', methods=['GET', 'POST'])
 @login_required
 def redis_keys():
