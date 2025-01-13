@@ -27,7 +27,7 @@
                          style="height: 40px;">
                 </a>
                 <div class="d-flex">
-                    <span class="navbar-text me-3">{{ current_user.__dict__  }} Welcome, {{ current_user.is_authenticated  }}</span>
+                    <span class="navbar-text me-3">Welcome, {{ current_user._id  }}</span>
                     <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-danger">Logout</a>
                 </div>
             </div>
@@ -42,7 +42,7 @@
                 {% endif %}
             {% endwith %}
             <h1>Welcome to Burgonet Gateway</h1>
-            <p class="lead">You are successfully logged in.</p>
+            
         </div>
     {% else %}
         <div class="container mt-5">
@@ -55,6 +55,13 @@
                                  class="img-fluid mb-2" 
                                  style="max-height: 100px;">
                         </div>
+                        {% with messages = get_flashed_messages() %}
+                            {% if messages %}
+                                {% for message in messages %}
+                                    <div class="alert alert-danger">{{ message }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
                         <div class="card-body">
                             <form method="POST" action="{{ url_for('auth.login') }}">
                                 <div class="mb-3">
