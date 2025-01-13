@@ -27,7 +27,7 @@
                         {% endwith %}
                         
                         {% if current_user.is_authenticated %}
-                            <p>Welcome, {{ current_user.dn }}!</p>
+                            <p>Welcome, {{ current_user.username }}!</p>
                             <div class="d-grid gap-2">
                                 <a href="{{ url_for('admin.nginx_config') }}" class="btn btn-primary">Nginx Configuration</a>
                                 <a href="{{ url_for('tokens.generate_token') }}" class="btn btn-secondary">Generate API Token</a>

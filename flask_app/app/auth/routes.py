@@ -3,13 +3,14 @@ from werkzeug.datastructures import MultiDict
 from flask_login import login_user, logout_user, current_user
 from .. import ldap_manager, login_manager
 from flask import current_app as app
+from ..models import User
 
 auth_bp = Blueprint('auth', __name__)
 
 @login_manager.user_loader
 def load_user(id):
-    # Simple user loader using LDAP
-    return {'id': id, 'dn': id}
+    # Return a basic user instance with just the ID/DN
+    return User(id=id, dn=id, username=None, gid=None, group=None)
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
@@ -58,13 +59,13 @@ def login():
         groupname = ldap_manager.connection.entries[0].cn.values[0] if ldap_manager.connection.entries else None
 
         # Create user object
-        user = {
-            'id': auth_result.user_dn,
-            'dn': auth_result.user_dn,
-            'username': username,
-            'gid': gid,
-            'group': groupname,
-        }
+        user = User(
+            id=auth_result.user_dn,
+            dn=auth_result.user_dn,
+            username=username,
+            gid=gid,
+            group=groupname
+        )
         login_user(user)
         return redirect(url_for('main.index'))
 
