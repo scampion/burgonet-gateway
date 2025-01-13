@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from flask_login import login_required, current_user
-from .. import TOKENS_FILE
+from ..config import TOKENS_FILE
 import secrets
 from datetime import datetime, timedelta
 import json
