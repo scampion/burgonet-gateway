@@ -67,6 +67,8 @@ def login():
             group=groupname
         )
         login_user(user)
+        flash(f'Logged in as {username}')
+        print(f'Logged in as {username}')
         return redirect(url_for('main.index'))
 
     except Exception as e:
