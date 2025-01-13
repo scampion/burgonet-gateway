@@ -31,4 +31,8 @@ def create_app():
     # Ensure data directory exists
     os.makedirs(app.config['DATA_DIR'], exist_ok=True)
     
+    # Initialize filters
+    from .filters import init_app as init_filters
+    init_filters(app)
+    
     return app

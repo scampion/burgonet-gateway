@@ -16,9 +16,6 @@ def index():
 @login_required
 def dashboard():
     # Load tokens for the current user from Redis
-    user_tokens = {
-        token: {'expires_at': expires_at}
-        for token, expires_at in get_user_tokens(current_user.get_id()).items()
-    }
+    user_tokens = get_user_tokens(current_user.get_id())
     
     return render_template('index.html', tokens=user_tokens)

@@ -22,8 +22,8 @@
                 {% for token, details in tokens.items() %}
                 <tr>
                     <td class="text-truncate" style="max-width: 200px;">{{ token }}</td>
-                    <td>{{ details.created_at }}</td>
-                    <td>{{ details.expires_at }}</td>
+                    <td>{{ details.created_at|datetimeformat }}</td>
+                    <td>{{ details.expires_at|datetimeformat }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
