@@ -10,7 +10,7 @@ function check_token(token)
         and 'nginx_tokens:bearer' or ngx.var.access_token_set
     ---
 
-    local redis = require "nginx.redis"
+    local redis = require "resty.redis"
     local red = redis:new()
 
     red:set_timeout(1000)
