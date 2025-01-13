@@ -8,11 +8,12 @@ SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-key-123'
 LDAP_HOST = 'ldap://localhost'
 LDAP_BASE_DN = 'dc=mycompany,dc=com'
 LDAP_USER_DN = 'ou=people,dc=mycompany,dc=com'
-LDAP_GROUP_DN = 'ou=group,dc=mycompany,dc=com'
+LDAP_GROUP_DN = 'ou=groups,dc=mycompany,dc=com'
 LDAP_USER_OBJECT_FILTER = '(|(objectClass=inetOrgPerson)(objectClass=posixAccount))'
 LDAP_GROUP_OBJECT_FILTER = '(objectClass=posixGroup)'
-LDAP_ADMIN_DN = 'cn=admin,dc=mycompany,dc=com'
-LDAP_ADMIN_PASSWORD = 'adminpassword'
+LDAP_BIND_USER_DN = 'cn=admin,dc=mycompany,dc=com'
+LDAP_BIND_USER_PASSWORD = 'adminpassword'
+
 
 # Data storage
 DATA_DIR = os.path.join(BASE_DIR, 'data')
