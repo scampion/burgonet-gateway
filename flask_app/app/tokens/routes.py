@@ -52,7 +52,7 @@ def generate_token():
         return jsonify({'error': 'Label is required'}), 400
     
     # Generate secure token
-    token = secrets.token_urlsafe(64)
+    token = "bgk_" + secrets.token_urlsafe(32)
     
     # Store token in Redis
     add_user_token(user_id, token, label)
