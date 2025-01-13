@@ -25,8 +25,15 @@ function check_token(token)
     local exists, err = red:sismember(access_token_set, token)
     if not exists then
         ngx.log(ngx.ERR, "failed to check token: ", err)
+        red:set_keepalive(10000, 100)  -- Return connection to pool
         ngx.exit(ngx.HTTP_INTERNAL_SERVER_ERROR)
         return false
+    end
+
+    -- Return connection to pool
+    local ok, err = red:set_keepalive(10000, 100)
+    if not ok then
+        ngx.log(ngx.ERR, "failed to set keepalive: ", err)
     end
 
     return exists == 1
