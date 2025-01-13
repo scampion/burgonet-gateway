@@ -15,9 +15,8 @@ if ngx.arg[2] then
                 bearer_token,
                 ngx.escape_uri(ngx.ctx.buffered)
             )
-        )
-        
-        -- Write to responses.log
+            
+            -- Write to responses.log
         local log_path = "/var/log/nginx/responses.log"
         local file = io.open(log_path, "a")
         if file then
