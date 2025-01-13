@@ -1,0 +1,17 @@
+dn: cn=it,ou=groups,dc=mycompany,dc=com
+objectClass: posixGroup
+cn: it
+gidNumber: 1000
+memberUid: alice
+
+dn: cn=financial,ou=groups,dc=mycompany,dc=com
+objectClass: posixGroup
+cn: financial
+gidNumber: 1001
+memberUid: bob
+
+dn: cn=human_resource,ou=groups,dc=mycompany,dc=com
+objectClass: posixGroup
+cn: human_resource
+gidNumber: 1002
+memberUid: charlie

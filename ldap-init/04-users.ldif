@@ -9,6 +9,7 @@ uidNumber: 1000
 gidNumber: 1000
 homeDirectory: /home/alice
 userPassword: alice2025!
+loginShell: /bin/bash
 
 dn: uid=bob,ou=people,dc=mycompany,dc=com
 objectClass: inetOrgPerson
@@ -21,6 +22,7 @@ uidNumber: 1001
 gidNumber: 1001
 homeDirectory: /home/bob
 userPassword: bob2025!
+loginShell: /bin/bash
 
 dn: uid=charlie,ou=people,dc=mycompany,dc=com
 objectClass: inetOrgPerson
@@ -33,3 +35,4 @@ uidNumber: 1002
 gidNumber: 1002
 homeDirectory: /home/charlie
 userPassword: charlie2025!
+loginShell: /bin/bash
