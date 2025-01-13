@@ -15,21 +15,21 @@ def load_user(id):
 def login():
     username = request.form.get('username')
     password = request.form.get('password')
-    
+
     try:
         # First authenticate the user
         auth_result = ldap_manager.authenticate(username, password)
         if not auth_result.status:
             flash('Invalid credentials')
             return redirect(url_for('main.index'))
-            
+
         # Bind as admin for searches
         ldap_manager.connection.unbind()
         ldap_manager.connection.bind(
             app.config['LDAP_ADMIN_DN'],
             app.config['LDAP_ADMIN_PASSWORD']
         )
-        
+
         # Get user details
         user_filter = f'(&(uid={username}){app.config["LDAP_USER_OBJECT_FILTER"]})'
         user_result = ldap_manager.connection.search(
@@ -37,14 +37,11 @@ def login():
             user_filter,
             attributes=['cn', 'uid', 'gidNumber']
         )
-        print("Result : ", user_result)
-    except Exception as e:
-        print("Error : ", e)
 
         if not user_result.status or not user_result.entries:
             flash('User details not found')
             return redirect(url_for('main.index'))
-            
+
         # Get group details
         gid = user_result.entries[0].gidNumber.values[0]
         group_filter = f'(&(gidNumber={gid}){app.config["LDAP_GROUP_OBJECT_FILTER"]})'
@@ -53,7 +50,7 @@ def login():
             group_filter,
             attributes=['cn', 'gidNumber']
         )
-        
+
         # Create user object
         user = {
             'id': auth_result.user_dn,
@@ -62,11 +59,14 @@ def login():
             'gid': gid,
             'group': group_result.entries[0].cn.values[0] if group_result.status and group_result.entries else None
         }
-        
+
         login_user(user)
         return redirect(url_for('main.index'))
-        
+
     except Exception as e:
+        #print traceback
+        import traceback
+        traceback.print_exc()
         flash(f'Login failed: {str(e)}')
         return redirect(url_for('main.index'))
 
