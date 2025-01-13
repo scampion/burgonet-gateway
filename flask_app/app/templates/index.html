@@ -15,7 +15,7 @@
                 <tr>
                     <th>Token</th>
                     <th>Created At</th>
-                    <th>Expires At</th>
+                    <th>Label</th>
                 </tr>
             </thead>
             <tbody id="token-list">
@@ -23,7 +23,7 @@
                 <tr>
                     <td class="text-truncate" style="max-width: 200px;">{{ token }}</td>
                     <td>{{ details.created_at|datetimeformat }}</td>
-                    <td>{{ details.expires_at|datetimeformat }}</td>
+                    <td>{{ details.label }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -34,11 +34,15 @@
 <script>
 async function generateToken() {
     try {
+        const label = prompt('Enter a label for this token:');
+        if (!label) return;
+        
         const response = await fetch('/tokens', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
-            }
+            },
+            body: JSON.stringify({ label })
         });
         
         if (response.ok) {
@@ -49,7 +53,7 @@ async function generateToken() {
             newRow.innerHTML = `
                 <td class="text-truncate" style="max-width: 200px;">${data.token}</td>
                 <td>${new Date().toLocaleString()}</td>
-                <td>${new Date(data.expires_at).toLocaleString()}</td>
+                <td>${data.label}</td>
             `;
             tokenList.prepend(newRow);
         } else {

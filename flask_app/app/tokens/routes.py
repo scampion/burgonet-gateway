@@ -24,15 +24,15 @@ def get_user_tokens(user_id):
             token = key.split(':', 1)[1]
             tokens[token] = {
                 'created_at': token_data.get(f'meta:{token}:created_at'),
-                'expires_at': value
+                'label': value
             }
     return tokens
 
-def add_user_token(user_id, token, expires_at):
+def add_user_token(user_id, token, label):
     """Add a new token for a user with metadata"""
     created_at = datetime.utcnow().isoformat()
     with redis_client.pipeline() as pipe:
-        pipe.hset(f'user:{user_id}:tokens', f'token:{token}', expires_at)
+        pipe.hset(f'user:{user_id}:tokens', f'token:{token}', label)
         pipe.hset(f'user:{user_id}:tokens', f'meta:{token}:created_at', created_at)
         pipe.execute()
 
@@ -43,14 +43,18 @@ def generate_token():
     if not user_id:
         return jsonify({'error': 'User not found'}), 404
     
+    # Get label from request
+    label = request.json.get('label')
+    if not label:
+        return jsonify({'error': 'Label is required'}), 400
+    
     # Generate secure token
     token = secrets.token_urlsafe(64)
-    expires_at = (datetime.utcnow() + timedelta(days=30)).isoformat()
     
     # Store token in Redis
-    add_user_token(user_id, token, expires_at)
+    add_user_token(user_id, token, label)
     
     return jsonify({
         'token': token,
-        'expires_at': expires_at
+        'label': label
     }), 201
