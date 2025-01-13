@@ -18,3 +18,10 @@ objectClass: posixGroup
 cn: human_resource
 gidNumber: 1002
 memberUid: charlie
+
+dn: cn=admin,ou=groups,dc=mycompany,dc=com
+changetype: add
+objectClass: posixGroup
+cn: admin
+gidNumber: 9999
+memberUid: admin

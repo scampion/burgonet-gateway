@@ -11,6 +11,8 @@ LDAP_USER_DN = 'ou=people,dc=mycompany,dc=com'
 LDAP_GROUP_DN = 'ou=group,dc=mycompany,dc=com'
 LDAP_USER_OBJECT_FILTER = '(|(objectClass=inetOrgPerson)(objectClass=posixAccount))'
 LDAP_GROUP_OBJECT_FILTER = '(objectClass=posixGroup)'
+LDAP_ADMIN_DN = 'cn=admin,dc=mycompany,dc=com'
+LDAP_ADMIN_PASSWORD = 'adminpassword'
 
 # Data storage
 DATA_DIR = os.path.join(BASE_DIR, 'data')

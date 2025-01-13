@@ -23,15 +23,20 @@ def login():
             flash('Invalid credentials')
             return redirect(url_for('main.index'))
             
+        # Bind as admin for searches
+        ldap_manager.connection.unbind()
+        ldap_manager.connection.bind(
+            app.config['LDAP_ADMIN_DN'],
+            app.config['LDAP_ADMIN_PASSWORD']
+        )
+        
         # Get user details
         user_filter = f'(&(uid={username}){app.config["LDAP_USER_OBJECT_FILTER"]})'
-        print(app.config["LDAP_USER_DN"], user_filter)
-        try:
-            user_result = ldap_manager.connection.search(
-                app.config["LDAP_USER_DN"],
-                user_filter,
-                attributes=['cn', 'uid', 'gidNumber']
-                )
+        user_result = ldap_manager.connection.search(
+            app.config["LDAP_USER_DN"],
+            user_filter,
+            attributes=['cn', 'uid', 'gidNumber']
+        )
             print("Result : ", user_result)
         except Exception as e:
             print("Error : ", e)

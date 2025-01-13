@@ -12,6 +12,20 @@ homeDirectory: /home/alice
 userPassword: alice2025!
 loginShell: /bin/bash
 
+dn: uid=admin,ou=people,dc=mycompany,dc=com
+changetype: add
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: top
+cn: Admin
+sn: Admin
+uid: admin
+uidNumber: 9999
+gidNumber: 9999
+homeDirectory: /home/admin
+userPassword: adminpassword
+loginShell: /bin/bash
+
 dn: uid=bob,ou=people,dc=mycompany,dc=com
 changetype: add
 objectClass: inetOrgPerson
