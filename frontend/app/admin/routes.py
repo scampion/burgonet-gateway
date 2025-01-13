@@ -80,4 +80,4 @@ def redis_keys():
             'value': value
         })
     
-    return render_template('admin/redis_keys.html', keys=keys)
+    return render_template('admin/apikeys.html', keys=keys)
