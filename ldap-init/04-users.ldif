@@ -1,4 +1,5 @@
 dn: uid=alice,ou=people,dc=mycompany,dc=com
+changetype: add
 objectClass: inetOrgPerson
 objectClass: posixAccount
 objectClass: top
@@ -12,6 +13,7 @@ userPassword: alice2025!
 loginShell: /bin/bash
 
 dn: uid=bob,ou=people,dc=mycompany,dc=com
+changetype: add
 objectClass: inetOrgPerson
 objectClass: posixAccount
 objectClass: top
@@ -25,6 +27,7 @@ userPassword: bob2025!
 loginShell: /bin/bash
 
 dn: uid=charlie,ou=people,dc=mycompany,dc=com
+changetype: add
 objectClass: inetOrgPerson
 objectClass: posixAccount
 objectClass: top

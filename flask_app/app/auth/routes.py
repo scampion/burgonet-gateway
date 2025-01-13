@@ -2,6 +2,7 @@ from flask import Blueprint, redirect, url_for, flash, request
 from werkzeug.datastructures import MultiDict
 from flask_login import login_user, logout_user, current_user
 from .. import ldap_manager, login_manager
+from flask import current_app as app
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -24,12 +25,17 @@ def login():
             
         # Get user details
         user_filter = f'(&(uid={username}){app.config["LDAP_USER_OBJECT_FILTER"]})'
-        user_result = ldap_manager.connection.search(
-            app.config["LDAP_USER_DN"],
-            user_filter,
-            attributes=['cn', 'uid', 'gidNumber']
-        )
-        
+        print(app.config["LDAP_USER_DN"], user_filter)
+        try:
+            user_result = ldap_manager.connection.search(
+                app.config["LDAP_USER_DN"],
+                user_filter,
+                attributes=['cn', 'uid', 'gidNumber']
+                )
+            print("Result : ", user_result)
+        except Exception as e:
+            print("Error : ", e)
+
         if not user_result.status or not user_result.entries:
             flash('User details not found')
             return redirect(url_for('main.index'))
