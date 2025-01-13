@@ -26,8 +26,8 @@ def login():
         # Bind as admin for searches
         ldap_manager.connection.unbind()
         ldap_manager.connection.bind(
-            app.config['LDAP_ADMIN_DN'],
-            app.config['LDAP_ADMIN_PASSWORD'],
+            dn=app.config['LDAP_ADMIN_DN'],
+            password=app.config['LDAP_ADMIN_PASSWORD'],
             controls=[]
         )
 
