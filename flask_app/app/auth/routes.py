@@ -37,9 +37,9 @@ def login():
             user_filter,
             attributes=['cn', 'uid', 'gidNumber']
         )
-            print("Result : ", user_result)
-        except Exception as e:
-            print("Error : ", e)
+        print("Result : ", user_result)
+    except Exception as e:
+        print("Error : ", e)
 
         if not user_result.status or not user_result.entries:
             flash('User details not found')
