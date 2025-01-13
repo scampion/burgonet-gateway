@@ -25,11 +25,7 @@ def login():
 
         # Bind as admin for searches
         ldap_manager.connection.unbind()
-        ldap_manager.connection.bind(
-            dn=app.config['LDAP_ADMIN_DN'],
-            password=app.config['LDAP_ADMIN_PASSWORD'],
-            controls=[]
-        )
+        ldap_manager.connection.bind()
 
         # Get user details
         user_filter = f'(&(uid={username}){app.config["LDAP_USER_OBJECT_FILTER"]})'
