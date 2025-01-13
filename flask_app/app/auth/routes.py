@@ -25,14 +25,19 @@ def login():
 
         # Bind as admin for searches
         ldap_manager.connection.unbind()
-        ldap_manager.connection.bind()
+        ldap_manager.connection.bind(
+            dn=app.config['LDAP_ADMIN_DN'],
+            password=app.config['LDAP_ADMIN_PASSWORD'],
+            controls=[]
+        )
 
         # Get user details
         user_filter = f'(&(uid={username}){app.config["LDAP_USER_OBJECT_FILTER"]})'
         user_result = ldap_manager.connection.search(
-            app.config["LDAP_USER_DN"],
-            user_filter,
-            attributes=['cn', 'uid', 'gidNumber']
+            search_base=app.config["LDAP_USER_DN"],
+            search_filter=user_filter,
+            attributes=['cn', 'uid', 'gidNumber'],
+            controls=[]
         )
 
         if not user_result.status or not user_result.entries:
@@ -43,9 +48,10 @@ def login():
         gid = user_result.entries[0].gidNumber.values[0]
         group_filter = f'(&(gidNumber={gid}){app.config["LDAP_GROUP_OBJECT_FILTER"]})'
         group_result = ldap_manager.connection.search(
-            app.config["LDAP_GROUP_DN"],
-            group_filter,
-            attributes=['cn', 'gidNumber']
+            search_base=app.config["LDAP_GROUP_DN"],
+            search_filter=group_filter,
+            attributes=['cn', 'gidNumber'],
+            controls=[]
         )
 
         # Create user object
