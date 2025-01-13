@@ -4,14 +4,14 @@ import crossplane
 import os
 import redis
 from datetime import datetime
-from ..config import CROSSPLANE_CONFIG_DIR, CROSSPLANE_BACKUP_DIR, REDIS_HOST, REDIS_PORT, REDIS_DB, REDIS_API_KEY_PREFIX
+from ..config import CROSSPLANE_CONFIG_DIR, CROSSPLANE_BACKUP_DIR, REDIS_HOST, REDIS_PORT, REDIS_DB, REDIS_API_KEY_PREFIX, ADMIN_GROUP
 
 admin_bp = Blueprint('admin', __name__)
 
 @admin_bp.route('/nginx-config', methods=['GET', 'POST'])
 @login_required
 def nginx_config():
-    if current_user.gid != 1001:  # Assuming 1001 is the admin group ID
+    if current_user.gid != ADMIN_GROUP:
         flash('Access denied')
         return redirect(url_for('main.index'))
     
@@ -49,7 +49,7 @@ def get_redis_connection():
 @login_required
 def redis_keys():
     print(current_user.gid)
-    if current_user.gid != 1000:  # Assuming 1001 is the admin group ID
+    if current_user.gid != ADMIN_GROUP:
         flash('Access denied')
         return redirect(url_for('main.index'))
     

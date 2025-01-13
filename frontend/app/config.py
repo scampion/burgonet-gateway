@@ -25,3 +25,6 @@ REDIS_API_KEY_PREFIX = 'api:'
 # Crossplane
 CROSSPLANE_CONFIG_DIR = '/etc/nginx/conf.d'
 CROSSPLANE_BACKUP_DIR = '/var/backups/nginx'
+
+# Admin group ID
+ADMIN_GROUP = 1000
