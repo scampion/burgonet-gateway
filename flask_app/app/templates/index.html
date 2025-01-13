@@ -50,15 +50,8 @@ async function generateToken() {
         
         if (response.ok) {
             const data = await response.json();
-            // Add new token to the table
-            const tokenList = document.getElementById('token-list');
-            const newRow = document.createElement('tr');
-            newRow.innerHTML = `
-                <td class="text-truncate" style="max-width: 200px;">${data.token}</td>
-                <td>${new Date().toLocaleString()}</td>
-                <td>${data.label}</td>
-            `;
-            tokenList.prepend(newRow);
+            // Reload the page to show the new token with delete button
+            window.location.reload();
         } else {
             alert('Failed to generate token');
         }
