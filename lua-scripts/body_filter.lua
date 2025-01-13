@@ -9,11 +9,20 @@ if ngx.arg[2] then
         -- Extract Bearer token
         local bearer_token = string.match(auth_header, "Bearer%s+(.+)")
         if bearer_token then
+            -- Check if response is JSON
+            local content_type = ngx.header["Content-Type"]
+            local response_body = ngx.ctx.buffered
+            
+            -- Only escape if not JSON
+            if not content_type or not string.find(content_type:lower(), "application/json") then
+                response_body = ngx.escape_uri(response_body)
+            end
+
             -- Create JSON log entry
             local log_entry = string.format(
                 '{"authorization":"%s","response":"%s"}\n',
                 bearer_token,
-                ngx.escape_uri(ngx.ctx.buffered)
+                response_body
             )
             
             -- Write to responses.log
