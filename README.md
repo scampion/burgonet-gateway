@@ -8,6 +8,20 @@
 
 Burgonet Gateway is an enterprise LLM gateway that provides secure access and compliance controls for AI systems.​​​​​​​​​​​​​​​​
 
+The goal is to provide for employees, unit and project access to
+cloud based LLL providers or self-hosted models via that single entrypoint.
+
+Users can request new tokens 
+
+Admin can :
+- configure providers (OpenAI, Claude, DeepSeek, Ollama, ...)
+in one place, quotas by tokens or balance per user, group or project.
+- monitor usage
+- audit logs input/outputs
+- create access list by rules 
+
+
+
 It provides:
 
 - Token-based API authentication
