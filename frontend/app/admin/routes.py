@@ -48,6 +48,7 @@ def get_redis_connection():
 @admin_bp.route('/redis-keys', methods=['GET', 'POST'])
 @login_required
 def redis_keys():
+    print(current_user.gid)
     if current_user.gid != 1001:  # Assuming 1001 is the admin group ID
         flash('Access denied')
         return redirect(url_for('main.index'))
