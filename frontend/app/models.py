@@ -16,7 +16,7 @@ class User(UserMixin):
             port=current_app.config['REDIS_PORT'],
             db=current_app.config['REDIS_DB']
         )
-        user_key = f"user:{self._id}"
+        user_key = f"sessions:{self._id}"
         # Convert None values to empty strings for Redis storage
         r.hset(user_key, mapping={
             'id': self._id,
@@ -60,7 +60,7 @@ class User(UserMixin):
             port=current_app.config['REDIS_PORT'],
             db=current_app.config['REDIS_DB']
         )
-        user_key = f"user:{data['id']}"
+        user_key = f"sessions:{data['id']}"
         user_data = r.hgetall(user_key)
         
         if user_data:
