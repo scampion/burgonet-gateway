@@ -1,6 +1,8 @@
 # Burgonet Gateway
 
-![Burgonet Logo](frontend/app/static/images/logo.png?raw=true)
+<p align="center">
+  <img src="flask_app/app/static/images/logo.png?raw=true" style="width: 200px; height: auto;" />
+</p>
 
 ## About
 
