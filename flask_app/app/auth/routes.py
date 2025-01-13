@@ -33,21 +33,21 @@ def login():
         # Get user details
         user_filter = f'(&(uid={username}){app.config["LDAP_USER_OBJECT_FILTER"]})'
 
-        user_result = ldap_manager.connection.search(
+        ldap_manager.connection.search(
             search_base=app.config["LDAP_USER_DN"],
             search_filter=user_filter,
             attributes=['cn', 'uid', 'gidNumber'],
             controls=[]
         )
-
-        if not user_result.status or not user_result.entries:
+        
+        if not ldap_manager.connection.entries:
             flash('User details not found')
             return redirect(url_for('main.index'))
 
         # Get group details
         gid = user_result.entries[0].gidNumber.values[0]
         group_filter = f'(&(gidNumber={gid}){app.config["LDAP_GROUP_OBJECT_FILTER"]})'
-        group_result = ldap_manager.connection.search(
+        ldap_manager.connection.search(
             search_base=app.config["LDAP_GROUP_DN"],
             search_filter=group_filter,
             attributes=['cn', 'gidNumber'],
@@ -58,9 +58,9 @@ def login():
         user = {
             'id': auth_result.user_dn,
             'dn': auth_result.user_dn,
-            'username': user_result.entries[0].uid.values[0],
+            'username': ldap_manager.connection.entries[0].uid.values[0],
             'gid': gid,
-            'group': group_result.entries[0].cn.values[0] if group_result.status and group_result.entries else None
+            'group': ldap_manager.connection.entries[0].cn.values[0] if ldap_manager.connection.entries else None
         }
 
         login_user(user)
