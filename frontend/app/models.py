@@ -16,15 +16,25 @@ class User(UserMixin):
             port=current_app.config['REDIS_PORT'],
             db=current_app.config['REDIS_DB']
         )
+
         user_key = f"sessions:{self._id}"
-        # Convert None values to empty strings for Redis storage
-        r.hset(user_key, mapping={
-            'id': self._id,
-            'dn': self.dn,
-            'username': self.username or '',
-            'gid': self.gid or 0,
-            'group': self.group or ''
-        })
+        # Check if the session key already exists
+        if r.exists(user_key):
+            user_data = r.hgetall(user_key)
+            self._id = user_data.get(b'id', self._id).decode('utf-8')
+            self.dn = user_data.get(b'dn', self.dn).decode('utf-8')
+            self.username = user_data.get(b'username', self.username).decode('utf-8') or None
+            self.gid = int(user_data.get(b'gid', self.gid).decode('utf-8')) if user_data.get(b'gid') else None
+            self.group = user_data.get(b'group', self.group).decode('utf-8') or None
+        else:
+            # Convert None values to empty strings for Redis storage
+            r.hset(user_key, mapping={
+                'id': self._id,
+                'dn': self.dn,
+                'username': self.username,
+                'gid': self.gid,
+                'group': self.group
+            })
         r.expire(user_key, 3600)  # Expire after 1 hour
 
     @property
@@ -76,3 +86,12 @@ class User(UserMixin):
             self.username = data['username']
             self.gid = data['gid']
             self.group = data['group']
+
+    def delete_session(self):
+        r = redis.Redis(
+            host=current_app.config['REDIS_HOST'],
+            port=current_app.config['REDIS_PORT'],
+            db=current_app.config['REDIS_DB']
+        )
+        user_key = f"sessions:{self._id}"
+        r.delete(user_key)

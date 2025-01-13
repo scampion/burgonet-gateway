@@ -69,7 +69,11 @@ def delete_token(token):
     user_id = current_user.get_id()
     if not user_id:
         return jsonify({'error': 'User not found'}), 404
-    
+
+    token_exists = redis_client.hexists(f'user:{user_id}:tokens', f'token:{token}')
+    if not token_exists:
+        return jsonify({'error': 'Token not found'}), 404
+
     with redis_client.pipeline() as pipe:
         # Remove from user's tokens
         pipe.hdel(f'user:{user_id}:tokens', f'token:{token}')

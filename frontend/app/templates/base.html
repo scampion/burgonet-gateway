@@ -38,7 +38,7 @@
                          style="height: 40px;">
                 </a>
                 <div class="d-flex">
-                    <span class="navbar-text me-3">Welcome, {{ current_user._id }}</span>
+                    <span class="navbar-text me-3">Welcome, {{ current_user.username }}</span>
                     <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-danger">Logout</a>
                 </div>
             </div>

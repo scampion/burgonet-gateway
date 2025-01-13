@@ -14,6 +14,7 @@
             <thead>
                 <tr data-token="{{ token }}">
                     <th>Token</th>
+                    <th></th>
                     <th>Created At</th>
                     <th>Label</th>
                 </tr>
@@ -23,12 +24,14 @@
                 <tr>
                     <td>
                         <div class="token-display">
-                            <span class="token-value">{{ token[:8] }}...</span>
-                            <button class="btn btn-sm btn-outline-secondary" 
-                                    onclick="copyToClipboard('{{ token }}')">
-                                Copy
-                            </button>
+                            <span class="token-value">{{ token[:12] }}...</span>
                         </div>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-secondary"
+                        onclick="copyToClipboard('{{ token }}')">
+                        Copy
+                        </button>
                     </td>
                     <td>{{ details.created_at|datetimeformat }}</td>
                     <td>{{ details.label }}</td>
