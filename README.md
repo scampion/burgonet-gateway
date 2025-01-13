@@ -1,6 +1,6 @@
 # Burgonet Gateway
 
-![Burgonet Logo](flask_app/app/static/images/logo.png)
+![Burgonet Logo](flask_app/app/static/images/logo.png?raw=true)
 
 ## About
 
