@@ -18,10 +18,10 @@ def create_app():
     login_manager.init_app(app)
 
     # Register blueprints
-    from flask_app.app.auth.routes import auth_bp
-    from flask_app.app.admin.routes import admin_bp
-    from flask_app.app.tokens.routes import tokens_bp
-    from flask_app.app.main.routes import main_bp
+    from frontend.app.auth.routes import auth_bp
+    from frontend.app.admin.routes import admin_bp
+    from frontend.app.tokens.routes import tokens_bp
+    from frontend.app.main.routes import main_bp
     
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp)

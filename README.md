@@ -1,6 +1,6 @@
 # Burgonet Gateway
 
-![Burgonet Logo](flask_app/app/static/images/logo.png?raw=true)
+![Burgonet Logo](frontend/app/static/images/logo.png?raw=true)
 
 ## About
 
@@ -31,7 +31,7 @@ Burgonet Gateway is a secure API gateway management system built with Flask, Red
    pip install -r requirements.txt
    ```
 
-3. Configure the application by editing `flask_app/app/config.py`
+3. Configure the application by editing `frontend/app/config.py`
 
 4. Run the application:
    ```bash
