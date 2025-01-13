@@ -21,7 +21,15 @@
             <tbody id="token-list">
                 {% for token, details in tokens.items() %}
                 <tr>
-                    <td class="text-truncate" style="max-width: 200px;">{{ token }}</td>
+                    <td>
+                        <div class="token-display">
+                            <span class="token-value">{{ token[:8] }}...</span>
+                            <button class="btn btn-sm btn-outline-secondary" 
+                                    onclick="copyToClipboard('{{ token }}')">
+                                Copy
+                            </button>
+                        </div>
+                    </td>
                     <td>{{ details.created_at|datetimeformat }}</td>
                     <td>{{ details.label }}</td>
                     <td>
