@@ -20,7 +20,7 @@ def login():
         if result.status:
             user = {'id': result.user_dn, 'dn': result.user_dn}
             login_user(user)
-            return redirect(url_for('admin.index'))
+            return redirect(url_for('main.index'))
     except Exception as e:
         flash('Login failed')
     

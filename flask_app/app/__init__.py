@@ -21,7 +21,9 @@ def create_app():
     from flask_app.app.auth.routes import auth_bp
     from flask_app.app.admin.routes import admin_bp
     from flask_app.app.tokens.routes import tokens_bp
+    from flask_app.app.main.routes import main_bp
     
+    app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(tokens_bp)
