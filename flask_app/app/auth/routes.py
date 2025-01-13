@@ -23,9 +23,9 @@ def login():
             return redirect(url_for('main.index'))
             
         # Get user details
-        user_filter = f'(uid={username})'
+        user_filter = f'(&(uid={username}){app.config["LDAP_USER_OBJECT_FILTER"]})'
         user_result = ldap_manager.connection.search(
-            ldap_manager.full_user_search_dn,
+            app.config["LDAP_USER_DN"],
             user_filter,
             attributes=['cn', 'uid', 'gidNumber']
         )
@@ -36,9 +36,9 @@ def login():
             
         # Get group details
         gid = user_result.entries[0].gidNumber.values[0]
-        group_filter = f'(gidNumber={gid})'
+        group_filter = f'(&(gidNumber={gid}){app.config["LDAP_GROUP_OBJECT_FILTER"]})'
         group_result = ldap_manager.connection.search(
-            ldap_manager.full_group_search_dn,
+            app.config["LDAP_GROUP_DN"],
             group_filter,
             attributes=['cn', 'gidNumber']
         )

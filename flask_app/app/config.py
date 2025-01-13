@@ -7,8 +7,8 @@ BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-key-123'
 LDAP_HOST = 'ldap://localhost'
 LDAP_BASE_DN = 'dc=mycompany,dc=com'
-LDAP_USER_DN = 'ou=people'
-LDAP_GROUP_DN = 'ou=groups'
+LDAP_USER_DN = 'ou=People,dc=mycompany,dc=com'
+LDAP_GROUP_DN = 'ou=Group,dc=mycompany,dc=com'
 LDAP_USER_OBJECT_FILTER = '(|(objectClass=inetOrgPerson)(objectClass=posixAccount))'
 LDAP_GROUP_OBJECT_FILTER = '(objectClass=posixGroup)'
 
