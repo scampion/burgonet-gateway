@@ -9,7 +9,7 @@ LDAP_HOST = 'ldap://localhost'
 LDAP_BASE_DN = 'dc=mycompany,dc=com'
 LDAP_USER_DN = 'ou=people'
 LDAP_GROUP_DN = 'ou=groups'
-LDAP_USER_OBJECT_FILTER = '(objectClass=person)'
+LDAP_USER_OBJECT_FILTER = '(objectClass=inetOrgPerson)'
 
 # Data storage
 DATA_DIR = os.path.join(BASE_DIR, 'data')

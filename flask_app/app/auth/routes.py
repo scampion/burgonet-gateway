@@ -17,6 +17,7 @@ def login():
     
     try:
         result = ldap_manager.authenticate(username, password)
+        print(result.__dict__)
         if result.status:
             user = {'id': result.user_dn, 'dn': result.user_dn}
             login_user(user)
