@@ -15,12 +15,12 @@ if ngx.arg[2] then
             
             -- Only escape if not JSON
             if not content_type or not string.find(content_type:lower(), "application/json") then
-                response_body = ngx.escape_uri(response_body)
+                response_body = '"' .. ngx.escape_uri(response_body) .. '"'
             end
 
             -- Create JSON log entry
             local log_entry = string.format(
-                '{"authorization":"%s","response":"%s"}\n',
+                '{"authorization":"%s","response": %s}\n',
                 bearer_token,
                 response_body
             )
