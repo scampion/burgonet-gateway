@@ -81,11 +81,8 @@ async function deleteToken(token) {
         });
         
         if (response.ok) {
-            // Remove the row from the table
-            const row = document.querySelector(`tr[data-token="${token}"]`);
-            if (row) {
-                row.remove();
-            }
+            // Reload the page to refresh the token list
+            window.location.reload();
         } else {
             alert('Failed to delete token');
         }
