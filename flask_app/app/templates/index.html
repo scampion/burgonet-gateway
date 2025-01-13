@@ -27,7 +27,7 @@
                          style="height: 40px;">
                 </a>
                 <div class="d-flex">
-                    <span class="navbar-text me-3">Welcome, {{ current_user.username }}</span>
+                    <span class="navbar-text me-3">{{ current_user.__dict__  }} Welcome, {{ current_user.is_authenticated  }}</span>
                     <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-danger">Logout</a>
                 </div>
             </div>
