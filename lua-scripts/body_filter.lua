@@ -19,12 +19,15 @@ if ngx.arg[2] then
             end
 
             -- Get current timestamp
-            local timestamp = ngx.localtime()
-            
+            local datetime = ngx.localtime()
+            local timestamp = ngx.now()
+
+
             -- Create JSON log entry
             local log_entry = string.format(
-                '{"timestamp":"%s","authorization":"%s","response": %s}\n',
+                '{"timestamp":"%s", "datetime":"%s" ,"authorization":"%s","response": %s}\n',
                 timestamp,
+                datetime,
                 bearer_token,
                 response_body
             )

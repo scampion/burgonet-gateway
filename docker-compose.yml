@@ -5,17 +5,12 @@ services:
     image: openresty/openresty:1.21.4.1-0-alpine
     #image: nginx:latest
     container_name: nginx
-    env_file:
-      - .env.dev
-    environment:
-      - BURGONET_API_KEY_DEEPSEEK_V3=1234567890
-      - DEEPSEEK_API_KEY=123456789
     ports:
       - "8080:80"
     volumes:
       - ./nginx-conf/conf.d:/etc/nginx/conf.d
-      - ./nginx-conf/nginx.conf:/etc/nginx/nginx.conf
-      - ./lua-scripts:/opt/lualib
+      - ./lua-scripts:/etc/nginx/lua-scripts
+      - ./nginx-logs:/var/log/nginx
     depends_on:
       - redis
       - ldap
