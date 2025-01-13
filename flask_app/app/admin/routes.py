@@ -3,7 +3,7 @@ from flask_login import login_required, current_user
 import crossplane
 import os
 from datetime import datetime
-from .. import CROSSPLANE_CONFIG_DIR, CROSSPLANE_BACKUP_DIR
+from ..config import CROSSPLANE_CONFIG_DIR, CROSSPLANE_BACKUP_DIR
 
 admin_bp = Blueprint('admin', __name__)
 
