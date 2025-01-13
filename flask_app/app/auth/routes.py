@@ -43,7 +43,7 @@ def login():
         # Get the first value from uid attribute (LDAP returns lists)
         entry = ldap_manager.connection.entries[0]
         current_app.logger.debug(f"LDAP Entry: {entry}")
-        username = entry.uid.value if ldap_manager.connection.entries else None
+        username = entry.uid.values[0]
         current_app.logger.debug(f"Extracted username: {username}")
         # Get group details
         gid = ldap_manager.connection.entries[0].gidNumber.values[0]
@@ -59,12 +59,13 @@ def login():
 
         # Create user object
         user = User(
-            id=auth_result.user_dn,
-            dn=auth_result.user_dn,
+            id=username,
+            dn=groupname,
             username=username,
             gid=gid,
             group=groupname
         )
+        print("User object created ", user.__dict__)
         login_user(user)
         return redirect(url_for('main.index'))
 

@@ -1,3 +1,4 @@
+nginx-logs/*.log
 .aider*
 .env
 # Python cache and bytecode

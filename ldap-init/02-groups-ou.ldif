@@ -1,4 +1,0 @@
-dn: ou=groups,dc=mycompany,dc=com
-objectClass: top
-objectClass: organizationalUnit
-ou: groups

@@ -1,3 +1,15 @@
+dn: ou=people,dc=mycompany,dc=com
+changetype: add
+objectClass: top
+objectClass: organizationalUnit
+ou: people
+
+dn: ou=groups,dc=mycompany,dc=com
+changetype: add
+objectClass: top
+objectClass: organizationalUnit
+ou: groups
+
 dn: uid=alice,ou=people,dc=mycompany,dc=com
 changetype: add
 objectClass: inetOrgPerson
@@ -10,20 +22,6 @@ uidNumber: 1000
 gidNumber: 1000
 homeDirectory: /home/alice
 userPassword: alice2025!
-loginShell: /bin/bash
-
-dn: uid=admin,ou=people,dc=mycompany,dc=com
-changetype: add
-objectClass: inetOrgPerson
-objectClass: posixAccount
-objectClass: top
-cn: Admin
-sn: Admin
-uid: admin
-uidNumber: 9999
-gidNumber: 9999
-homeDirectory: /home/admin
-userPassword: adminpassword
 loginShell: /bin/bash
 
 dn: uid=bob,ou=people,dc=mycompany,dc=com
@@ -53,3 +51,24 @@ gidNumber: 1002
 homeDirectory: /home/charlie
 userPassword: charlie2025!
 loginShell: /bin/bash
+
+dn: cn=it,ou=groups,dc=mycompany,dc=com
+changetype: add
+objectClass: posixGroup
+cn: it
+gidNumber: 1000
+memberUid: alice
+
+dn: cn=financial,ou=groups,dc=mycompany,dc=com
+changetype: add
+objectClass: posixGroup
+cn: financial
+gidNumber: 1001
+memberUid: bob
+
+dn: cn=human_resource,ou=groups,dc=mycompany,dc=com
+changetype: add
+objectClass: posixGroup
+cn: human_resource
+gidNumber: 1002
+memberUid: charlie
