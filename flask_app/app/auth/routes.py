@@ -44,6 +44,7 @@ def login():
             flash('User details not found')
             return redirect(url_for('main.index'))
 
+        username = ldap_manager.connection.entries[0].uid.values[0] if ldap_manager.connection.entries else None
         # Get group details
         gid = ldap_manager.connection.entries[0].gidNumber.values[0]
         group_filter = f'(&(gidNumber={gid}){app.config["LDAP_GROUP_OBJECT_FILTER"]})'
@@ -54,15 +55,16 @@ def login():
             controls=[]
         )
 
+        groupname = ldap_manager.connection.entries[0].cn.values[0] if ldap_manager.connection.entries else None
+
         # Create user object
         user = {
             'id': auth_result.user_dn,
             'dn': auth_result.user_dn,
-            'username': ldap_manager.connection.entries[0].uid.values[0],
+            'username': username,
             'gid': gid,
-            'group': ldap_manager.connection.entries[0].cn.values[0] if ldap_manager.connection.entries else None
+            'group': groupname,
         }
-
         login_user(user)
         return redirect(url_for('main.index'))
 
