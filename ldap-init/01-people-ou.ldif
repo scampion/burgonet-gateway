@@ -1,0 +1,4 @@
+dn: ou=people,dc=mycompany,dc=com
+objectClass: top
+objectClass: organizationalUnit
+ou: people
