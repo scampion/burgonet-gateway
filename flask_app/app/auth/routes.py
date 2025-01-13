@@ -22,24 +22,34 @@ def login():
             flash('Invalid credentials')
             return redirect(url_for('main.index'))
             
-        # Get user details including group membership
-        search_filter = f'(uid={username})'
-        search_result = ldap_manager.connection.search(
+        # Get user details
+        user_filter = f'(uid={username})'
+        user_result = ldap_manager.connection.search(
             ldap_manager.full_user_search_dn,
-            search_filter,
+            user_filter,
             attributes=['cn', 'uid', 'gidNumber']
         )
         
-        if not search_result.status:
+        if not user_result.status or not user_result.entries:
             flash('User details not found')
             return redirect(url_for('main.index'))
             
-        # Create user object with group information
+        # Get group details
+        gid = user_result.entries[0].gidNumber.values[0]
+        group_filter = f'(gidNumber={gid})'
+        group_result = ldap_manager.connection.search(
+            ldap_manager.full_group_search_dn,
+            group_filter,
+            attributes=['cn', 'gidNumber']
+        )
+        
+        # Create user object
         user = {
             'id': auth_result.user_dn,
             'dn': auth_result.user_dn,
-            'username': search_result.entries[0].uid.values[0],
-            'gid': search_result.entries[0].gidNumber.values[0]
+            'username': user_result.entries[0].uid.values[0],
+            'gid': gid,
+            'group': group_result.entries[0].cn.values[0] if group_result.status and group_result.entries else None
         }
         
         login_user(user)
