@@ -10,6 +10,7 @@ auth_bp = Blueprint('auth', __name__)
 @login_manager.user_loader
 def load_user(id):
     # Return a basic user instance with just the ID/DN
+    # This will be enhanced by Flask-Login's session management
     return User(id=id, dn=id, username=None, gid=None, group=None)
 
 @auth_bp.route('/login', methods=['POST'])
