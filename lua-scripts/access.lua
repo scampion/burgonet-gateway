@@ -51,6 +51,27 @@ function authenticate()
     return check_token(token)
 end
 
+-- Get API key from Redis
+local apikey = nil
+local redis = require "resty.redis"
+local red = redis:new()
+red:set_timeout(1000)
+
+local ok, err = red:connect("redis", 6379)
+if ok then
+    apikey, err = red:get("api:deepseek:v3:key")
+    if not apikey then
+        ngx.log(ngx.ERR, "failed to get redis key: ", err)
+    end
+else
+    ngx.log(ngx.ERR, "failed to connect to redis: ", err)
+end
+
+-- Set API key as nginx variable
+if apikey then
+    ngx.var.apikey = apikey
+end
+
 local authenticated = authenticate()
 
 if not authenticated then
