@@ -58,5 +58,9 @@ if not authenticated then
     ngx.header.www_authenticate = 'Bearer realm=""'
     ngx.status = ngx.HTTP_UNAUTHORIZED
     ngx.say('401 Access Denied')
-    ngx.exit(ngx.HTTP_UNAUTHORIZED)
+    return ngx.exit(ngx.HTTP_UNAUTHORIZED)
 end
+
+-- Explicitly return 200 for successful authentication
+ngx.status = ngx.HTTP_OK
+return ngx.exit(ngx.HTTP_OK)
