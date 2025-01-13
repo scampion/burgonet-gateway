@@ -16,7 +16,7 @@ def create_app():
     # Initialize extensions
     ldap_manager.init_app(app)
     login_manager.init_app(app)
-    
+
     # Register blueprints
     from flask_app.app.auth.routes import auth_bp
     from flask_app.app.admin.routes import admin_bp
