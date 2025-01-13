@@ -3,12 +3,16 @@ local resp_body = ngx.arg[1]
 ngx.ctx.buffered = (ngx.ctx.buffered or "") .. resp_body
 
 if ngx.arg[2] then
-    -- Only log if we have an API key
-    if ngx.var.apikey and ngx.var.apikey ~= "" then
-        -- Create JSON log entry
-        local log_entry = string.format(
-            '{"api_key":"%s","response":"%s"}\n',
-            ngx.var.apikey,
+    -- Get Authorization header
+    local auth_header = ngx.var.http_authorization
+    if auth_header then
+        -- Extract Bearer token
+        local bearer_token = string.match(auth_header, "Bearer%s+(.+)")
+        if bearer_token then
+            -- Create JSON log entry
+            local log_entry = string.format(
+                '{"authorization":"Bearer %s","response":"%s"}\n',
+                bearer_token,
             ngx.escape_uri(ngx.ctx.buffered)
         )
         
