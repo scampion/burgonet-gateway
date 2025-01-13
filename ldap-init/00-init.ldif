@@ -1,0 +1,16 @@
+dn: dc=mycompany,dc=com
+objectClass: top
+objectClass: dcObject
+objectClass: organization
+o: My Company
+dc: mycompany
+
+dn: ou=people,dc=mycompany,dc=com
+objectClass: top
+objectClass: organizationalUnit
+ou: people
+
+dn: ou=groups,dc=mycompany,dc=com
+objectClass: top
+objectClass: organizationalUnit
+ou: groups
