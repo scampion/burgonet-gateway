@@ -7,9 +7,18 @@ class User(UserMixin):
         self.username = username
         self.gid = gid
         self.group = group
-        self.is_active = True  # Required by Flask-Login
-        self.is_authenticated = True  # Required by Flask-Login
-        self.is_anonymous = False  # Required by Flask-Login
+
+    @property
+    def is_active(self):
+        return True
+
+    @property
+    def is_authenticated(self):
+        return True
+
+    @property
+    def is_anonymous(self):
+        return False
 
     def get_id(self):
         return self.id
