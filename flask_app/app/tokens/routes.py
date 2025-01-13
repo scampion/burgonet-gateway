@@ -32,8 +32,11 @@ def add_user_token(user_id, token, label):
     """Add a new token for a user with metadata"""
     created_at = datetime.utcnow().isoformat()
     with redis_client.pipeline() as pipe:
+        # Store in user's tokens
         pipe.hset(f'user:{user_id}:tokens', f'token:{token}', label)
         pipe.hset(f'user:{user_id}:tokens', f'meta:{token}:created_at', created_at)
+        # Store in nginx_tokens with bearer prefix
+        pipe.hset('nginx_tokens:bearer', token, user_id)
         pipe.execute()
 
 @tokens_bp.route('/tokens', methods=['POST'])
@@ -56,5 +59,6 @@ def generate_token():
     
     return jsonify({
         'token': token,
-        'label': label
+        'label': label,
+        'bearer_token': f'Bearer {token}'  # Return the full bearer token format
     }), 201
