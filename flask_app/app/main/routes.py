@@ -5,12 +5,7 @@ import json
 
 main_bp = Blueprint('main', __name__)
 
-def load_tokens():
-    try:
-        with open(TOKENS_FILE) as f:
-            return json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        return {}
+from ..tokens.routes import get_user_tokens
 
 @main_bp.route('/')
 def index():
@@ -21,11 +16,10 @@ def index():
 @main_bp.route('/dashboard')
 @login_required
 def dashboard():
-    # Load tokens for the current user
-    tokens = load_tokens()
+    # Load tokens for the current user from Redis
     user_tokens = {
-        token: details for token, details in tokens.items() 
-        if details.get('user_dn') == current_user.dn
+        token: {'expires_at': expires_at}
+        for token, expires_at in get_user_tokens(current_user.get_id()).items()
     }
     
     return render_template('index.html', tokens=user_tokens)
