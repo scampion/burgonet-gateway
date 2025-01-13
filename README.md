@@ -67,6 +67,10 @@ This project is licensed under the GNU Affero General Public License v3.0 - see 
 
 Sébastien Campion - sebastien.campion@foss4.eu
 
+## Name origin 
+
+The [burgonet](https://en.wikipedia.org/wiki/Burgonet) is helmet, it's a protection for the brain.
+Protect your knowledge 
 ---
 
 **Note**: This project is under active development. Please report any issues or feature requests through the issue tracker.
