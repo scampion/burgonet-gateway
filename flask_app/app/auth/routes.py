@@ -27,7 +27,8 @@ def login():
         ldap_manager.connection.unbind()
         ldap_manager.connection.bind(
             app.config['LDAP_ADMIN_DN'],
-            app.config['LDAP_ADMIN_PASSWORD']
+            app.config['LDAP_ADMIN_PASSWORD'],
+            controls=[]
         )
 
         # Get user details
