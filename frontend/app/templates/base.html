@@ -14,6 +14,17 @@
             margin: 2rem auto;
             padding: 2rem;
         }
+        .token-display {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .token-value {
+            font-family: monospace;
+            background: #f8f9fa;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
@@ -45,5 +56,16 @@
         
         {% block content %}{% endblock %}
     </div>
+    
+    <script>
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(function() {
+                // Show some feedback that the text was copied
+                alert('Token copied to clipboard!');
+            }, function(err) {
+                console.error('Could not copy text: ', err);
+            });
+        }
+    </script>
 </body>
 </html>
