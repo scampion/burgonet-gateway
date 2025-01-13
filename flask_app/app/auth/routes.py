@@ -25,13 +25,6 @@ def login():
             flash('Invalid credentials')
             return redirect(url_for('main.index'))
 
-        # # Bind as admin for searches
-        # ldap_manager.connection.unbind()
-        # ldap_manager.connection.bind(
-        #     app.config['LDAP_ADMIN_DN'],
-        #     app.config['LDAP_ADMIN_PASSWORD']
-        # )
-
         # Get user details
         user_filter = f'(&(uid={username}){app.config["LDAP_USER_OBJECT_FILTER"]})'
 
@@ -68,8 +61,6 @@ def login():
             group=groupname
         )
         login_user(user)
-        flash(f'Logged in as {username}')
-        print(f'Logged in as {username}')
         return redirect(url_for('main.index'))
 
     except Exception as e:
