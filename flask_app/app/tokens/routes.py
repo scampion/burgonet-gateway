@@ -62,3 +62,20 @@ def generate_token():
         'label': label,
         'bearer_token': f'Bearer {token}'  # Return the full bearer token format
     }), 201
+
+@tokens_bp.route('/tokens/<token>', methods=['DELETE'])
+@login_required
+def delete_token(token):
+    user_id = current_user.get_id()
+    if not user_id:
+        return jsonify({'error': 'User not found'}), 404
+    
+    with redis_client.pipeline() as pipe:
+        # Remove from user's tokens
+        pipe.hdel(f'user:{user_id}:tokens', f'token:{token}')
+        pipe.hdel(f'user:{user_id}:tokens', f'meta:{token}:created_at')
+        # Remove from nginx_tokens set
+        pipe.srem('nginx_tokens:bearer', token)
+        pipe.execute()
+    
+    return jsonify({'message': 'Token deleted'}), 200
