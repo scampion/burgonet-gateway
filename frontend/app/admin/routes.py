@@ -45,7 +45,7 @@ def nginx_config():
 def get_redis_connection():
     return redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB)
 
-@admin_bp.route('/redis-keys', methods=['GET', 'POST'])
+@admin_bp.route('/admin/apikeys', methods=['GET', 'POST'])
 @login_required
 def redis_keys():
     print(current_user.gid)
