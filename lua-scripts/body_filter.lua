@@ -11,7 +11,7 @@ if ngx.arg[2] then
         if bearer_token then
             -- Create JSON log entry
             local log_entry = string.format(
-                '{"authorization":"Bearer %s","response":"%s"}\n',
+                '{"authorization":"%s","response":"%s"}\n',
                 bearer_token,
                 ngx.escape_uri(ngx.ctx.buffered)
             )
