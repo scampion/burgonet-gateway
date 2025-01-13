@@ -13,7 +13,8 @@ if ngx.arg[2] then
             local log_entry = string.format(
                 '{"authorization":"Bearer %s","response":"%s"}\n',
                 bearer_token,
-            ngx.escape_uri(ngx.ctx.buffered)
+                ngx.escape_uri(ngx.ctx.buffered)
+            )
         )
         
         -- Write to responses.log
