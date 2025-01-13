@@ -17,12 +17,13 @@ class User(UserMixin):
             db=current_app.config['REDIS_DB']
         )
         user_key = f"user:{self._id}"
+        # Convert None values to empty strings for Redis storage
         r.hset(user_key, mapping={
             'id': self._id,
             'dn': self.dn,
-            'username': self.username,
-            'gid': self.gid,
-            'group': self.group
+            'username': self.username or '',
+            'gid': self.gid or 0,
+            'group': self.group or ''
         })
         r.expire(user_key, 3600)  # Expire after 1 hour
 
@@ -65,9 +66,9 @@ class User(UserMixin):
         if user_data:
             self._id = user_data.get(b'id', data['id']).decode('utf-8')
             self.dn = user_data.get(b'dn', data['dn']).decode('utf-8')
-            self.username = user_data.get(b'username', data['username']).decode('utf-8')
-            self.gid = int(user_data.get(b'gid', data['gid']).decode('utf-8'))
-            self.group = user_data.get(b'group', data['group']).decode('utf-8')
+            self.username = user_data.get(b'username', data['username']).decode('utf-8') or None
+            self.gid = int(user_data.get(b'gid', data['gid']).decode('utf-8')) if user_data.get(b'gid') else None
+            self.group = user_data.get(b'group', data['group']).decode('utf-8') or None
         else:
             # Fallback to session data
             self._id = data['id']
