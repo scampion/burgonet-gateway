@@ -10,7 +10,7 @@ admin_bp = Blueprint('admin', __name__)
 @admin_bp.route('/nginx-config', methods=['GET', 'POST'])
 @login_required
 def nginx_config():
-    if not current_user.get('dn', '').endswith('ou=admin,ou=groups,dc=mycompany,dc=com'):
+    if current_user.get('gid') != 1001:  # Assuming 1001 is the admin group ID
         flash('Access denied')
         return redirect(url_for('main.index'))
     
