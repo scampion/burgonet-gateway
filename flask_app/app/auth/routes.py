@@ -45,7 +45,7 @@ def login():
             return redirect(url_for('main.index'))
 
         # Get group details
-        gid = user_result.entries[0].gidNumber.values[0]
+        gid = ldap_manager.connection.entries[0].gidNumber.values[0]
         group_filter = f'(&(gidNumber={gid}){app.config["LDAP_GROUP_OBJECT_FILTER"]})'
         ldap_manager.connection.search(
             search_base=app.config["LDAP_GROUP_DN"],
