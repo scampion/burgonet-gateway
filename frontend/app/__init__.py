@@ -3,9 +3,18 @@ from flask_ldap3_login import LDAP3LoginManager
 from flask_login import LoginManager
 import os
 import json
+import redis
+from datetime import timedelta
 
 ldap_manager = LDAP3LoginManager()
 login_manager = LoginManager()
+
+def get_redis_connection(app):
+    return redis.Redis(
+        host=app.config['REDIS_HOST'],
+        port=app.config['REDIS_PORT'],
+        db=app.config['REDIS_DB']
+    )
 
 def create_app():
     app = Flask(__name__)
@@ -34,5 +43,10 @@ def create_app():
     # Initialize filters
     from .filters import init_app as init_filters
     init_filters(app)
+    
+    # Configure session to use Redis
+    app.config['SESSION_TYPE'] = 'redis'
+    app.config['SESSION_REDIS'] = get_redis_connection(app)
+    app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=1)
     
     return app
