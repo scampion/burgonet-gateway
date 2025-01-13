@@ -6,12 +6,22 @@
 
 ## About
 
-Burgonet Gateway is a secure API gateway management system built with Flask, Redis, and LDAP authentication. It provides:
+Burgonet Gateway is an enterprise LLM gateway that provides secure access and compliance controls for AI systems.​​​​​​​​​​​​​​​​
+
+It provides:
 
 - Token-based API authentication
 - User management via LDAP
 - Nginx configuration management
 - Secure token generation and storage
+
+planned: 
+- Websso integration
+- Quota management (per group / per user)
+- Access Control List to dispatch on permise and cloud providers 
+- Semantic routing 
+- Keywords and PII filtering
+
 
 ## Features
 
