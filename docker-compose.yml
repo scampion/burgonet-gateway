@@ -3,14 +3,13 @@ version: '3.8'
 services:
   nginx:
     image: openresty/openresty:1.21.4.1-0-alpine
-    #image: nginx:latest
     container_name: nginx
     ports:
       - "8080:80"
     volumes:
       - ./nginx-conf/conf.d:/etc/nginx/conf.d
-      - ./lua-scripts:/etc/nginx/lua-scripts
       - ./nginx-logs:/var/log/nginx
+      - ./lua-scripts:/etc/nginx/lua-scripts
     depends_on:
       - redis
       - ldap
