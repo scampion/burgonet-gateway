@@ -18,9 +18,13 @@ if ngx.arg[2] then
                 response_body = '"' .. ngx.escape_uri(response_body) .. '"'
             end
 
+            -- Get current timestamp
+            local timestamp = ngx.localtime()
+            
             -- Create JSON log entry
             local log_entry = string.format(
-                '{"authorization":"%s","response": %s}\n',
+                '{"timestamp":"%s","authorization":"%s","response": %s}\n',
+                timestamp,
                 bearer_token,
                 response_body
             )
