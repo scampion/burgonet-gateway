@@ -28,6 +28,7 @@ services:
       LDAP_ORGANISATION: "My Company"
       LDAP_DOMAIN: "mycompany.com"
       LDAP_ADMIN_PASSWORD: "adminpassword"
+      LDAP_TLS: "false"
     ports:
       - "389:389"
       - "636:636"
