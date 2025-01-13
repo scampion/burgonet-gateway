@@ -18,9 +18,9 @@ def create_app():
     login_manager.init_app(app)
     
     # Register blueprints
-    from .auth import auth_bp
-    from .admin import admin_bp
-    from .tokens import tokens_bp
+    from flask_app.app.auth.routes import auth_bp
+    from flask_app.app.admin.routes import admin_bp
+    from flask_app.app.tokens.routes import tokens_bp
     
     app.register_blueprint(auth_bp)
     app.register_blueprint(admin_bp)
