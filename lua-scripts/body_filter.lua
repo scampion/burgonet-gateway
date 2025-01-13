@@ -7,7 +7,7 @@ if ngx.arg[2] then
     if ngx.var.apikey and ngx.var.apikey ~= "" then
         -- Create JSON log entry
         local log_entry = string.format(
-            '{"token":"%s","response":"%s"}\n',
+            '{"api_key":"%s","response":"%s"}\n',
             ngx.var.apikey,
             ngx.escape_uri(ngx.ctx.buffered)
         )
