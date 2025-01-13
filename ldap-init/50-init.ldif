@@ -44,7 +44,7 @@
  gidNumber: 1000
  homeDirectory: /home/alice
  loginShell: /bin/bash
- userPassword: {SSHA}5en6G6MezRroT3XKqkdpoCu9ZwX70vL+
+ userPassword: {SSHA}Vv8z2Z4X7y9A1b3C5d7e9f0g1h2i3j4k5
 
  dn: uid=bob,ou=people,dc=mycompany,dc=com
  objectClass: inetOrgPerson
@@ -57,7 +57,7 @@
  gidNumber: 1001
  homeDirectory: /home/bob
  loginShell: /bin/bash
- userPassword: {SSHA}5en6G6MezRroT3XKqkdpoCu9ZwX70vL+
+ userPassword: {SSHA}Ww9x3Y5Z8a2B4C6D8e0f1g2h3i4j5k6l7
 
  dn: uid=charlie,ou=people,dc=mycompany,dc=com
  objectClass: inetOrgPerson
@@ -70,4 +70,4 @@
  gidNumber: 1002
  homeDirectory: /home/charlie
  loginShell: /bin/bash
- userPassword: {SSHA}5en6G6MezRroT3XKqkdpoCu9ZwX70vL+
+ userPassword: {SSHA}Xx0y4Z6A9b3C5D7E9f1g2h3i4j5k6l7m8
