@@ -1,0 +1,16 @@
+site_name: Burgonet Gateway Documentation
+
+nav:
+  - Home: index.md
+  - Screenshots: screenshots.md
+  - About: about.md
+
+theme:
+  name: readthedocs
+  analytics:
+    gtag: GTM-TSWFRGBR
+
+
+
+
+

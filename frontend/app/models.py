@@ -1,6 +1,9 @@
+from dataclasses import dataclass
+
 from flask_login import UserMixin
 import redis
 from flask import current_app
+
 
 class User(UserMixin):
     def __init__(self, id, dn, username, gid, group):
@@ -9,7 +12,7 @@ class User(UserMixin):
         self.username = username
         self.gid = gid
         self.group = group
-        
+
         # Store user data in Redis
         r = redis.Redis(
             host=current_app.config['REDIS_HOST'],
@@ -72,7 +75,7 @@ class User(UserMixin):
         )
         user_key = f"sessions:{data['id']}"
         user_data = r.hgetall(user_key)
-        
+
         if user_data:
             self._id = user_data.get(b'id', data['id']).decode('utf-8')
             self.dn = user_data.get(b'dn', data['dn']).decode('utf-8')
@@ -95,3 +98,63 @@ class User(UserMixin):
         )
         user_key = f"sessions:{self._id}"
         r.delete(user_key)
+
+
+@dataclass
+class Provider:
+    provider: str
+    api_key: str = 'deepseek:v3'
+    proxy_pass: str = 'https://api.deepseek.com/chat/completions'
+    location: str = '/api.deepseek.com/v3/chat/completions'
+    redis_host: str = 'redis'
+    redis_port: str = '6379'
+    model_name: str = 'deepseek'
+    model_version: str = 'v3'
+
+    def __repr__(self):
+        return f'<Provider {self}>'
+
+    def nginx_config(self):
+        return {
+            'directive': 'location',
+            'args': [self.location],
+            'block': [
+                {'directive': 'set', 'args': ['$apikey', '']},
+                {'directive': 'set', 'args': ['$access_redis_host', self.redis_host]},
+                {'directive': 'set', 'args': ['$access_redis_port', self.redis_port]},
+                {'directive': 'set', 'args': ['$access_token_set', 'nginx_tokens:bearer']},
+                {'directive': 'set', 'args': ['$access_model_name', self.model_name]},
+                {'directive': 'set', 'args': ['$access_model_version', self.model_version]},
+                {'directive': 'access_by_lua_file', 'args': ['/etc/nginx/lua-scripts/access.lua']},
+                {'directive': 'proxy_pass', 'args': [self.proxy_pass]},
+                {'directive': 'proxy_ssl_server_name', 'args': ['on']},
+                {'directive': 'proxy_set_header', 'args': ['Host', 'api.deepseek.com']},
+                {'directive': 'proxy_set_header', 'args': ['X-Real-IP', '$remote_addr']},
+                {'directive': 'proxy_set_header', 'args': ['X-Forwarded-For', '$proxy_add_x_forwarded_for']},
+                {'directive': 'proxy_set_header', 'args': ['X-Forwarded-Proto', '$scheme']},
+                {'directive': 'proxy_set_header', 'args': ['Content-Type', '$content_type']},
+                {'directive': 'proxy_set_header', 'args': ['Authorization', 'Bearer $apikey']},
+                {'directive': 'proxy_set_header', 'args': ['Content-Length', '$content_length']},
+                {'directive': 'proxy_pass_request_body', 'args': ['on']}
+            ]
+        }
+
+
+@dataclass
+class DeepSeek(Provider):
+    api_key: str = 'deepseek:v3'
+    proxy_pass: str = 'https://api.deepseek.com/chat/completions'
+    location: str = '/api.deepseek.com/v3/chat/completions'
+
+@dataclass
+class OpenAI(Provider):
+    api_key: str = 'openai:v1'
+    proxy_pass: str = 'https://api.openai.com/v1/engines/davinci/completions'
+    location: str = '/api.openai.com/v1/engines/davinci/completions'
+
+
+@dataclass
+class Anthropic(Provider):
+    api_key: str = 'anthropic:v1'
+    proxy_pass: str = 'https://api.anthropic.com/v1/chat/completions'
+    location: str = '/api.anthropic.com/v1/chat/completions'

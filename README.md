@@ -40,6 +40,9 @@ planned:
 - Keywords and PII filtering
 
 
+The complete documentation is available at [https://burgonet.eu/](https://burgonet.eu/)
+
+
 ## Features
 
 - **Token Management**: Generate, view, and delete API tokens

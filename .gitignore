@@ -5,3 +5,9 @@ nginx-logs/*.log
 __pycache__/
 *.py[cod]
 *$py.class
+publish.sh
+.idea/
+.python-version
+site/
+init_keys.sh
+

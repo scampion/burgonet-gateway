@@ -5,7 +5,7 @@ import crossplane
 import os
 import redis
 from datetime import datetime
-from ..config import PROVIDERS_CONFIG, CROSSPLANE_CONFIG, REDIS_HOST, REDIS_PORT, REDIS_DB, REDIS_API_KEY_PREFIX, \
+from ..config import MODELS_CONFIG, CROSSPLANE_CONFIG, REDIS_HOST, REDIS_PORT, REDIS_DB, REDIS_API_KEY_PREFIX, \
     ADMIN_GROUP
 from ..models import Provider, DeepSeek, OpenAI, Anthropic
 
@@ -88,13 +88,13 @@ def delete_key(key):
     return redirect(url_for('admin.redis_keys'))
 
 
-def load_providers_config():
-    config_path = PROVIDERS_CONFIG
+def load_models_config():
+    config_path = MODELS_CONFIG
     if not os.path.isabs(config_path):
         config_path = os.path.join(os.path.dirname(__file__), config_path)
     config_path = os.path.join(config_path)
     with open(config_path) as f:
-        return json.load(f)
+        return json.load(f)['models']
 
 
 def get_provider_class(provider_name):
@@ -106,87 +106,75 @@ def get_provider_class(provider_name):
     }
     return provider_classes.get(provider_name.lower(), Provider)
 
+
 def generate_location_block(provider_config, api_key):
     """Generate location block using Provider class methods"""
     provider_class = get_provider_class(provider_config['model'])
     provider = provider_class()
-    
+
     # Update provider instance with config values
     provider.apikey = api_key
     provider.proxy_pass = provider_config['proxy_pass']
     provider.location = provider_config['location']
-    
+
     return provider.nginx_config_build()
 
 
 @admin_bp.route('/admin/build', methods=['POST', 'GET'])
 @login_required
 def build_config():
-    # print current directory
-    print(os.getcwd())
     if current_user.gid != ADMIN_GROUP:
         flash('Access denied')
         return redirect(url_for('main.index'))
 
     try:
-        # Load base config
-        with open(CROSSPLANE_CONFIG) as f:
-            base_config = f.read()
-
         # Parse base config
-        parsed = crossplane.parse(base_config)
+        parsed = crossplane.parse(CROSSPLANE_CONFIG)
+        server = None
+        filepath = None
 
-        # Load providers config
-        providers_config = load_providers_config()
+        # Select the burgonet file
+        for i, config in enumerate(parsed['config']):
+            if config['file'].split(os.sep)[-1] == 'burgonet.conf':
+                print("Server config found")
+                filepath = config['file']
+                server = config['parsed'][0]
+                break
 
-        # Get Redis connection
-        r = get_redis_connection()
+        if server is None:
+            raise Exception('burgonet.conf not found in base config')
 
-        # Generate location blocks using Provider classes
-        location_blocks = []
-        for provider_config in providers_config['providers']:
-            # Get API key from Redis
-            redis_key = f"{REDIS_API_KEY_PREFIX}{provider_config['model']}:v1"
-            api_key = r.get(redis_key)
-            if api_key:
-                provider_config['apikey'] = api_key.decode('utf-8')
-                location_blocks.append(generate_location_block(provider_config, api_key.decode('utf-8')))
+        # remove all the location blocks
+        server['block'] = [block for block in server['block'] if block['directive'] != 'location']
+        print(server)
 
-        # Insert location blocks into server block
-        for block in parsed['config']:
-            if block['directive'] == 'http':
-                for server_block in block['block']:
-                    if server_block['directive'] == 'server':
-                        # Add location blocks
-                        server_block['block'].extend([
-                            crossplane.builder.build(loc)
-                            for loc in location_blocks
-                        ])
+        # Generate new location blocks
+        for model in load_models_config():
+            provider = get_provider_class(model['provider'])(**model)
+            server['block'].append(provider.nginx_config())
 
         # Generate new config
-        new_config = crossplane.builder.build(parsed['config'])
+        new_config = crossplane.build([server])
 
         # Save new config
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        backup_path = os.path.join(CROSSPLANE_BACKUP_DIR, f'nginx_{timestamp}.conf')
-        with open(backup_path, 'w') as f:
-            f.write(base_config)
-
-        with open(os.path.join(CROSSPLANE_CONFIG_DIR, 'default.conf'), 'w') as f:
+        with open(os.path.join(filepath), 'w') as f:
             f.write(new_config)
 
         flash('Configuration built and updated successfully')
-        return jsonify({'status': 'success', 'message': 'Configuration updated'})
+        return jsonify({'status': 'success',
+                        'message': 'Configuration updated',
+                        'filepath': filepath,})
 
     except Exception as e:
         flash(f'Error building configuration: {str(e)}')
+        import traceback
+        traceback.print_exc()
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
 
 @admin_bp.route('/admin/apikeys', methods=['GET', 'POST'])
 @login_required
 def redis_keys():
-    print(current_user.gid)
     if current_user.gid != ADMIN_GROUP:
         flash('Access denied')
         return redirect(url_for('main.index'))
