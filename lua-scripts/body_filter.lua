@@ -12,29 +12,13 @@ if ngx.arg[2] then
             -- Get current timestamp
             local datetime = ngx.localtime()
             local timestamp = ngx.now()
-            
-            -- Get response status
-            local status = ngx.status
-            
-            -- Get request details
-            local request_method = ngx.var.request_method
-            local request_uri = ngx.var.request_uri
-            local remote_addr = ngx.var.remote_addr
-            
-            -- Format response body
             local response_body = ngx.ctx.buffered
-            local content_type = ngx.header["Content-Type"] or ""
-            
+
             -- Create JSON log entry
             local log_entry = {
                 timestamp = timestamp,
                 datetime = datetime,
-                status = status,
-                method = request_method,
-                uri = request_uri,
-                remote_addr = remote_addr,
-                authorization = bearer_token,
-                content_type = content_type,
+                token = bearer_token,
                 response = response_body
             }
             
