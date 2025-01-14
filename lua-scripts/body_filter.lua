@@ -9,37 +9,40 @@ if ngx.arg[2] then
         -- Extract Bearer token
         local bearer_token = string.match(auth_header, "Bearer%s+(.+)")
         if bearer_token then
-            -- Check if response is JSON
-            local content_type = ngx.header["Content-Type"]
-            local response_body = ngx.ctx.buffered
-            
-            -- Only escape if not JSON
-            if not content_type or not string.find(content_type:lower(), "application/json") then
-                response_body = '"' .. ngx.escape_uri(response_body) .. '"'
-            end
-
             -- Get current timestamp
             local datetime = ngx.localtime()
             local timestamp = ngx.now()
-
-            -- Create JSON log entry
-            local log_entry = string.format(
-                '{"timestamp":"%s", "datetime":"%s" ,"authorization":"%s","response": %s}\n',
-                timestamp,
-                datetime,
-                bearer_token,
-                response_body
-            )
             
-            -- Write to responses.log
-        local log_path = "/var/log/nginx/responses.log"
-        local file = io.open(log_path, "a")
-        if file then
-            file:write(log_entry)
-            file:close()
-        else
-            ngx.log(ngx.ERR, "failed to open responses.log for writing")
+            -- Get response status
+            local status = ngx.status
+            
+            -- Get request details
+            local request_method = ngx.var.request_method
+            local request_uri = ngx.var.request_uri
+            local remote_addr = ngx.var.remote_addr
+            
+            -- Format response body
+            local response_body = ngx.ctx.buffered
+            local content_type = ngx.header["Content-Type"] or ""
+            
+            -- Create JSON log entry
+            local log_entry = {
+                timestamp = timestamp,
+                datetime = datetime,
+                status = status,
+                method = request_method,
+                uri = request_uri,
+                remote_addr = remote_addr,
+                authorization = bearer_token,
+                content_type = content_type,
+                response = response_body
+            }
+            
+            -- Convert to JSON string
+            local json_log = require("cjson").encode(log_entry)
+            
+            -- Write to nginx error log
+            ngx.log(ngx.INFO, json_log)
         end
     end
-end
 end
