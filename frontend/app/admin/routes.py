@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify, abort
+from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify, abort, current_app
 import json
 from flask_login import login_required, current_user
 import crossplane
@@ -87,6 +87,38 @@ def build_config():
         traceback.print_exc()
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
+
+@admin_bp.route('/admin/dashboard')
+@login_required
+def dashboard():
+    if current_user.gid != ADMIN_GROUP:
+        flash('Access denied')
+        return redirect(url_for('main.index'))
+    
+    # Get stats from Redis
+    r = current_app.redis
+    stats = {
+        'total_requests': r.get('stats:total_requests') or 0,
+        'successful_requests': r.get('stats:successful_requests') or 0,
+        'failed_requests': r.get('stats:failed_requests') or 0,
+        'active_users': r.scard('active_users') or 0,
+        'models': []
+    }
+    
+    # Get model usage stats
+    models = load_models_config()
+    for model in models:
+        model_stats = {
+            'name': model['model_name'],
+            'requests': r.get(f"stats:model:{model['model_name']}:requests") or 0,
+            'success': r.get(f"stats:model:{model['model_name']}:success") or 0,
+            'errors': r.get(f"stats:model:{model['model_name']}:errors") or 0
+        }
+        stats['models'].append(model_stats)
+    
+    return render_template('admin/dashboard.html', 
+                         stats=stats,
+                         ADMIN_GROUP=ADMIN_GROUP)
 
 @admin_bp.route('/admin/models', methods=['GET', 'POST'])
 @login_required

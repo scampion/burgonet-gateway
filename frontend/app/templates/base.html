@@ -45,7 +45,8 @@
                 <div class="d-flex">
                     <span class="navbar-text me-3">Welcome, {{ current_user.username }}</span>
                     {% if current_user.gid == ADMIN_GROUP %}
-                        <a href="{{ url_for('admin.manage_models') }}" class="btn btn-outline-primary me-2">Admin</a>
+                        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-primary me-2">Dashboard</a>
+                        <a href="{{ url_for('admin.manage_models') }}" class="btn btn-outline-primary me-2">Models</a>
                     {% endif %}
                     <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-danger">Logout</a>
                 </div>
