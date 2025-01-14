@@ -7,6 +7,7 @@ import redis
 from datetime import datetime
 from ..config import PROVIDERS_CONFIG, CROSSPLANE_CONFIG, REDIS_HOST, REDIS_PORT, REDIS_DB, REDIS_API_KEY_PREFIX, \
     ADMIN_GROUP
+from ..models import Provider, DeepSeek, OpenAI, Anthropic
 
 admin_bp = Blueprint('admin', __name__)
 
@@ -96,17 +97,26 @@ def load_providers_config():
         return json.load(f)
 
 
-def generate_location_block(provider, api_key):
-    return f"""
-    location {provider['location']} {{
-        proxy_pass {provider['proxy_pass']};
-        proxy_set_header {provider['auth_header']} "Bearer {api_key}";
-        proxy_set_header Content-Type "application/json";
-        proxy_set_header Accept "application/json";
-        proxy_ssl_server_name on;
-        proxy_ssl_verify off;
-    }}
-    """
+def get_provider_class(provider_name):
+    """Get the appropriate Provider subclass based on provider name"""
+    provider_classes = {
+        'deepseek': DeepSeek,
+        'openai': OpenAI,
+        'anthropic': Anthropic
+    }
+    return provider_classes.get(provider_name.lower(), Provider)
+
+def generate_location_block(provider_config, api_key):
+    """Generate location block using Provider class methods"""
+    provider_class = get_provider_class(provider_config['model'])
+    provider = provider_class()
+    
+    # Update provider instance with config values
+    provider.apikey = api_key
+    provider.proxy_pass = provider_config['proxy_pass']
+    provider.location = provider_config['location']
+    
+    return provider.nginx_config_build()
 
 
 @admin_bp.route('/admin/build', methods=['POST', 'GET'])
@@ -132,14 +142,15 @@ def build_config():
         # Get Redis connection
         r = get_redis_connection()
 
-        # Generate location blocks
+        # Generate location blocks using Provider classes
         location_blocks = []
-        for provider in providers_config['providers']:
+        for provider_config in providers_config['providers']:
             # Get API key from Redis
-            redis_key = f"{REDIS_API_KEY_PREFIX}{provider['model']}:v1"
+            redis_key = f"{REDIS_API_KEY_PREFIX}{provider_config['model']}:v1"
             api_key = r.get(redis_key)
             if api_key:
-                location_blocks.append(generate_location_block(provider, api_key.decode('utf-8')))
+                provider_config['apikey'] = api_key.decode('utf-8')
+                location_blocks.append(generate_location_block(provider_config, api_key.decode('utf-8')))
 
         # Insert location blocks into server block
         for block in parsed['config']:
