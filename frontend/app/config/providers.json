@@ -1,0 +1,16 @@
+{
+    "providers": [
+        {
+            "model": "deepseek",
+            "location": "/deepseek",
+            "proxy_pass": "https://api.deepseek.com",
+            "auth_header": "Authorization"
+        },
+        {
+            "model": "openai",
+            "location": "/openai",
+            "proxy_pass": "https://api.openai.com",
+            "auth_header": "Authorization"
+        }
+    ]
+}

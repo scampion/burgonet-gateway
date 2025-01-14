@@ -1,4 +1,5 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for
+from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify
+import json
 from flask_login import login_required, current_user
 import crossplane
 import os
@@ -85,6 +86,83 @@ def delete_key(key):
         flash('Key not found')
     
     return redirect(url_for('admin.redis_keys'))
+
+def load_providers_config():
+    config_path = os.path.join(os.path.dirname(__file__), 'config', 'providers.json')
+    with open(config_path) as f:
+        return json.load(f)
+
+def generate_location_block(provider, api_key):
+    return f"""
+    location {provider['location']} {{
+        proxy_pass {provider['proxy_pass']};
+        proxy_set_header {provider['auth_header']} "Bearer {api_key}";
+        proxy_set_header Content-Type "application/json";
+        proxy_set_header Accept "application/json";
+        proxy_ssl_server_name on;
+        proxy_ssl_verify off;
+    }}
+    """
+
+@admin_bp.route('/admin/build', methods=['POST'])
+@login_required
+def build_config():
+    if current_user.gid != ADMIN_GROUP:
+        flash('Access denied')
+        return redirect(url_for('main.index'))
+    
+    try:
+        # Load base config
+        with open(os.path.join(CROSSPLANE_CONFIG_DIR, 'default.conf')) as f:
+            base_config = f.read()
+        
+        # Parse base config
+        parsed = crossplane.parse(base_config)
+        
+        # Load providers config
+        providers_config = load_providers_config()
+        
+        # Get Redis connection
+        r = get_redis_connection()
+        
+        # Generate location blocks
+        location_blocks = []
+        for provider in providers_config['providers']:
+            # Get API key from Redis
+            redis_key = f"{REDIS_API_KEY_PREFIX}{provider['model']}:v1"
+            api_key = r.get(redis_key)
+            if api_key:
+                location_blocks.append(generate_location_block(provider, api_key.decode('utf-8')))
+        
+        # Insert location blocks into server block
+        for block in parsed['config']:
+            if block['directive'] == 'http':
+                for server_block in block['block']:
+                    if server_block['directive'] == 'server':
+                        # Add location blocks
+                        server_block['block'].extend([
+                            crossplane.builder.build(loc) 
+                            for loc in location_blocks
+                        ])
+        
+        # Generate new config
+        new_config = crossplane.builder.build(parsed['config'])
+        
+        # Save new config
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        backup_path = os.path.join(CROSSPLANE_BACKUP_DIR, f'nginx_{timestamp}.conf')
+        with open(backup_path, 'w') as f:
+            f.write(base_config)
+        
+        with open(os.path.join(CROSSPLANE_CONFIG_DIR, 'default.conf'), 'w') as f:
+            f.write(new_config)
+        
+        flash('Configuration built and updated successfully')
+        return jsonify({'status': 'success', 'message': 'Configuration updated'})
+    
+    except Exception as e:
+        flash(f'Error building configuration: {str(e)}')
+        return jsonify({'status': 'error', 'message': str(e)}), 500
 
 @admin_bp.route('/admin/apikeys', methods=['GET', 'POST'])
 @login_required
