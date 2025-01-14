@@ -47,6 +47,7 @@
                     {% if current_user.gid == ADMIN_GROUP %}
                         <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-primary me-2">Dashboard</a>
                         <a href="{{ url_for('admin.manage_models') }}" class="btn btn-outline-primary me-2">Models</a>
+                        <a href="{{ url_for('main.index') }}" class="btn btn-outline-primary me-2">Main</a>
                     {% endif %}
                     <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-danger">Logout</a>
                 </div>
