@@ -44,21 +44,21 @@
     </div>
 
     <!-- Existing Models Table -->
-    <form method="POST" action="{{ url_for('admin.manage_models') }}">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Provider</th>
-                    <th>Model Name</th>
-                    <th>Location</th>
-                    <th>Proxy Pass</th>
-                    <th>API Key</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for model in models %}
-                <tr>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Provider</th>
+                <th>Model Name</th>
+                <th>Location</th>
+                <th>Proxy Pass</th>
+                <th>API Key</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for model in models %}
+            <tr>
+                <form method="POST" action="{{ url_for('admin.manage_models') }}">
                     <td>
                         <select name="provider" class="form-select" required>
                             <option value="deepseek" {% if model.provider == 'deepseek' %}selected{% endif %}>DeepSeek</option>
@@ -82,11 +82,11 @@
                             Delete
                         </button>
                     </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </form>
+                </form>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
     <!-- Build Config Button -->
     <div class="mt-4">
