@@ -50,16 +50,3 @@ if not authenticate() then
     return ngx.exit(ngx.HTTP_UNAUTHORIZED)
 end
 
--- Get API key from Redis after successful authentication
-local model_name = ngx.var.access_model_name or "deepseek"
-local model_version = ngx.var.access_model_version or "v3"
-local redis_key = string.format("api:%s:%s:key", model_name, model_version)
-
-local apikey, err = red:get(redis_key)
-if not apikey then
-    ngx.log(ngx.ERR, "failed to get redis key: ", err)
-    ngx.exit(ngx.HTTP_INTERNAL_SERVER_ERROR)
-end
-
--- Set API key as nginx variable
-ngx.var.apikey = apikey
