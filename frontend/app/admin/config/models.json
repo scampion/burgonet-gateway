@@ -8,7 +8,7 @@
             "api_key": "YOUR_API_KEY"
         },
         {
-            "provider": "OpenAI",
+            "provider": "openai",
             "model_name": "gpt4o",
             "location": "/openai",
             "proxy_pass": "https://api.openai.com",
