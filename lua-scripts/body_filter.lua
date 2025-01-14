@@ -22,7 +22,6 @@ if ngx.arg[2] then
             local datetime = ngx.localtime()
             local timestamp = ngx.now()
 
-
             -- Create JSON log entry
             local log_entry = string.format(
                 '{"timestamp":"%s", "datetime":"%s" ,"authorization":"%s","response": %s}\n',
