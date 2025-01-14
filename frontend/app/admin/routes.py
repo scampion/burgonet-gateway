@@ -12,35 +12,6 @@ from ..models import Provider, DeepSeek, OpenAI, Anthropic
 admin_bp = Blueprint('admin', __name__)
 
 
-@admin_bp.route('/nginx-config', methods=['GET', 'POST'])
-@login_required
-def nginx_config():
-    if current_user.gid != ADMIN_GROUP:
-        flash('Access denied')
-        return redirect(url_for('main.index'))
-
-    crossplane_config_dir = os.path.dirname(CROSSPLANE_CONFIG)
-    if request.method == 'POST':
-        config = request.form.get('config')
-        try:
-            # Parse and validate config
-            crossplane.parse(config)
-
-            # Write new config
-            with open(os.path.join(crossplane_config_dir, 'burgonet.conf'), 'w') as f:
-                f.write(config)
-
-            flash('Configuration updated successfully')
-        except Exception as e:
-            flash(f'Error updating configuration: {str(e)}')
-
-    # Get current config
-    with open(os.path.join(crossplane_config_dir, 'burgonet.conf')) as f:
-        current_config = f.read()
-
-    return render_template('admin/nginx_config.html', config=current_config)
-
-
 def get_redis_connection():
     return redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB)
 
@@ -105,19 +76,6 @@ def get_provider_class(provider_name):
         'anthropic': Anthropic
     }
     return provider_classes.get(provider_name.lower(), Provider)
-
-
-def generate_location_block(provider_config, api_key):
-    """Generate location block using Provider class methods"""
-    provider_class = get_provider_class(provider_config['model'])
-    provider = provider_class()
-
-    # Update provider instance with config values
-    provider.apikey = api_key
-    provider.proxy_pass = provider_config['proxy_pass']
-    provider.location = provider_config['location']
-
-    return provider.nginx_config_build()
 
 
 @admin_bp.route('/admin/build', methods=['POST', 'GET'])
