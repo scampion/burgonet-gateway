@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Model Configuration</h1>
+
+<div class="mt-4">
+    <!-- Add New Model Form -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Add New Model</h5>
+            <form method="POST" action="{{ url_for('admin.manage_models') }}">
+                <input type="hidden" name="action" value="add">
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="form-label">Provider</label>
+                        <select name="provider" class="form-select" required>
+                            <option value="deepseek">DeepSeek</option>
+                            <option value="openai">OpenAI</option>
+                            <option value="anthropic">Anthropic</option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Model Name</label>
+                        <input type="text" name="model_name" class="form-control" required>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="form-label">Location Path</label>
+                        <input type="text" name="location" class="form-control" required>
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Proxy Pass URL</label>
+                        <input type="text" name="proxy_pass" class="form-control" required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">API Key Prefix</label>
+                    <input type="text" name="api_key" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-success">Add Model</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Existing Models Table -->
+    <form method="POST" action="{{ url_for('admin.manage_models') }}">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Provider</th>
+                    <th>Model Name</th>
+                    <th>Location</th>
+                    <th>Proxy Pass</th>
+                    <th>API Key</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for model in models %}
+                <tr>
+                    <td>
+                        <select name="provider" class="form-select" required>
+                            <option value="deepseek" {% if model.provider == 'deepseek' %}selected{% endif %}>DeepSeek</option>
+                            <option value="openai" {% if model.provider == 'openai' %}selected{% endif %}>OpenAI</option>
+                            <option value="anthropic" {% if model.provider == 'anthropic' %}selected{% endif %}>Anthropic</option>
+                        </select>
+                    </td>
+                    <td><input type="text" name="model_name" value="{{ model.model_name }}" class="form-control" required></td>
+                    <td><input type="text" name="location" value="{{ model.location }}" class="form-control" required></td>
+                    <td><input type="text" name="proxy_pass" value="{{ model.proxy_pass }}" class="form-control" required></td>
+                    <td><input type="text" name="api_key" value="{{ model.api_key }}" class="form-control" required></td>
+                    <td>
+                        <input type="hidden" name="action" value="edit">
+                        <input type="hidden" name="model_index" value="{{ loop.index0 }}">
+                        <button type="submit" class="btn btn-primary btn-sm">Update</button>
+                        <button type="submit" 
+                                formaction="{{ url_for('admin.manage_models') }}"
+                                class="btn btn-danger btn-sm"
+                                onclick="return confirm('Are you sure you want to delete this model?')"
+                                name="action" value="delete">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </form>
+
+    <!-- Build Config Button -->
+    <div class="mt-4">
+        <form method="POST" action="{{ url_for('admin.build_config') }}">
+            <button type="submit" class="btn btn-warning">Build Nginx Configuration</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

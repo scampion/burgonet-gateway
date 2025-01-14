@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify
+from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify, abort
 import json
 from flask_login import login_required, current_user
 import crossplane
@@ -129,6 +129,59 @@ def build_config():
         traceback.print_exc()
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
+
+@admin_bp.route('/admin/models', methods=['GET', 'POST'])
+@login_required
+def manage_models():
+    if current_user.gid != ADMIN_GROUP:
+        flash('Access denied')
+        return redirect(url_for('main.index'))
+
+    try:
+        models = load_models_config()
+        
+        if request.method == 'POST':
+            # Handle form submission
+            action = request.form.get('action')
+            
+            if action == 'add':
+                new_model = {
+                    "provider": request.form.get('provider'),
+                    "model_name": request.form.get('model_name'),
+                    "location": request.form.get('location'),
+                    "proxy_pass": request.form.get('proxy_pass'),
+                    "api_key": request.form.get('api_key')
+                }
+                models.append(new_model)
+                flash('Model added successfully')
+                
+            elif action == 'edit':
+                model_index = int(request.form.get('model_index'))
+                models[model_index] = {
+                    "provider": request.form.get('provider'),
+                    "model_name": request.form.get('model_name'),
+                    "location": request.form.get('location'),
+                    "proxy_pass": request.form.get('proxy_pass'),
+                    "api_key": request.form.get('api_key')
+                }
+                flash('Model updated successfully')
+                
+            elif action == 'delete':
+                model_index = int(request.form.get('model_index'))
+                models.pop(model_index)
+                flash('Model deleted successfully')
+            
+            # Save updated config
+            with open(MODELS_CONFIG, 'w') as f:
+                json.dump({"models": models}, f, indent=4)
+            
+            return redirect(url_for('admin.manage_models'))
+        
+        return render_template('admin/models.html', models=models)
+    
+    except Exception as e:
+        flash(f'Error managing models: {str(e)}')
+        return redirect(url_for('admin.manage_models'))
 
 @admin_bp.route('/admin/apikeys', methods=['GET', 'POST'])
 @login_required
