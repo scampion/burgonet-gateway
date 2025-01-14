@@ -172,7 +172,10 @@ def manage_models():
                 flash('Model deleted successfully')
             
             # Save updated config
-            with open(MODELS_CONFIG, 'w') as f:
+            model_config = MODELS_CONFIG
+            if not os.path.isabs(model_config):
+                model_config = os.path.join(os.path.dirname(__file__), model_config)
+            with open(model_config, 'w') as f:
                 json.dump({"models": models}, f, indent=4)
             
             return redirect(url_for('admin.manage_models'))
@@ -181,6 +184,8 @@ def manage_models():
     
     except Exception as e:
         flash(f'Error managing models: {str(e)}')
+        import traceback
+        traceback.print_exc()
         return redirect(url_for('admin.manage_models'))
 
 @admin_bp.route('/admin/apikeys', methods=['GET', 'POST'])
