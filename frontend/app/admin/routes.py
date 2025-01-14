@@ -150,7 +150,9 @@ def manage_models():
             
             return redirect(url_for('admin.manage_models'))
         
-        return render_template('admin/models.html', models=models)
+        return render_template('admin/models.html', 
+                             models=models,
+                             ADMIN_GROUP=ADMIN_GROUP)
     
     except Exception as e:
         flash(f'Error managing models: {str(e)}')
