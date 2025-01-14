@@ -58,14 +58,14 @@
         <tbody>
             {% for model in models %}
             <tr>
-                <form method="POST" action="{{ url_for('admin.manage_models') }}">
-                    <td>
+                <td>
+                    <form method="POST" action="{{ url_for('admin.manage_models') }}">
                         <select name="provider" class="form-select" required>
                             <option value="deepseek" {% if model.provider == 'deepseek' %}selected{% endif %}>DeepSeek</option>
                             <option value="openai" {% if model.provider == 'openai' %}selected{% endif %}>OpenAI</option>
                             <option value="anthropic" {% if model.provider == 'anthropic' %}selected{% endif %}>Anthropic</option>
                         </select>
-                    </td>
+                </td>
                     <td><input type="text" name="model_name" value="{{ model.model_name }}" class="form-control" required></td>
                     <td><input type="text" name="location" value="{{ model.location }}" class="form-control" required></td>
                     <td><input type="text" name="proxy_pass" value="{{ model.proxy_pass }}" class="form-control" required></td>
@@ -82,7 +82,7 @@
                             Delete
                         </button>
                     </td>
-                </form>
+                    </form>
             </tr>
             {% endfor %}
         </tbody>
