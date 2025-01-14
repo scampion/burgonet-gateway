@@ -44,6 +44,7 @@
     </div>
 
     <!-- Existing Models Table -->
+    <!-- Existing Models Table -->
     <table class="table">
         <thead>
             <tr>
@@ -71,9 +72,14 @@
                     <td><input type="text" name="proxy_pass" value="{{ model.proxy_pass }}" class="form-control" required></td>
                     <td><input type="text" name="api_key" value="{{ model.api_key }}" class="form-control" required></td>
                     <td>
-                        <input type="hidden" name="action" value="edit">
+
                         <input type="hidden" name="model_index" value="{{ loop.index0 }}">
-                        <button type="submit" class="btn btn-primary btn-sm">Update</button>
+                        <button type="submit"
+                                formaction="{{ url_for('admin.manage_models') }}"
+                                class="btn btn-primary btn-sm"
+                                name="action" value="edit">
+                            Update
+                        </button>
                         <button type="submit" 
                                 formaction="{{ url_for('admin.manage_models') }}"
                                 class="btn btn-danger btn-sm"

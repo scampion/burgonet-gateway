@@ -1,52 +1,54 @@
-local redis = require "resty.redis"
-local red = redis:new()
-red:set_timeout(1000)
+-- Retrieve the token from the request header
+local bearer = ngx.req.get_headers()["Authorization"]
 
--- Get Redis connection parameters
-local access_redis_host = ngx.var.access_redis_host or "redis"
-local access_redis_port = ngx.var.access_redis_port or 6379
-local access_token_set = ngx.var.access_token_set or "nginx_tokens:bearer"
+-- Check if the Authorization header is present and starts with 'Bearer '
+if not bearer or not bearer:lower():find("^bearer ") then
+    ngx.exit(ngx.HTTP_UNAUTHORIZED)
+end
+
+-- Extract the token (everything after 'Bearer ')
+local token = bearer:sub(8)  -- 'Bearer ' is 7 characters long, so we start from the 8th character
+
+-- Check if the token is present and not empty
+if not token or token == "" then
+    ngx.exit(ngx.HTTP_UNAUTHORIZED)
+end
 
 -- Connect to Redis
-local ok, err = red:connect(access_redis_host, access_redis_port)
+local redis = require "resty.redis"
+local red = redis:new()
+local redis_host = ngx.var.redis_host or "redis"
+local redis_port = ngx.var.redis_port or 6379
+
+red:set_timeout(1000)
+local ok, err = red:connect(redis_host, redis_port)
 if not ok then
-    ngx.log(ngx.ERR, "failed to connect to redis: ", err)
+    ngx.log(ngx.ERR, "Failed to connect to Redis: ", err)
     ngx.exit(ngx.HTTP_INTERNAL_SERVER_ERROR)
 end
 
--- Authenticate request
-local function authenticate()
-    local header = ngx.req.get_headers()['Authorization']
-    if not header or not header:find(" ") then
-        return false
-    end
-
-    local divider = header:find(' ')
-    if header:sub(0, divider-1):lower() ~= 'bearer' then
-        return false
-    end
-
-    local token = header:sub(divider+1)
-    if not token or token == "" then
-        return false
-    end
-
-    -- Check if token exists in Redis set
-    local exists, err = red:sismember(access_token_set, token)
-    if not exists then
-        ngx.log(ngx.ERR, "failed to check token: ", err)
-        return false
-    end
-
-    return exists == 1
+-- Validate token and get user ID
+local user_id = red:get("token:" .. token)
+if not user_id then
+    ngx.exit(ngx.HTTP_UNAUTHORIZED)
 end
 
--- Only proceed if authentication is successful
-if not authenticate() then
-    ngx.header.content_type = 'text/plain'
-    ngx.header.www_authenticate = 'Bearer realm=""'
-    ngx.status = ngx.HTTP_UNAUTHORIZED
-    ngx.say('401 Access Denied')
-    return ngx.exit(ngx.HTTP_UNAUTHORIZED)
+-- Get the requested route
+local route_path = ngx.var.uri
+local route_key = "route:" .. route_path
+local disabled_groups = red:hget(route_key, "disabled_groups")
+if not disabled_groups then
+    ngx.exit(ngx.HTTP_FORBIDDEN)
 end
 
+-- Check if user belongs to any disabled group
+local user_groups = red:smembers("user:" .. user_id .. ":groups")
+for _, group_id in ipairs(user_groups) do
+    if disabled_groups:find(group_id, 1, true) then
+        ngx.exit(ngx.HTTP_FORBIDDEN)
+    end
+end
+
+-- Authorization granted
+red:set("cache:" .. token, user_id, 3600)
+ngx.exec()

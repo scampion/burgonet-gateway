@@ -120,9 +120,8 @@ class Provider:
             'args': [self.location],
             'block': [
                 {'directive': 'set', 'args': ['$apikey', '']},
-                {'directive': 'set', 'args': ['$access_redis_host', self.redis_host]},
-                {'directive': 'set', 'args': ['$access_redis_port', self.redis_port]},
-                {'directive': 'set', 'args': ['$access_token_set', 'nginx_tokens:bearer']},
+                {'directive': 'set', 'args': ['$redis_host', self.redis_host]},
+                {'directive': 'set', 'args': ['$redis_port', self.redis_port]},
                 {'directive': 'set', 'args': ['$access_model_name', self.model_name]},
                 {'directive': 'set', 'args': ['$access_model_version', self.model_version]},
                 {'directive': 'access_by_lua_file', 'args': ['/etc/nginx/lua-scripts/access.lua']},

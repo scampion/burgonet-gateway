@@ -35,8 +35,8 @@ def add_user_token(user_id, token, label):
         # Store in user's tokens
         pipe.hset(f'user:{user_id}:tokens', f'token:{token}', label)
         pipe.hset(f'user:{user_id}:tokens', f'meta:{token}:created_at', created_at)
-        # Store in nginx_tokens set with bearer prefix
-        pipe.sadd('nginx_tokens:bearer', token)
+
+        pipe.set(f'token:{token}', user_id)
         pipe.execute()
 
 @tokens_bp.route('/tokens', methods=['POST'])

@@ -126,15 +126,27 @@ def manage_models():
                 
             elif action == 'delete':
                 model_index = int(request.form.get('model_index'))
-                models.pop(model_index)
+                model = models.pop(model_index)
+                #remove the model from redis
+                r = get_redis_connection()
+                route_path = model['location']
+                r.delete(f'routes:{route_path}')
                 flash('Model deleted successfully')
-            
+
             # Save updated config
             model_config = MODELS_CONFIG
             if not os.path.isabs(model_config):
                 model_config = os.path.join(os.path.dirname(__file__), model_config)
             with open(model_config, 'w') as f:
                 json.dump({"models": models}, f, indent=4)
+
+            # Update redis routes:route_path hset disabled_groups
+            r = get_redis_connection()
+            for model in models:
+                route_path = model['location']
+                disabled_groups = model.get('disabled_groups', '')
+                r.hset(f'routes:{route_path}', 'disabled_groups', disabled_groups)
+
             
             return redirect(url_for('admin.manage_models'))
         
