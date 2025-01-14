@@ -23,8 +23,8 @@ REDIS_DB = int(os.environ.get('REDIS_DB', 0))
 REDIS_API_KEY_PREFIX = 'api:'
 
 # Crossplane
-CROSSPLANE_CONFIG_DIR = '/etc/nginx/conf.d'
-CROSSPLANE_BACKUP_DIR = '/var/backups/nginx'
+CROSSPLANE_CONFIG = './nginx-conf/nginx.conf'
+PROVIDERS_CONFIG = './config/providers.json'
 
 # Admin group ID
 ADMIN_GROUP = 1000
