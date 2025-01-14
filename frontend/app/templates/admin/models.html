@@ -97,7 +97,11 @@
     <!-- Build Config Button -->
     <div class="mt-4">
         <form method="POST" action="{{ url_for('admin.build_config') }}">
-            <button type="submit" class="btn btn-warning">Build Nginx Configuration</button>
+            <button type="submit"
+                    class="btn btn-warning"
+                    onclick="return confirm('Are you sure you want to overwrite the file {{ filepath }}?')">
+                Update Nginx Configuration
+            </button>
         </form>
     </div>
 </div>

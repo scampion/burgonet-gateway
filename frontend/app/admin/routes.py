@@ -16,7 +16,6 @@ def get_redis_connection():
     return redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB)
 
 
-
 def load_models_config():
     config_path = MODELS_CONFIG
     if not os.path.isabs(config_path):
@@ -36,6 +35,17 @@ def get_provider_class(provider_name):
     return provider_classes.get(provider_name.lower(), Provider)
 
 
+def get_config_filepath():
+    parsed = crossplane.parse(CROSSPLANE_CONFIG)
+    for i, config in enumerate(parsed['config']):
+        if config['file'].split(os.sep)[-1] == 'burgonet.conf':
+            if os.path.isabs(config['file']):
+                return config['file']
+            else:
+                return os.path.join(os.getcwd(), config['file'])
+    return None
+
+
 @admin_bp.route('/admin/build', methods=['POST', 'GET'])
 @login_required
 def build_config():
@@ -48,21 +58,24 @@ def build_config():
         parsed = crossplane.parse(CROSSPLANE_CONFIG)
         server = None
         filepath = None
+        previous_directives = ''
 
         # Select the burgonet file
-        for i, config in enumerate(parsed['config']):
+        for config in parsed['config']:
             if config['file'].split(os.sep)[-1] == 'burgonet.conf':
-                print("Server config found")
                 filepath = config['file']
-                server = config['parsed'][0]
+                for o in config['parsed']:
+                    if o['directive'] == 'server':
+                        server = o
+                    else:
+                        previous_directives += crossplane.build([o]) + '\n'
                 break
 
         if server is None:
             raise Exception('burgonet.conf not found in base config')
 
         # remove all the location blocks
-        server['block'] = [block for block in server['block'] if block['directive'] != 'location']
-        print(server)
+        server['block'] = [block for block in server.get('block', []) if block['directive'] != 'location']
 
         # Generate new location blocks
         for model in load_models_config():
@@ -70,22 +83,20 @@ def build_config():
             server['block'].append(provider.nginx_config())
 
         # Generate new config
-        new_config = crossplane.build([server])
+        new_config_server = crossplane.build([server])
 
         # Save new config
         with open(os.path.join(filepath), 'w') as f:
-            f.write(new_config)
+            f.write(previous_directives)
+            f.write(new_config_server)
 
-        flash('Configuration built and updated successfully')
-        return jsonify({'status': 'success',
-                        'message': 'Configuration updated',
-                        'filepath': filepath,})
+        return previous_directives + new_config_server, 200, {'Content-Type': 'text/plain; charset=utf-8'}
 
     except Exception as e:
         flash(f'Error building configuration: {str(e)}')
         import traceback
         traceback.print_exc()
-        return jsonify({'status': 'error', 'message': str(e)}), 500
+        return jsonify({'error': str(e)}), 500
 
 
 @admin_bp.route('/admin/dashboard')
@@ -94,9 +105,9 @@ def dashboard():
     if current_user.gid != ADMIN_GROUP:
         flash('Access denied')
         return redirect(url_for('main.index'))
-    
+
     # Get stats from Redis
-    r = current_app.redis
+    r = get_redis_connection()
     stats = {
         'total_requests': r.get('stats:total_requests') or 0,
         'successful_requests': r.get('stats:successful_requests') or 0,
@@ -104,7 +115,7 @@ def dashboard():
         'active_users': r.scard('active_users') or 0,
         'models': []
     }
-    
+
     # Get model usage stats
     models = load_models_config()
     for model in models:
@@ -115,10 +126,11 @@ def dashboard():
             'errors': r.get(f"stats:model:{model['model_name']}:errors") or 0
         }
         stats['models'].append(model_stats)
-    
-    return render_template('admin/dashboard.html', 
-                         stats=stats,
-                         ADMIN_GROUP=ADMIN_GROUP)
+
+    return render_template('admin/dashboard.html',
+                           stats=stats,
+                           ADMIN_GROUP=ADMIN_GROUP)
+
 
 @admin_bp.route('/admin/models', methods=['GET', 'POST'])
 @login_required
@@ -129,11 +141,11 @@ def manage_models():
 
     try:
         models = load_models_config()
-        
+
         if request.method == 'POST':
             # Handle form submission
             action = request.form.get('action')
-            
+
             if action == 'add':
                 new_model = {
                     "provider": request.form.get('provider'),
@@ -144,7 +156,7 @@ def manage_models():
                 }
                 models.append(new_model)
                 flash('Model added successfully')
-                
+
             elif action == 'edit':
                 model_index = int(request.form.get('model_index'))
                 models[model_index] = {
@@ -155,11 +167,11 @@ def manage_models():
                     "api_key": request.form.get('api_key')
                 }
                 flash('Model updated successfully')
-                
+
             elif action == 'delete':
                 model_index = int(request.form.get('model_index'))
                 model = models.pop(model_index)
-                #remove the model from redis
+                # remove the model from redis
                 r = get_redis_connection()
                 route_path = model['location']
                 r.delete(f'routes:{route_path}')
@@ -179,16 +191,15 @@ def manage_models():
                 disabled_groups = model.get('disabled_groups', '')
                 r.hset(f'routes:{route_path}', 'disabled_groups', disabled_groups)
 
-            
             return redirect(url_for('admin.manage_models'))
-        
-        return render_template('admin/models.html', 
-                             models=models,
-                             ADMIN_GROUP=ADMIN_GROUP)
-    
+
+        return render_template('admin/models.html',
+                               models=models,
+                               filepath=get_config_filepath(),
+                               ADMIN_GROUP=ADMIN_GROUP)
+
     except Exception as e:
         flash(f'Error managing models: {str(e)}')
         import traceback
         traceback.print_exc()
         return redirect(url_for('admin.manage_models'))
-
