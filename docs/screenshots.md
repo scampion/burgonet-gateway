@@ -8,6 +8,7 @@
 
 ![image-20250114110743398](img/screenshots/image-20250114110743398.png)
 
+![image-20250115163041558](img/screenshots/image-20250115163041558.png)
 
 ## Log example
 
