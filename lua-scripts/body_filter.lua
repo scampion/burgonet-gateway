@@ -6,8 +6,6 @@ if ngx.arg[2] then
     local response_body = ngx.ctx.buffered
     ngx.var.resp_body = response_body
 
-
-    
     -- Handle error responses
     if ngx.status >= 400 then
         -- Get additional request details
