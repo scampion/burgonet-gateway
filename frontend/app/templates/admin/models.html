@@ -17,6 +17,8 @@
                             <option value="deepseek">DeepSeek</option>
                             <option value="openai">OpenAI</option>
                             <option value="anthropic">Anthropic</option>
+                            <option value="azure">Azure</option>
+                            <option value="ollama">Ollama</option>
                         </select>
                     </div>
                     <div class="col">
@@ -65,6 +67,8 @@
                             <option value="deepseek" {% if model.provider == 'deepseek' %}selected{% endif %}>DeepSeek</option>
                             <option value="openai" {% if model.provider == 'openai' %}selected{% endif %}>OpenAI</option>
                             <option value="anthropic" {% if model.provider == 'anthropic' %}selected{% endif %}>Anthropic</option>
+                            <option value="azure" {% if model.provider == 'azure' %}selected{% endif %}>Azure</option>
+                            <option value="ollama" {% if model.provider == 'ollama' %}selected{% endif %}>Ollama</option>
                         </select>
                 </td>
                     <td><input type="text" name="model_name" value="{{ model.model_name }}" class="form-control" required></td>
