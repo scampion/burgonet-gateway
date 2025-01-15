@@ -43,8 +43,20 @@ local blacklist_words = red:hget(route_key, "blacklist_words")
 -- log the blacklist words
 if blacklist_words then
     -- Check if the request contains any blacklisted words
-    local request_body = ngx.req.get_body_data()
-    request_body = request_body and request_body:lower()
+    -- Read the request body first
+    ngx.req.read_body()
+    -- Read the request body first
+    ngx.req.read_body()
+    local request_body, err = ngx.req.get_body_data()
+    if not request_body then
+        if err == "request body too large" then
+            ngx.log(ngx.ERR, "Request body too large")
+            ngx.exit(ngx.HTTP_REQUEST_ENTITY_TOO_LARGE)
+        end
+        request_body = ""
+    else
+        request_body = request_body:lower()
+    end
     ngx.log(ngx.INFO, "🚫 Blacklist words: ", blacklist_words, " in request body: ", request_body)
     if request_body then
         for word in blacklist_words:gmatch("%S+") do
