@@ -13,12 +13,6 @@ parsers = {
     'ollama': Ollama.parse_response,
 }
 
-
-def parse_response(response):
-    provider_name = response.get('provider')
-    return parsers[provider_name](response)
-
-
 def main():
     if len(sys.argv) != 3:
         print("Usage: aggregator.py <redis_host> <redis_port>")
@@ -36,8 +30,9 @@ def main():
             try:
                 print(f"{k}")
                 response = json.loads(v)
-                parsed_response = parse_response(response)
-                parsed_response['provider'] = response['provider']
+                provider_name = response['provider']
+                parsed_response = parsers[provider_name](response)
+                parsed_response['provider'] = provider_name
                 pprint.pprint(parsed_response)
                 print("-" * 80)
             except Exception as e:
