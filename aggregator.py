@@ -3,7 +3,7 @@ import json
 import pprint
 import sys
 import redis
-from frontend.models import DeepSeek, OpenAI, Anthropic, Azure
+from frontend.app.models import DeepSeek, OpenAI, Anthropic, Azure
 
 parsers = {
     'deepseek': DeepSeek.parse_response,
