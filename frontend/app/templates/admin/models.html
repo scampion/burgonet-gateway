@@ -60,9 +60,10 @@
         </thead>
         <tbody>
             {% for model in models %}
-            <form method="POST" action="{{ url_for('admin.manage_models') }}">
-                <tr>
-                    <td>
+            <tr>
+                <td>
+                    <form method="POST" action="{{ url_for('admin.manage_models') }}" class="d-inline">
+                        <input type="hidden" name="model_index" value="{{ loop.index0 }}">
                         <select name="provider" class="form-select" required>
                             <option value="deepseek" {% if model.provider == 'deepseek' %}selected{% endif %}>DeepSeek</option>
                             <option value="openai" {% if model.provider == 'openai' %}selected{% endif %}>OpenAI</option>
@@ -70,29 +71,52 @@
                             <option value="azure" {% if model.provider == 'azure' %}selected{% endif %}>Azure</option>
                             <option value="ollama" {% if model.provider == 'ollama' %}selected{% endif %}>Ollama</option>
                         </select>
-                    </td>
-                    <td><input type="text" name="model_name" value="{{ model.model_name }}" class="form-control" required></td>
-                    <td><input type="text" name="location" value="{{ model.location }}" class="form-control" required></td>
-                    <td><input type="text" name="proxy_pass" value="{{ model.proxy_pass }}" class="form-control" required></td>
-                    <td><input type="text" name="api_key" value="{{ model.api_key }}" class="form-control" required></td>
-                    <td>
+                    </form>
+                </td>
+                <td>
+                    <form method="POST" action="{{ url_for('admin.manage_models') }}" class="d-inline">
+                        <input type="hidden" name="model_index" value="{{ loop.index0 }}">
+                        <input type="text" name="model_name" value="{{ model.model_name }}" class="form-control" required>
+                    </form>
+                </td>
+                <td>
+                    <form method="POST" action="{{ url_for('admin.manage_models') }}" class="d-inline">
+                        <input type="hidden" name="model_index" value="{{ loop.index0 }}">
+                        <input type="text" name="location" value="{{ model.location }}" class="form-control" required>
+                    </form>
+                </td>
+                <td>
+                    <form method="POST" action="{{ url_for('admin.manage_models') }}" class="d-inline">
+                        <input type="hidden" name="model_index" value="{{ loop.index0 }}">
+                        <input type="text" name="proxy_pass" value="{{ model.proxy_pass }}" class="form-control" required>
+                    </form>
+                </td>
+                <td>
+                    <form method="POST" action="{{ url_for('admin.manage_models') }}" class="d-inline">
+                        <input type="hidden" name="model_index" value="{{ loop.index0 }}">
+                        <input type="text" name="api_key" value="{{ model.api_key }}" class="form-control" required>
+                    </form>
+                </td>
+                <td>
+                    <form method="POST" action="{{ url_for('admin.manage_models') }}" class="d-inline">
                         <input type="hidden" name="model_index" value="{{ loop.index0 }}">
                         <button type="submit"
-                                formaction="{{ url_for('admin.manage_models') }}"
                                 class="btn btn-primary btn-sm"
                                 name="action" value="edit">
                             Update
                         </button>
+                    </form>
+                    <form method="POST" action="{{ url_for('admin.manage_models') }}" class="d-inline">
+                        <input type="hidden" name="model_index" value="{{ loop.index0 }}">
                         <button type="submit" 
-                                formaction="{{ url_for('admin.manage_models') }}"
                                 class="btn btn-danger btn-sm"
                                 onclick="return confirm('Are you sure you want to delete this model?')"
                                 name="action" value="delete">
                             Delete
                         </button>
-                    </td>
-                </tr>
-            </form>
+                    </form>
+                </td>
+            </tr>
             {% endfor %}
         </tbody>
     </table>
