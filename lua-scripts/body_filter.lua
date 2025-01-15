@@ -20,17 +20,5 @@ if ngx.arg[2] then
         -- Construct detailed error message
         local error_details = string.format([[🚨️ Error Requests status: %d Request Method: %s Request URI: %s Client IP: %s Upstream Status: %s Request Time: %s Model Name: %s Response Body: %s ]], ngx.status, request_method, request_uri, remote_addr, upstream_status, request_time, model_name, response_body)
         ngx.log(ngx.ERR, error_details)
-        
-        -- Replace the response body with the error message
-        ngx.arg[1] = response_body
-        
-        -- Only modify headers if we can
-        if ngx.headers_sent ~= true then
-            ngx.header["Connection"] = "close"
-            ngx.header["Content-Length"] = #response_body
-        else
-            -- If headers already sent, just log a warning
-            ngx.log(ngx.WARN, "Headers already sent, cannot modify Connection header")
-        end
     end
 end

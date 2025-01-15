@@ -22,10 +22,11 @@
             "api_key": "YOUR_API_KEY"
         },
         {
-            "location": "/ollama/gemma2/2b/",
             "provider": "ollama",
             "model_name": "gemma2:2b-instruct-q6_K",
-            "proxy_pass": "http://localhost:11434/api/chat"
+            "location": "/ollama/gemma2/2b/",
+            "proxy_pass": "http://m1:11434/api/chat",
+            "api_key": "NA"
         }
     ]
 }
