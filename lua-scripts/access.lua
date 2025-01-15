@@ -34,9 +34,32 @@ if user_id == ngx.null then
     ngx.exit(ngx.HTTP_UNAUTHORIZED)
 end
 
+
+
 -- Get the requested route
 local route_path = ngx.var.uri
-local route_key = "route:" .. route_path
+local route_key = "routes:" .. route_path
+local blacklist_words = red:hget(route_key, "blacklist_words")
+-- log the blacklist words
+if blacklist_words then
+    -- Check if the request contains any blacklisted words
+    local request_body = ngx.req.get_body_data()
+    request_body = request_body and request_body:lower()
+    ngx.log(ngx.INFO, "🚫 Blacklist words: ", blacklist_words, " in request body: ", request_body)
+    if request_body then
+        for word in blacklist_words:gmatch("%S+") do
+            word = word:lower()
+            if request_body:find(word, 1, true) then
+                ngx.status = ngx.HTTP_FORBIDDEN
+                ngx.header.content_type = "text/plain"
+                ngx.say("Request contains blacklisted word: ", word)
+                ngx.exit(ngx.HTTP_FORBIDDEN)
+            end
+        end
+    end
+end
+
+
 local disabled_groups = red:hget(route_key, "disabled_groups")
 if not disabled_groups then
     ngx.exit(ngx.HTTP_FORBIDDEN)
