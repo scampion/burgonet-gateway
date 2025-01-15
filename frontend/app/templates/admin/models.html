@@ -98,14 +98,10 @@
                     </form>
                 </td>
                 <td>
-                    <form method="POST" action="{{ url_for('admin.manage_models') }}" class="d-inline">
-                        <input type="hidden" name="model_index" value="{{ loop.index0 }}">
-                        <button type="submit"
-                                class="btn btn-primary btn-sm"
-                                name="action" value="edit">
-                            Update
-                        </button>
-                    </form>
+                    <a href="{{ url_for('admin.model_config', model_index=loop.index0) }}" 
+                       class="btn btn-primary btn-sm">
+                        Configure
+                    </a>
                     <form method="POST" action="{{ url_for('admin.manage_models') }}" class="d-inline">
                         <input type="hidden" name="model_index" value="{{ loop.index0 }}">
                         <button type="submit" 

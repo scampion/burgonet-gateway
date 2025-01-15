@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify, abort, current_app
+from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify, abort, current_app, json
 import json
 from flask_login import login_required, current_user
 import crossplane
@@ -131,6 +131,58 @@ def dashboard():
     return render_template('admin/dashboard.html',
                            stats=stats,
                            ADMIN_GROUP=ADMIN_GROUP)
+
+
+@admin_bp.route('/admin/model/<int:model_index>', methods=['GET', 'POST'])
+@login_required
+def model_config(model_index):
+    if current_user.gid != ADMIN_GROUP:
+        flash('Access denied')
+        return redirect(url_for('main.index'))
+
+    try:
+        models = load_models_config()
+        
+        if model_index >= len(models):
+            flash('Invalid model index')
+            return redirect(url_for('admin.manage_models'))
+
+        model = models[model_index]
+        
+        if request.method == 'POST':
+            # Update model configuration
+            model['disabled_groups'] = request.form.get('disabled_groups', '')
+            model['blacklist_words'] = request.form.get('blacklist_words', '')
+            
+            # Save updated config
+            model_config = MODELS_CONFIG
+            if not os.path.isabs(model_config):
+                model_config = os.path.join(os.path.dirname(__file__), model_config)
+            with open(model_config, 'w') as f:
+                json.dump({"models": models}, f, indent=4)
+            
+            # Update redis
+            r = get_redis_connection()
+            route_path = model['location']
+            r.hset(f'routes:{route_path}', 'disabled_groups', model['disabled_groups'])
+            r.hset(f'routes:{route_path}', 'blacklist_words', model['blacklist_words'])
+            
+            flash('Model configuration updated successfully')
+            return redirect(url_for('admin.model_config', model_index=model_index))
+
+        # Get current values
+        disabled_groups = model.get('disabled_groups', '')
+        blacklist_words = model.get('blacklist_words', '')
+        
+        return render_template('admin/model_config.html',
+                             model=model,
+                             model_index=model_index,
+                             disabled_groups=disabled_groups,
+                             blacklist_words=blacklist_words)
+
+    except Exception as e:
+        flash(f'Error updating model configuration: {str(e)}')
+        return redirect(url_for('admin.manage_models'))
 
 
 @admin_bp.route('/admin/models', methods=['GET', 'POST'])
