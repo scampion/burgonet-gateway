@@ -61,8 +61,8 @@
         <tbody>
             {% for model in models %}
             <tr>
-                <td>
-                    <form method="POST" action="{{ url_for('admin.manage_models') }}">
+                <form method="POST" action="{{ url_for('admin.manage_models') }}">
+                    <td>
                         <select name="provider" class="form-select" required>
                             <option value="deepseek" {% if model.provider == 'deepseek' %}selected{% endif %}>DeepSeek</option>
                             <option value="openai" {% if model.provider == 'openai' %}selected{% endif %}>OpenAI</option>
@@ -70,13 +70,12 @@
                             <option value="azure" {% if model.provider == 'azure' %}selected{% endif %}>Azure</option>
                             <option value="ollama" {% if model.provider == 'ollama' %}selected{% endif %}>Ollama</option>
                         </select>
-                </td>
+                    </td>
                     <td><input type="text" name="model_name" value="{{ model.model_name }}" class="form-control" required></td>
                     <td><input type="text" name="location" value="{{ model.location }}" class="form-control" required></td>
                     <td><input type="text" name="proxy_pass" value="{{ model.proxy_pass }}" class="form-control" required></td>
                     <td><input type="text" name="api_key" value="{{ model.api_key }}" class="form-control" required></td>
                     <td>
-
                         <input type="hidden" name="model_index" value="{{ loop.index0 }}">
                         <button type="submit"
                                 formaction="{{ url_for('admin.manage_models') }}"
@@ -92,7 +91,7 @@
                             Delete
                         </button>
                     </td>
-                    </form>
+                </form>
             </tr>
             {% endfor %}
         </tbody>
