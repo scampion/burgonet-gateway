@@ -24,8 +24,13 @@ if ngx.arg[2] then
         -- Replace the response body with the error message
         ngx.arg[1] = response_body
         
-        -- Ensure connection is closed
-        ngx.header["Connection"] = "close"
-        ngx.header["Content-Length"] = #response_body
+        -- Only modify headers if we can
+        if ngx.headers_sent ~= true then
+            ngx.header["Connection"] = "close"
+            ngx.header["Content-Length"] = #response_body
+        else
+            -- If headers already sent, just log a warning
+            ngx.log(ngx.WARN, "Headers already sent, cannot modify Connection header")
+        end
     end
 end
