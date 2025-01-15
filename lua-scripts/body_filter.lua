@@ -8,7 +8,29 @@ if ngx.arg[2] then
     
     -- Handle error responses
     if ngx.status >= 400 then
-        ngx.log(ngx.ERR, "Request failed with status: ", ngx.status, " Response: ", response_body)
+        -- Get additional request details
+        local request_method = ngx.req.get_method()
+        local request_uri = ngx.var.request_uri
+        local remote_addr = ngx.var.remote_addr
+        local upstream_status = ngx.var.upstream_status or "N/A"
+        local request_time = ngx.var.request_time or "N/A"
+        local model_name = ngx.var.model_name or "N/A"
+        
+        -- Construct detailed error message
+        local error_details = string.format([[
+Request failed with status: %d
+Request Method: %s
+Request URI: %s
+Client IP: %s
+Upstream Status: %s
+Request Time: %s
+Model Name: %s
+Response Body: %s
+]], ngx.status, request_method, request_uri, remote_addr, 
+   upstream_status, request_time, model_name, response_body)
+
+        ngx.log(ngx.ERR, error_details)
+        
         -- Replace the response body with the error message
         ngx.arg[1] = response_body
     end
