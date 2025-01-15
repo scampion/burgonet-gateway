@@ -10,11 +10,11 @@ if ngx.arg[2] then
     if ngx.status >= 400 then
         ngx.log(ngx.ERR, "Request failed with status: ", ngx.status, " Response: ", response_body)
         
-        -- Forward the error response to client
+        -- Modify response headers and body
         ngx.header.content_length = nil
         ngx.header.content_type = "application/json"
-        ngx.status = ngx.status
-        ngx.say(response_body)
-        return ngx.exit(ngx.status)
+        
+        -- Replace the response body with the error message
+        ngx.arg[1] = response_body
     end
 end
