@@ -3,13 +3,14 @@ import json
 import pprint
 import sys
 import redis
-from frontend.app.models import DeepSeek, OpenAI, Anthropic, Azure
+from frontend.app.models import DeepSeek, OpenAI, Anthropic, Azure, Ollama
 
 parsers = {
     'deepseek': DeepSeek.parse_response,
     'openai': OpenAI.parse_response,
     'anthropic': Anthropic.parse_response,
-    'azure': Azure.parse_response
+    'azure': Azure.parse_response,
+    'ollama': Ollama.parse_response,
 }
 
 
@@ -33,12 +34,14 @@ def main():
         print(f"\nProcessing token: {token}")
         for k, v in rd.hgetall(token).items():
             try:
-                print(f"Key: {k}")
+                print(f"{k}")
                 response = json.loads(v)
                 parsed_response = parse_response(response)
+                parsed_response['provider'] = response['provider']
                 pprint.pprint(parsed_response)
+                print("-" * 80)
             except Exception as e:
-                print(f"Error: {e}")
+                print(f"Error: {e} {v}")
                 continue
 
 

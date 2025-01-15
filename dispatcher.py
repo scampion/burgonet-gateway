@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import hashlib
 import json
 import pprint
@@ -29,8 +30,8 @@ def dispatch(line):
     pprint.pprint(data)
     data_hash = hashlib.sha1(json.dumps(data).encode()).hexdigest()
     with rd.pipeline() as pipe:
-        pipe.hset(f'response:{token}', mapping={data_hash: json.dumps(data)})
-        pipe.hexpire(f'response:{token}', 172800, data_hash)
+        pipe.hset(f'responses:{token}', mapping={data_hash: json.dumps(data)})
+        pipe.hexpire(f'responses:{token}', 172800, data_hash)
         pipe.execute()
         print(f"Data saved with hash: {data_hash}")
 
@@ -47,5 +48,5 @@ with open(nginx_log_filepath) as f:
             print("-" * 80)
         except Exception as e:
             # log the error with the class name and the error message
-            print(f"Error:{e.__class__.__name__}   {str(e)}")
+            print(f"🚨️ Error:{e.__class__.__name__}   {str(e)} {line}")
             continue

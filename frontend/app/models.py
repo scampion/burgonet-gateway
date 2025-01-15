@@ -114,7 +114,15 @@ class Provider:
     def __repr__(self):
         return f'<Provider {self}>'
 
+    @staticmethod
+    def parse_response(response):
+        pass
+
     def nginx_config(self):
+        if not self.provider:
+            provider = self.__class__.__name__.lower()
+        else:
+            provider = self.provider
         return {
             'directive': 'location',
             'args': [self.location],
@@ -124,6 +132,7 @@ class Provider:
                 {'directive': 'set', 'args': ['$redis_port', self.redis_port]},
                 {'directive': 'set', 'args': ['$model_name', self.model_name]},
                 {'directive': 'set', 'args': ['$model_version', self.model_version]},
+                {'directive': 'set', 'args': ['$provider', provider]},
                 {'directive': 'access_by_lua_file', 'args': ['/etc/nginx/lua-scripts/access.lua']},
                 {'directive': 'proxy_pass', 'args': [self.proxy_pass]},
                 {'directive': 'proxy_ssl_server_name', 'args': ['on']},
@@ -145,6 +154,13 @@ class DeepSeek(Provider):
     proxy_pass: str = 'https://api.deepseek.com/chat/completions'
     location: str = '/api.deepseek.com/v3/chat/completions'
 
+    def parse_response(response):
+        return {
+            "tokens_input": response['response_body']['usage']['prompt_tokens'],
+            "tokens_output": response['response_body']['usage']['completion_tokens']
+        }
+
+
 @dataclass
 class OpenAI(Provider):
     api_key: str = 'openai:v1'
@@ -157,6 +173,7 @@ class Anthropic(Provider):
     api_key: str = 'anthropic:v1'
     proxy_pass: str = 'https://api.anthropic.com/v1/chat/completions'
     location: str = '/api.anthropic.com/v1/chat/completions'
+
 
 @dataclass
 class Azure(Provider):
@@ -175,3 +192,13 @@ class Azure(Provider):
         init_config['block'] = [block for block in init_config['block'] if block['directive'] != 'proxy_pass']
         init_config['block'].append({'directive': 'proxy_pass', 'args': ['$endpoint']})
         return init_config
+
+
+@dataclass
+class Ollama(Provider):
+
+    def parse_response(response):
+        return {
+            "tokens_input": response['response_body']['prompt_eval_count'],
+            "tokens_output": response['response_body']['eval_count']
+        }
