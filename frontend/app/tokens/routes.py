@@ -15,6 +15,7 @@ redis_client = redis.Redis(
     decode_responses=True
 )
 
+
 def get_user_tokens(user_id):
     """Get all tokens for a user"""
     token_data = redis_client.hgetall(f'user:{user_id}:tokens')
@@ -28,6 +29,7 @@ def get_user_tokens(user_id):
             }
     return tokens
 
+
 def add_user_token(user_id, token, label):
     """Add a new token for a user with metadata"""
     created_at = datetime.utcnow().isoformat()
@@ -39,29 +41,32 @@ def add_user_token(user_id, token, label):
         pipe.set(f'token:{token}', user_id)
         pipe.execute()
 
+
+
 @tokens_bp.route('/tokens', methods=['POST'])
 @login_required
 def generate_token():
     user_id = current_user.get_id()
     if not user_id:
         return jsonify({'error': 'User not found'}), 404
-    
+
     # Get label from request
     label = request.json.get('label')
     if not label:
         return jsonify({'error': 'Label is required'}), 400
-    
+
     # Generate secure token
     token = "bgk_" + secrets.token_urlsafe(32)
-    
+
     # Store token in Redis
     add_user_token(user_id, token, label)
-    
+
     return jsonify({
         'token': token,
         'label': label,
         'bearer_token': f'Bearer {token}'  # Return the full bearer token format
     }), 201
+
 
 @tokens_bp.route('/tokens/<token>', methods=['DELETE'])
 @login_required
@@ -81,5 +86,5 @@ def delete_token(token):
         # Remove from nginx_tokens set
         pipe.srem('nginx_tokens:bearer', token)
         pipe.execute()
-    
+
     return jsonify({'message': 'Token deleted'}), 200

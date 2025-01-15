@@ -6,12 +6,12 @@ from flask import current_app
 
 
 class User(UserMixin):
-    def __init__(self, id, dn, username, gid, group):
+    def __init__(self, id, username, gid, groups):
         self._id = id
-        self.dn = dn
         self.username = username
         self.gid = gid
-        self.group = group
+        self.groups = groups
+
 
         # Store user data in Redis
         r = redis.Redis(
@@ -20,23 +20,29 @@ class User(UserMixin):
             db=current_app.config['REDIS_DB']
         )
 
+        # Store groups info in user:" .. user_id .. ":groups
+        if self.groups:
+            user_groups_key = f"user:{self._id}:groups"
+            r.delete(user_groups_key)
+            for group in self.groups:
+                r.sadd(user_groups_key, group)
+
+        # Session infos
         user_key = f"sessions:{self._id}"
         # Check if the session key already exists
         if r.exists(user_key):
             user_data = r.hgetall(user_key)
             self._id = user_data.get(b'id', self._id).decode('utf-8')
-            self.dn = user_data.get(b'dn', self.dn).decode('utf-8')
             self.username = user_data.get(b'username', self.username).decode('utf-8') or None
             self.gid = int(user_data.get(b'gid', self.gid).decode('utf-8')) if user_data.get(b'gid') else None
-            self.group = user_data.get(b'group', self.group).decode('utf-8') or None
+            self.groups = user_data.get(b'groups', "").split() or None
         else:
             # Convert None values to empty strings for Redis storage
             r.hset(user_key, mapping={
                 'id': self._id,
-                'dn': self.dn,
                 'username': self.username,
                 'gid': self.gid,
-                'group': self.group
+                'groups': ' '.join(self.groups)
             })
         r.expire(user_key, 3600)  # Expire after 1 hour
 
@@ -59,10 +65,9 @@ class User(UserMixin):
         """Tell Flask-Login how to serialize the User object"""
         return {
             'id': self._id,
-            'dn': self.dn,
             'username': self.username,
             'gid': self.gid,
-            'group': self.group
+            'groups': self.groups
         }
 
     def __setstate__(self, data):
@@ -78,17 +83,15 @@ class User(UserMixin):
 
         if user_data:
             self._id = user_data.get(b'id', data['id']).decode('utf-8')
-            self.dn = user_data.get(b'dn', data['dn']).decode('utf-8')
             self.username = user_data.get(b'username', data['username']).decode('utf-8') or None
             self.gid = int(user_data.get(b'gid', data['gid']).decode('utf-8')) if user_data.get(b'gid') else None
-            self.group = user_data.get(b'group', data['group']).decode('utf-8') or None
+            self.groups = user_data.get(b'groups', "").split() or None
         else:
             # Fallback to session data
             self._id = data['id']
-            self.dn = data['dn']
             self.username = data['username']
             self.gid = data['gid']
-            self.group = data['group']
+            self.groups = data['groups']
 
     def delete_session(self):
         r = redis.Redis(

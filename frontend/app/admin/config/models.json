@@ -15,9 +15,9 @@
             "api_key": "YOUR_API_KEY"
         },
         {
-            "location": "/azure/gpt4o",
             "provider": "azure",
-            "model_name": "gpt4o",
+            "model_name": "gpt4",
+            "location": "/azure/gpt4o",
             "proxy_pass": "https://YOUR_RESOURCE_NAME.openai.azure.com/openai/deployments/YOUR_DEPLOYMENT_ID-id/completions?api-version=2024-10-21",
             "api_key": "YOUR_API_KEY"
         },
@@ -26,7 +26,9 @@
             "model_name": "gemma2:2b-instruct-q6_K",
             "location": "/ollama/gemma2/2b/",
             "proxy_pass": "http://m1:11434/api/chat",
-            "api_key": "NA"
+            "api_key": "NA",
+            "disabled_groups": "it",
+            "blacklist_words": "confidential mycorp"
         }
     ]
 }

@@ -153,7 +153,10 @@ def model_config(model_index):
             # Update model configuration
             model['disabled_groups'] = request.form.get('disabled_groups', '')
             model['blacklist_words'] = request.form.get('blacklist_words', '')
-            
+            # clean up the input
+            model['disabled_groups'] = ' '.join([group.strip() for group in model['disabled_groups'].split(',')])
+            model['blacklist_words'] = ' '.join([word.strip() for word in model['blacklist_words'].split(',')])
+
             # Save updated config
             model_config = MODELS_CONFIG
             if not os.path.isabs(model_config):

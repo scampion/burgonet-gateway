@@ -13,6 +13,8 @@ parsers = {
     'ollama': Ollama.parse_response,
 }
 
+
+
 def main():
     if len(sys.argv) != 3:
         print("Usage: aggregator.py <redis_host> <redis_port>")

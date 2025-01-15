@@ -65,11 +65,21 @@
                     <input type="hidden" name="model_index" value="{{ loop.index0 }}">
                     <td>
                         <select name="provider" class="form-select" required>
-                            <option value="deepseek" {% if model.provider == 'deepseek' %}selected{% endif %}>DeepSeek</option>
-                            <option value="openai" {% if model.provider == 'openai' %}selected{% endif %}>OpenAI</option>
-                            <option value="anthropic" {% if model.provider == 'anthropic' %}selected{% endif %}>Anthropic</option>
-                            <option value="azure" {% if model.provider == 'azure' %}selected{% endif %}>Azure</option>
-                            <option value="ollama" {% if model.provider == 'ollama' %}selected{% endif %}>Ollama</option>
+                            <option value="deepseek" {% if model.provider == 'deepseek' %}selected{% endif %}>
+                                DeepSeek
+                            </option>
+                            <option value="openai" {% if model.provider == 'openai' %}selected{% endif %}>
+                                OpenAI
+                            </option>
+                            <option value="anthropic" {% if model.provider == 'anthropic' %}selected{% endif %}>
+                                Anthropic
+                            </option>
+                            <option value="azure" {% if model.provider == 'azure' %}selected{% endif %}>
+                                Azure
+                            </option>
+                            <option value="ollama" {% if model.provider == 'ollama' %}selected{% endif %}>
+                                Ollama
+                            </option>
                         </select>
                     </td>
                     <td>

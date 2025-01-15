@@ -42,22 +42,11 @@ local route_key = "routes:" .. route_path
 local blacklist_words = red:hget(route_key, "blacklist_words")
 -- log the blacklist words
 if blacklist_words then
-    -- Check if the request contains any blacklisted words
-    -- Read the request body first
-    ngx.req.read_body()
     -- Read the request body first
     ngx.req.read_body()
     local request_body, err = ngx.req.get_body_data()
-    if not request_body then
-        if err == "request body too large" then
-            ngx.log(ngx.ERR, "Request body too large")
-            ngx.exit(ngx.HTTP_REQUEST_ENTITY_TOO_LARGE)
-        end
-        request_body = ""
-    else
-        request_body = request_body:lower()
-    end
-    ngx.log(ngx.INFO, "🚫 Blacklist words: ", blacklist_words, " in request body: ", request_body)
+    request_body = request_body:lower()
+    -- Check if the request contains any blacklisted words
     if request_body then
         for word in blacklist_words:gmatch("%S+") do
             word = word:lower()
@@ -73,14 +62,17 @@ end
 
 
 local disabled_groups = red:hget(route_key, "disabled_groups")
-if not disabled_groups then
-    ngx.exit(ngx.HTTP_FORBIDDEN)
+if disabled_groups == ngx.null then
+    disabled_groups = ""
 end
 
 -- Check if user belongs to any disabled group
 local user_groups = red:smembers("user:" .. user_id .. ":groups")
 for _, group_id in ipairs(user_groups) do
     if disabled_groups:find(group_id, 1, true) then
+        ngx.status = ngx.HTTP_FORBIDDEN
+        ngx.header.content_type = "text/plain"
+        ngx.say("User belongs to a disabled group")
         ngx.exit(ngx.HTTP_FORBIDDEN)
     end
 end

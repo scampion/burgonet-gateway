@@ -8,11 +8,13 @@ from ..models import User
 
 auth_bp = Blueprint('auth', __name__)
 
+
 @login_manager.user_loader
 def load_user(id):
     # Return a basic user instance with just the ID/DN
     # This will be enhanced by Flask-Login's session management
-    return User(id=id, dn=id, username=None, gid=None, group=None)
+    return User(id=id, username=None, gid=None, groups=None)
+
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
@@ -35,7 +37,7 @@ def login():
             attributes=['cn', 'uid', 'gidNumber'],
             controls=[]
         )
-        
+
         if not ldap_manager.connection.entries:
             flash('User details not found')
             return redirect(url_for('main.index'))
@@ -60,21 +62,21 @@ def login():
         # Create user object
         user = User(
             id=username,
-            dn=groupname,
             username=username,
             gid=gid,
-            group=groupname
+            groups=[groupname]
         )
         print("User object created ", user.__dict__)
         login_user(user)
         return redirect(url_for('main.index'))
 
     except Exception as e:
-        #print traceback
+        # print traceback
         import traceback
         traceback.print_exc()
         flash(f'Login failed: {str(e)}')
         return redirect(url_for('main.index'))
+
 
 @auth_bp.route('/logout')
 def logout():
