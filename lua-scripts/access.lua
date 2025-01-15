@@ -29,7 +29,8 @@ end
 
 -- Validate token and get user ID
 local user_id = red:get("token:" .. token)
-if not user_id then
+if user_id == ngx.null then
+    ngx.log(ngx.ERR, "User not found in Redis for token: ", token)
     ngx.exit(ngx.HTTP_UNAUTHORIZED)
 end
 
@@ -51,4 +52,6 @@ end
 
 -- Authorization granted
 red:set("cache:" .. token, user_id, 3600)
-ngx.exec()
+
+-- Close the connection
+ngx.log(ngx.INFO, "Authorization granted for user ID: ", user_id)

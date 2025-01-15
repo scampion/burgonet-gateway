@@ -1,18 +1,31 @@
 {
     "models": [
         {
+            "location": "/api.deepseek.com/v3/chat/completions",
             "provider": "deepseek",
             "model_name": "deepseek",
-            "location": "/api.deepseek.com/v3/chat/completions",
             "proxy_pass": "https://api.deepseek.com",
             "api_key": "YOUR_API_KEY"
         },
         {
+            "location": "/api.openai.com/v1/chat/completions",
             "provider": "openai",
             "model_name": "gpt4o",
-            "location": "/openai",
             "proxy_pass": "https://api.openai.com",
             "api_key": "YOUR_API_KEY"
+        },
+        {
+            "location": "/azure/gpt4o",
+            "provider": "azure",
+            "model_name": "gpt4o",
+            "proxy_pass": "https://YOUR_RESOURCE_NAME.openai.azure.com/openai/deployments/YOUR_DEPLOYMENT_ID-id/completions?api-version=2024-10-21",
+            "api_key": "YOUR_API_KEY"
+        },
+        {
+            "location": "/ollama/gemma2/2b/",
+            "provider": "ollama",
+            "model_name": "gemma2:2b-instruct-q6_K",
+            "proxy_pass": "http://localhost:11434/api/chat"
         }
     ]
 }

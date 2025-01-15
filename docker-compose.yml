@@ -8,6 +8,8 @@ services:
       - "8080:80"
     volumes:
       - ./nginx-conf/conf.d:/etc/nginx/conf.d
+      - ./nginx-conf/conf.d:/usr/local/openresty/nginx/conf/conf.d
+      - ./nginx-conf/nginx.conf:/usr/local/openresty/nginx/conf/nginx.conf
       - ./nginx-logs:/var/log/nginx
       - ./lua-scripts:/etc/nginx/lua-scripts
     depends_on:

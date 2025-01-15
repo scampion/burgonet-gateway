@@ -7,7 +7,7 @@ import redis
 from datetime import datetime
 from ..config import MODELS_CONFIG, CROSSPLANE_CONFIG, REDIS_HOST, REDIS_PORT, REDIS_DB, REDIS_API_KEY_PREFIX, \
     ADMIN_GROUP
-from ..models import Provider, DeepSeek, OpenAI, Anthropic
+from ..models import Provider, DeepSeek, OpenAI, Anthropic, Azure
 
 admin_bp = Blueprint('admin', __name__)
 
@@ -30,7 +30,8 @@ def get_provider_class(provider_name):
     provider_classes = {
         'deepseek': DeepSeek,
         'openai': OpenAI,
-        'anthropic': Anthropic
+        'anthropic': Anthropic,
+        'azure': Azure
     }
     return provider_classes.get(provider_name.lower(), Provider)
 

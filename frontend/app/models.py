@@ -122,8 +122,8 @@ class Provider:
                 {'directive': 'set', 'args': ['$apikey', '']},
                 {'directive': 'set', 'args': ['$redis_host', self.redis_host]},
                 {'directive': 'set', 'args': ['$redis_port', self.redis_port]},
-                {'directive': 'set', 'args': ['$access_model_name', self.model_name]},
-                {'directive': 'set', 'args': ['$access_model_version', self.model_version]},
+                {'directive': 'set', 'args': ['$model_name', self.model_name]},
+                {'directive': 'set', 'args': ['$model_version', self.model_version]},
                 {'directive': 'access_by_lua_file', 'args': ['/etc/nginx/lua-scripts/access.lua']},
                 {'directive': 'proxy_pass', 'args': [self.proxy_pass]},
                 {'directive': 'proxy_ssl_server_name', 'args': ['on']},
@@ -157,3 +157,21 @@ class Anthropic(Provider):
     api_key: str = 'anthropic:v1'
     proxy_pass: str = 'https://api.anthropic.com/v1/chat/completions'
     location: str = '/api.anthropic.com/v1/chat/completions'
+
+@dataclass
+class Azure(Provider):
+    api_key: str = 'azure:v1'
+    proxy_pass: 'https://api.azure.com/v1/chat/completions'
+    location: str = '/api.azure.com/v1/chat/completions'
+
+    def nginx_config(self):
+        """
+        Override the nginx_config method to add the endpoint directive
+        Azure endpoint can't be resolved by the DNS at runtime
+        :return:
+        """
+        init_config = super().nginx_config()
+        init_config['block'].append({'directive': 'set', 'args': ['$endpoint', self.proxy_pass]})
+        init_config['block'] = [block for block in init_config['block'] if block['directive'] != 'proxy_pass']
+        init_config['block'].append({'directive': 'proxy_pass', 'args': ['$endpoint']})
+        return init_config
