@@ -23,5 +23,9 @@ if ngx.arg[2] then
         
         -- Replace the response body with the error message
         ngx.arg[1] = response_body
+        
+        -- Ensure connection is closed
+        ngx.header["Connection"] = "close"
+        ngx.header["Content-Length"] = #response_body
     end
 end
