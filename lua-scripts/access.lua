@@ -77,6 +77,9 @@ for _, group_id in ipairs(user_groups) do
     end
 end
 
+
+
+
 -- Authorization granted
 red:set("cache:" .. token, user_id, 3600)
 
