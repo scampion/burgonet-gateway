@@ -1,15 +1,22 @@
-# Burgonet - AI & LLM Enterprise Gateway 
+# Burgonet - AI Enterprise Gateway
 
 <p align="center">
   <img src="frontend/app/static/images/logo.png?raw=true" style="width: 200px; height: auto;" />
 </p>
 
+
 ## About
 
-Burgonet Gateway is an enterprise LLM gateway that provides secure access and compliance controls for AI systems.​​​​​​​​​​​​​​​​
+Burgonet Gateway is a DevSecOps AI enterprise gateway that provides secure access to LLM and compliance controls for AI systems.​​​​​​​​​​​​​​​​
 
 The goal is to provide for employees, unit and project access to
 cloud based LLL providers or self-hosted models via that single entrypoint.
+
+<p align="center">
+  <img src="docs/images/overview.png?raw=true" " />
+</p>
+
+
 
 Users can:
 - request new tokens easily in a self-service approach 
@@ -83,9 +90,10 @@ The main configuration file is located at `flask_app/app/config.py`. Key setting
 
 This project is licensed under the GNU Affero General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
 
-## Author
+## Author & Entreprise support 
 
 Sébastien Campion - sebastien.campion@foss4.eu
+
 
 ## Name origin 
 
