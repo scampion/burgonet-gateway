@@ -77,12 +77,6 @@ for _, group_id in ipairs(user_groups) do
     end
 end
 
-
-
-
--- Authorization granted
-red:set("cache:" .. token, user_id, 3600)
-
 -- Final PII check
 local http = require "resty.http"
 local httpc = http.new()
@@ -91,15 +85,17 @@ local httpc = http.new()
 ngx.req.read_body()
 local request_body = ngx.req.get_body_data()
 if request_body then
+    -- convert body to base64
+    local body_base64 = ngx.encode_base64(request_body)
     -- Make PII check request
-    local res, err = httpc:request_uri("http://external.service:8001/check-pii", {
-        method = "POST",
-        headers = {
-            ["Content-Type"] = "application/json",
-        },
-        body = '{"text":' .. ngx.encode_args({text = request_body}) .. '}'
-    })
+    local res, err = httpc:request_uri("http://m1:8001/check-pii-base64", {
+    method = "POST",
+    body = '{"text": "'.. body_base64 ..'" }',
 
+    headers = {
+        ["Content-Type"] = "application/json",
+        },
+    })
     if not res then
         ngx.log(ngx.ERR, "Failed to check PII: ", err)
         ngx.exit(ngx.HTTP_INTERNAL_SERVER_ERROR)
@@ -116,3 +112,6 @@ end
 
 -- Close the connection
 ngx.log(ngx.INFO, "Authorization granted for user ID: ", user_id)
+
+-- Authorization granted
+red:set("cache:" .. token, user_id, 3600)

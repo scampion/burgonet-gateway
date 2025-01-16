@@ -10,8 +10,11 @@ services:
       - ./nginx-conf/conf.d:/etc/nginx/conf.d
       - ./nginx-conf/conf.d:/usr/local/openresty/nginx/conf/conf.d
       - ./nginx-conf/nginx.conf:/usr/local/openresty/nginx/conf/nginx.conf
-      - ./nginx-logs:/var/log/nginx
+      - ./nginx-logs/:/var/log/nginx/
       - ./lua-scripts:/etc/nginx/lua-scripts
+      - ./lua-scripts/http.lua:/usr/local/openresty/lualib/resty/http.lua
+      - ./lua-scripts/http_headers.lua:/usr/local/openresty/lualib/resty/http_headers.lua
+      - ./lua-scripts/http_connect.lua:/usr/local/openresty/lualib/resty/http_connect.lua
     depends_on:
       - redis
       - ldap
