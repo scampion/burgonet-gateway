@@ -18,14 +18,18 @@ Let's consider the following use case: in an organization, we have three employe
 
 The organization's governance rules are configured as follows:
 
-
-
 - The IT Department has access to all models, with quotas and rate limits
 - The Finance Department does not have access to external models only self-hosted.
 - The Human Resources Department has access to all models with unlimited budget
 
 
 ![overview](images/overview.png)
+
+## Use case: restrict group access 
+	⚠️ Implemented, to be documented 
+
+## Use case: restrict keywords
+	⚠️ Implemented, to be documented 
 
 
 

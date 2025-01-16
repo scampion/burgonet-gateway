@@ -1,5 +1,13 @@
 import os
 
+# Syslog server
+SYSLOG_HOST = 'm1'
+SYSLOG_PORT = 5140
+
+RESPONSES_LOGFILE = 'responses.log'
+
+EXPIRATION_TIME = 60 * 60 * 24 * 7  # 1 week
+
 # Base directory
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 

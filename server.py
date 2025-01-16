@@ -6,7 +6,6 @@ The goal of this script is to receive logs from nginx and dispatch them to a Red
 The logs are expected to be in the syslog format and sent via UDP to the server.
 
 """
-import hashlib
 import json
 import logging
 import re
@@ -18,10 +17,11 @@ from typing import NamedTuple, Optional
 
 import redis
 
-from frontend.app.config import REDIS_HOST, REDIS_PORT, SYSLOG_HOST, SYSLOG_PORT, EXPIRATION_TIME
+from frontend.app.config import REDIS_HOST, REDIS_PORT, SYSLOG_HOST, SYSLOG_PORT, RESPONSES_LOGFILE
 from frontend.app.models import DeepSeek, OpenAI, Anthropic, Azure, Ollama
 
 rd = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
+out = open(RESPONSES_LOGFILE, 'a')
 
 parsers = {
     'deepseek': DeepSeek.parse_response,
@@ -31,6 +31,8 @@ parsers = {
     'ollama': Ollama.parse_response,
 }
 
+# set logging level at INFO
+logging.basicConfig(level=logging.INFO)
 
 class SyslogMessage(NamedTuple):
     facility: int
@@ -125,35 +127,30 @@ class SyslogParser:
             return None
 
 
-def dispatch2(line):
-    data = json.loads(line)
-    rd.publish('nginx_log', line)
-    if data['status'] != "200":
-        raise Exception(f"Message received http status {data['status']}")
-    token = data['authorization'][7:]
-    keys_to_keep = ['time_local', 'request_body', 'response_body', 'provider', 'model_name', 'model_version']
-    data = {k: v for k, v in data.items() if k in keys_to_keep}
-    request_body = json.loads(data['request_body'])
-    response_body = json.loads(data['response_body'])
-    data['request_body'] = request_body
-    data['response_body'] = response_body
-    data['token'] = token
-    data_hash = hashlib.sha1(json.dumps(data).encode()).hexdigest()
-
-    with rd.pipeline() as pipe:
-        pipe.hset(f'responses:{token}', mapping={data_hash: json.dumps(data)})
-        pipe.hexpire(f'responses:{token}', EXPIRATION_TIME, data_hash)
-        pipe.execute()
-        print(f"🤗 Data saved with hash: {data_hash}")
-
 def dispatch(line):
-    response = json.loads(line)
-    provider_name = response['provider']
-    parsed_response = parsers[provider_name](response)
-    parsed_response['provider'] = provider_name
+    rd.publish('responses', line)  # duplicate the stream for future purposes
+    data = json.loads(line)
+    if data['status'] == '200':
+        # Clean up the data and prepare it
+        token = data['authorization'][7:]
+        data['token'] = token
+        keys_to_keep = ['time', 'request_body', 'response_body', 'provider', 'model_name', 'model_version']
+        data = {k: v for k, v in data.items() if k in keys_to_keep}
+        request_body = json.loads(data['request_body'])
+        response_body = json.loads(data['response_body'])
+        data['request_body'] = request_body
+        data['response_body'] = response_body
 
-
-
+        # Apply provider parser
+        provider_name = data['provider']
+        parsed_response = parsers[provider_name](data)
+        parsed_response['provider'] = provider_name
+        parsed_response['time'] = data['time']
+        parsed_response['token'] = token
+        out.write(json.dumps(parsed_response) + '\n')
+        logging.info(f"🚀 response parsed: {parsed_response}")
+    else:
+        raise Exception(f"Error HTTP Status: {data['status']} {data}")
 
 
 class SyslogUDPHandler(socketserver.BaseRequestHandler):
