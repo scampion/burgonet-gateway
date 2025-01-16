@@ -31,6 +31,9 @@ The organization's governance rules are configured as follows:
 ## Use case: restrict keywords
 	⚠️ Implemented, to be documented 
 
+![image-20250116135914752](img/screenshots/image-20250116135914752.png)
+
+
 ## Use case: prevent leakage of personal idenfier & information leak
 
 ```bash
