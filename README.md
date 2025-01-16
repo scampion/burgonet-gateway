@@ -6,7 +6,7 @@
 
 ## About
 
-Burgonet Gateway is an enterprise LLM gateway that provides secure access and compliance controls for AI systems.​​​​​​​​​​​​​​​​
+Burgonet Gateway is a DevSecOps AI enterprise gateway that provides secure access to LLM and compliance controls for AI systems.​​​​​​​​​​​​​​​​
 
 The goal is to provide for employees, unit and project access to
 cloud based LLL providers or self-hosted models via that single entrypoint.
