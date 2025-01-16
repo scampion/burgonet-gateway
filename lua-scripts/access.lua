@@ -77,6 +77,17 @@ for _, group_id in ipairs(user_groups) do
     end
 end
 
+
+local pii_protection_url = ngx.var.pii_protection_url or ""
+
+if pii_protection_url == "" then
+    -- Close the connection
+    ngx.log(ngx.INFO, "Authorization granted for user ID: ", user_id)
+    -- Authorization granted
+    red:set("cache:" .. token, user_id, 3600)
+    return
+end
+
 -- Final PII check
 local http = require "resty.http"
 local httpc = http.new()
@@ -88,7 +99,7 @@ if request_body then
     -- convert body to base64
     local body_base64 = ngx.encode_base64(request_body)
     -- Make PII check request
-    local res, err = httpc:request_uri("http://m1:8001/check-pii-base64", {
+    local res, err = httpc:request_uri(pii_protection_url, {
     method = "POST",
     body = '{"text": "'.. body_base64 ..'" }',
 

@@ -29,7 +29,7 @@
             "api_key": "NA",
             "disabled_groups": "",
             "blacklist_words": "confidential mycorp",
-            "pii_protection": true
+            "pii_protection_url": "http://m1:8001/check-pii-base64"
         }
     ]
 }

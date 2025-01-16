@@ -113,6 +113,7 @@ class Provider:
     redis_port: str = '6379'
     model_name: str = 'deepseek'
     model_version: str = 'v3'
+    pii_protection_url: str = ''
 
     def __repr__(self):
         return f'<Provider {self}>'
@@ -137,6 +138,7 @@ class Provider:
                 {'directive': 'set', 'args': ['$model_version', self.model_version]},
                 {'directive': 'set', 'args': ['$provider', provider]},
                 {'directive': 'access_by_lua_file', 'args': ['/etc/nginx/lua-scripts/access.lua']},
+                {'directive': 'pii_protection_url', 'args': [self.pii_protection_url]},
                 {'directive': 'proxy_pass', 'args': [self.proxy_pass]},
                 {'directive': 'proxy_ssl_server_name', 'args': ['on']},
                 {'directive': 'proxy_set_header', 'args': ['Host', 'api.deepseek.com']},
