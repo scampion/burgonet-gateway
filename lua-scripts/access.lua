@@ -83,5 +83,36 @@ end
 -- Authorization granted
 red:set("cache:" .. token, user_id, 3600)
 
+-- Final PII check
+local http = require "resty.http"
+local httpc = http.new()
+
+-- Read request body for PII check
+ngx.req.read_body()
+local request_body = ngx.req.get_body_data()
+if request_body then
+    -- Make PII check request
+    local res, err = httpc:request_uri("http://external.service:8001/check-pii", {
+        method = "POST",
+        headers = {
+            ["Content-Type"] = "application/json",
+        },
+        body = '{"text":' .. ngx.encode_args({text = request_body}) .. '}'
+    })
+
+    if not res then
+        ngx.log(ngx.ERR, "Failed to check PII: ", err)
+        ngx.exit(ngx.HTTP_INTERNAL_SERVER_ERROR)
+    end
+
+    -- If PII check failed, block access
+    if res.status ~= 200 then
+        ngx.status = ngx.HTTP_FORBIDDEN
+        ngx.header.content_type = "text/plain"
+        ngx.say("Request contains sensitive personal information")
+        ngx.exit(ngx.HTTP_FORBIDDEN)
+    end
+end
+
 -- Close the connection
 ngx.log(ngx.INFO, "Authorization granted for user ID: ", user_id)
