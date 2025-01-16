@@ -21,6 +21,13 @@
                     <div class="form-text">Words that will block requests to this model</div>
                 </div>
                 
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" name="pii_protection" id="pii_protection"
+                        {% if pii_protection %}checked{% endif %}>
+                    <label class="form-check-label" for="pii_protection">Enable PII Protection</label>
+                    <div class="form-text">Enable PII (Personally Identifiable Information) detection for this model</div>
+                </div>
+                
                 <button type="submit" class="btn btn-primary">Save Configuration</button>
                 <a href="{{ url_for('admin.manage_models') }}" class="btn btn-secondary">Back to Models</a>
             </form>

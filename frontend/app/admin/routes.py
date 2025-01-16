@@ -156,6 +156,7 @@ def model_config(model_index):
             # clean up the input
             model['disabled_groups'] = ' '.join([group.strip() for group in model['disabled_groups'].split(',')])
             model['blacklist_words'] = ' '.join([word.strip() for word in model['blacklist_words'].split(',')])
+            model['pii_protection'] = request.form.get('pii_protection') == 'on'
 
             # Save updated config
             model_config = MODELS_CONFIG
@@ -176,12 +177,14 @@ def model_config(model_index):
         # Get current values
         disabled_groups = model.get('disabled_groups', '')
         blacklist_words = model.get('blacklist_words', '')
+        pii_protection = model.get('pii_protection', False)
         
         return render_template('admin/model_config.html',
                              model=model,
                              model_index=model_index,
                              disabled_groups=disabled_groups,
-                             blacklist_words=blacklist_words)
+                             blacklist_words=blacklist_words,
+                             pii_protection=pii_protection)
 
     except Exception as e:
         flash(f'Error updating model configuration: {str(e)}')
