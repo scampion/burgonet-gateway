@@ -1,24 +1,135 @@
 #!/usr/bin/env python3
+"""
+Generic syslog server for receiving logs from nginx
+
+The goal of this script is to receive logs from nginx and dispatch them to a Redis server.
+The logs are expected to be in the syslog format and sent via UDP to the server.
+
+"""
 import hashlib
 import json
-import pprint
-import time
+import logging
+import re
+import socket
+import socketserver
 import sys
-from json import JSONDecodeError
+from datetime import datetime
+from typing import NamedTuple, Optional
 
 import redis
 
-nginx_log_filepath = sys.argv[1]
-redis_host = sys.argv[2]
-redis_port = sys.argv[3]
+from frontend.app.config import REDIS_HOST, REDIS_PORT, SYSLOG_HOST, SYSLOG_PORT, EXPIRATION_TIME
+from frontend.app.models import DeepSeek, OpenAI, Anthropic, Azure, Ollama
 
-rd = redis.Redis(host=redis_host, port=redis_port, db=0, decode_responses=True)
+rd = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
 
-def dispatch(line):
-    rd.publish('nginx_log', line)
+parsers = {
+    'deepseek': DeepSeek.parse_response,
+    'openai': OpenAI.parse_response,
+    'anthropic': Anthropic.parse_response,
+    'azure': Azure.parse_response,
+    'ollama': Ollama.parse_response,
+}
+
+
+class SyslogMessage(NamedTuple):
+    facility: int
+    severity: int
+    timestamp: datetime
+    hostname: str
+    program: str
+    pid: Optional[int]
+    message: str
+
+
+class SyslogParser:
+    # Mapping for facility codes
+    FACILITIES = {
+        0: "kern",  # kernel messages
+        1: "user",  # user-level messages
+        2: "mail",  # mail system
+        3: "daemon",  # system daemons
+        4: "auth",  # security/authorization messages
+        5: "syslog",  # messages generated internally by syslogd
+        6: "lpr",  # line printer subsystem
+        7: "news",  # network news subsystem
+        8: "uucp",  # UUCP subsystem
+        9: "cron",  # clock daemon
+        10: "authpriv",  # security/authorization messages
+        11: "ftp",  # FTP daemon
+        12: "ntp",  # NTP subsystem
+        13: "security",  # log audit
+        14: "console",  # log alert
+        15: "cron2",  # clock daemon
+        16: "local0",
+        17: "local1",
+        18: "local2",
+        19: "local3",
+        20: "local4",
+        21: "local5",
+        22: "local6",
+        23: "local7"
+    }
+
+    # Mapping for severity codes
+    SEVERITIES = {
+        0: "emerg",
+        1: "alert",
+        2: "crit",
+        3: "err",
+        4: "warning",
+        5: "notice",
+        6: "info",
+        7: "debug"
+    }
+
+    @staticmethod
+    def parse(message: str) -> Optional[SyslogMessage]:
+        """Parse a syslog message according to RFC 3164."""
+        try:
+            # Basic pattern for RFC 3164 syslog messages
+            pattern = r'<(\d+)>(\w+\s+\d+\s+\d+:\d+:\d+)\s+(\S+)\s+([^:\[\s]+)(?:\[(\d+)\])?:\s*(.*)'
+            match = re.match(pattern, message)
+
+            if not match:
+                return None
+
+            pri, timestamp_str, hostname, program, pid, content = match.groups()
+
+            # Parse priority field
+            pri = int(pri)
+            facility = pri >> 3
+            severity = pri & 0x07
+
+            # Parse timestamp
+            try:
+                current_year = datetime.now().year
+                timestamp = datetime.strptime(f"{current_year} {timestamp_str}", "%Y %b %d %H:%M:%S")
+            except ValueError:
+                timestamp = datetime.now()
+
+            # Convert pid to int if present
+            pid = int(pid) if pid else None
+
+            return SyslogMessage(
+                facility=facility,
+                severity=severity,
+                timestamp=timestamp,
+                hostname=hostname,
+                program=program,
+                pid=pid,
+                message=content
+            )
+        except Exception as e:
+            print(f"Error parsing message: {e}")
+            return None
+
+
+def dispatch2(line):
     data = json.loads(line)
+    rd.publish('nginx_log', line)
     if data['status'] != "200":
-        raise Exception(f"Status code is not 200: {data['status']}")
+        raise Exception(f"Message received http status {data['status']}")
     token = data['authorization'][7:]
     keys_to_keep = ['time_local', 'request_body', 'response_body', 'provider', 'model_name', 'model_version']
     data = {k: v for k, v in data.items() if k in keys_to_keep}
@@ -27,26 +138,55 @@ def dispatch(line):
     data['request_body'] = request_body
     data['response_body'] = response_body
     data['token'] = token
-    pprint.pprint(data)
     data_hash = hashlib.sha1(json.dumps(data).encode()).hexdigest()
+
     with rd.pipeline() as pipe:
         pipe.hset(f'responses:{token}', mapping={data_hash: json.dumps(data)})
-        pipe.hexpire(f'responses:{token}', 172800, data_hash)
+        pipe.hexpire(f'responses:{token}', EXPIRATION_TIME, data_hash)
         pipe.execute()
-        print(f"Data saved with hash: {data_hash}")
+        print(f"🤗 Data saved with hash: {data_hash}")
+
+def dispatch(line):
+    response = json.loads(line)
+    provider_name = response['provider']
+    parsed_response = parsers[provider_name](response)
+    parsed_response['provider'] = provider_name
 
 
-#open the file and read the line by line and wait for the new line to be added
-with open(nginx_log_filepath) as f:
-    while True:
-        line = f.readline()
-        if not line:
-            time.sleep(0.1)
-            continue
-        try:
-            dispatch(line)
-            print("-" * 80)
-        except Exception as e:
-            # log the error with the class name and the error message
-            print(f"🚨️ Error:{e.__class__.__name__}   {str(e)} {line}")
-            continue
+
+
+
+class SyslogUDPHandler(socketserver.BaseRequestHandler):
+    def handle(self):
+        data = bytes.decode(self.request[0].strip())
+        parsed = SyslogParser.parse(data)
+        if parsed:
+            try:
+                dispatch(parsed.message)
+            except Exception as e:
+                logging.error(f"🚨️ Error:{e.__class__.__name__}  {str(e)} {data}")
+        else:
+            logging.error(f"syslog message unparsed : {self.client_address[0]} (UNPARSED): {data}")
+
+
+def run_server(host='0.0.0.0', port=514):
+    try:
+        server = socketserver.UDPServer((host, port), SyslogUDPHandler)
+        print(f"Starting syslog server on {host}:{port}")
+        print("Waiting for messages... (Press Ctrl+C to stop)")
+        server.serve_forever()
+
+    except PermissionError:
+        logging.error("Error: Port 514 requires root privileges. Try running with sudo or use a port > 1024")
+    except KeyboardInterrupt:
+        logging.info("\nShutting down syslog server")
+        sys.exit(0)
+    except Exception as e:
+        logging.error(f"Error: {e}")
+
+
+if __name__ == "__main__":
+    if socket.gethostname() != SYSLOG_HOST and SYSLOG_HOST != socket.gethostname().split(".")[0]:
+        raise Exception(
+            f"SYSLOG_HOST ({SYSLOG_HOST}) does not match the host running the script ({socket.gethostname()})")
+    run_server(port=SYSLOG_PORT)
