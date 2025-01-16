@@ -4,12 +4,19 @@
   <img src="frontend/app/static/images/logo.png?raw=true" style="width: 200px; height: auto;" />
 </p>
 
+
 ## About
 
 Burgonet Gateway is a DevSecOps AI enterprise gateway that provides secure access to LLM and compliance controls for AI systems.​​​​​​​​​​​​​​​​
 
 The goal is to provide for employees, unit and project access to
 cloud based LLL providers or self-hosted models via that single entrypoint.
+
+<p align="center">
+  <img src="docs/images/overview.png?raw=true" " />
+</p>
+
+
 
 Users can:
 - request new tokens easily in a self-service approach 
