@@ -28,6 +28,14 @@
                     <div class="form-text">Enable PII (Personally Identifiable Information) detection for this model</div>
                 </div>
                 
+                <div class="mb-3">
+                    <label class="form-label">PII Protection Service URL</label>
+                    <input type="text" name="pii_protection_url" class="form-control" 
+                           value="{{ pii_protection_url or '' }}"
+                           placeholder="http://example.com/check-pii">
+                    <div class="form-text">URL of the PII detection service endpoint</div>
+                </div>
+                
                 <button type="submit" class="btn btn-primary">Save Configuration</button>
                 <a href="{{ url_for('admin.manage_models') }}" class="btn btn-secondary">Back to Models</a>
             </form>
