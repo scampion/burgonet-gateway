@@ -27,8 +27,9 @@
             "location": "/ollama/gemma2/2b/",
             "proxy_pass": "http://m1:11434/api/chat",
             "api_key": "NA",
-            "disabled_groups": "it",
-            "blacklist_words": "confidential mycorp"
+            "disabled_groups": "",
+            "blacklist_words": "confidential mycorp",
+            "pii_protection": "true"
         }
     ]
 }
