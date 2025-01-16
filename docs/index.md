@@ -31,5 +31,29 @@ The organization's governance rules are configured as follows:
 ## Use case: restrict keywords
 	⚠️ Implemented, to be documented 
 
+## Use case: prevent leakage of personal idenfier & information leak
+
+```bash
+curl http://127.0.0.1:8080/ollama/gemma2/2b/ -i  \
+-H "Authorization: Bearer your-token-here" \
+-d '{
+  "model": "gemma2:2b-instruct-q6_K",                                                                                                                        "messages": [
+    {
+      "role": "user",
+      "content": "Hi my name is Jean-Claude Dusse"
+    }
+  ] ,
+  "stream": false
+}'
+HTTP/1.1 403 Forbidden
+Server: openresty/1.21.4.1
+Date: Thu, 16 Jan 2025 13:01:06 GMT
+Content-Type: text/plain
+Transfer-Encoding: chunked
+Connection: keep-alive
+
+Request contains sensitive personal information
+```
+
 
 
