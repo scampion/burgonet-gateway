@@ -83,9 +83,10 @@ The main configuration file is located at `flask_app/app/config.py`. Key setting
 
 This project is licensed under the GNU Affero General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
 
-## Author
+## Author & Entreprise support 
 
 Sébastien Campion - sebastien.campion@foss4.eu
+
 
 ## Name origin 
 
