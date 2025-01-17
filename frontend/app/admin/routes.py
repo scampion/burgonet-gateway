@@ -5,8 +5,10 @@ import crossplane
 import os
 import redis
 from datetime import datetime
+import duckdb
+
 from ..config import MODELS_CONFIG, CROSSPLANE_CONFIG, REDIS_HOST, REDIS_PORT, REDIS_DB, REDIS_API_KEY_PREFIX, \
-    ADMIN_GROUP
+    ADMIN_GROUP, RESPONSES_LOGFILE
 from ..models import Provider, DeepSeek, OpenAI, Anthropic, Azure
 
 admin_bp = Blueprint('admin', __name__)
@@ -107,13 +109,16 @@ def dashboard():
         flash('Access denied')
         return redirect(url_for('main.index'))
 
-    # Get stats from Redis
-    r = get_redis_connection()
+    # Connect to DuckDB and read the response.log file
+    con = duckdb.connect(database=':memory:')
+    con.execute(f"CREATE TABLE response_log AS SELECT * FROM read_json_auto('{RESPONSES_LOGFILE}')")
+
+    # Get stats from DuckDB
     stats = {
-        'total_requests': r.get('stats:total_requests') or 0,
-        'successful_requests': r.get('stats:successful_requests') or 0,
-        'failed_requests': r.get('stats:failed_requests') or 0,
-        'active_users': r.scard('active_users') or 0,
+        'total_requests': con.execute("SELECT COUNT(*) FROM response_log").fetchone()[0],
+        'successful_requests': con.execute("SELECT COUNT(*) FROM response_log WHERE status = '200'").fetchone()[0],
+        'failed_requests': con.execute("SELECT COUNT(*) FROM response_log WHERE status != '200'").fetchone()[0],
+        'active_users': con.execute("SELECT COUNT(DISTINCT user) FROM response_log WHERE user IS NOT NULL").fetchone()[0],
         'models': []
     }
 
@@ -122,15 +127,16 @@ def dashboard():
     for model in models:
         model_stats = {
             'name': model['model_name'],
-            'requests': r.get(f"stats:model:{model['model_name']}:requests") or 0,
-            'success': r.get(f"stats:model:{model['model_name']}:success") or 0,
-            'errors': r.get(f"stats:model:{model['model_name']}:errors") or 0
+            'requests': con.execute(f"SELECT COUNT(*) FROM response_log WHERE model_name = '{model['model_name']}'").fetchone()[0],
+            'success': con.execute(f"SELECT COUNT(*) FROM response_log WHERE model_name = '{model['model_name']}' AND status = '200'").fetchone()[0],
+            'errors': con.execute(f"SELECT COUNT(*) FROM response_log WHERE model_name = '{model['model_name']}' AND status != '200'").fetchone()[0]
         }
         stats['models'].append(model_stats)
 
     return render_template('admin/dashboard.html',
                            stats=stats,
                            ADMIN_GROUP=ADMIN_GROUP)
+
 
 
 @admin_bp.route('/admin/model/<int:model_index>', methods=['GET', 'POST'])

@@ -1,0 +1,64 @@
+{% block content %}
+<h1>Dashboard</h1>
+
+<div class="mt-4">
+    <!-- Overall Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Requests</h5>
+                    <p class="card-text display-6">{{ stats.total_requests }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Successful Requests</h5>
+                    <p class="card-text display-6">{{ stats.successful_requests }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Failed Requests</h5>
+                    <p class="card-text display-6">{{ stats.failed_requests }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Active Users</h5>
+                    <p class="card-text display-6">{{ stats.active_users }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Model Stats -->
+    <h3>Model Usage</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Model</th>
+                <th>Requests</th>
+                <th>Success</th>
+                <th>Errors</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for model in stats.models %}
+            <tr>
+                <td>{{ model.name }}</td>
+                <td>{{ model.requests }}</td>
+                <td>{{ model.success }}</td>
+                <td>{{ model.errors }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
