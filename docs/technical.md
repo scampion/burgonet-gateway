@@ -60,6 +60,27 @@ classDiagram
     Route "1" *-- "many" Group : disables access for
 ```
 
+## Request Flow
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant NGINX
+    participant Redis
+    participant Auth
+    participant Provider
+    
+    User->>NGINX: API Request
+    NGINX->>Redis: Check token validity
+    Redis-->>NGINX: Token status
+    NGINX->>Auth: Validate permissions
+    Auth-->>NGINX: Permission status
+    NGINX->>Provider: Forward request
+    Provider-->>NGINX: Response
+    NGINX->>Redis: Log request
+    NGINX-->>User: Return response
+```
+
 ## NGINX Integration
 
 ```
