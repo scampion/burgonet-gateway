@@ -17,7 +17,7 @@ cloud based LLL providers or self-hosted models via that single entrypoint.
   <img src="docs/images/overview.png?raw=true" " />
 </p>
 
-
+The complete documentation is available at [https://burgonet.eu/](https://burgonet.eu/)
 
 Users can:
 - request new tokens easily in a self-service approach 
@@ -48,7 +48,6 @@ planned:
 - Keywords and PII filtering
 
 
-The complete documentation is available at [https://burgonet.eu/](https://burgonet.eu/)
 
 
 ## Features
