@@ -223,6 +223,7 @@ def dispatch(line):
 class SyslogUDPHandler(socketserver.BaseRequestHandler):
     def handle(self):
         data = bytes.decode(self.request[0].strip())
+        print(data)
         parsed = SyslogParser.parse(data)
         if parsed:
             try:
