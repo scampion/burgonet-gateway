@@ -30,8 +30,6 @@ The organization's governance rules are configured as follows:
 - The Human Resources Department has access to all models with unlimited budget
 
 
-![overview](images/overview.png)
-
 ### Restrict keywords
 
 	⚠️ Implemented, to be documented 
