@@ -1,4 +1,5 @@
 # Burgonet - AI Enterprise Gateway
+[in French](README.fr.md)
 
 <p align="center">
   <img src="frontend/app/static/images/logo.png?raw=true" style="width: 200px; height: auto;" />
@@ -89,8 +90,6 @@ The main configuration file is located at `flask_app/app/config.py`. Key setting
 ## License
 
 This project is licensed under the GNU Affero General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
-
-[Version française](README.fr.md)
 
 ## Author & Entreprise support 
 
