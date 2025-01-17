@@ -58,5 +58,36 @@ Connection: keep-alive
 Request contains sensitive personal information
 ```
 
+## Use Case: Cost Management with Quotas
+
+Administrators can effectively control costs by configuring **quotas** for model usage and user access.
+
+### Key Features:
+
+- **Per-Model Quotas**: Set usage limits for individual models to manage resource allocation.
+
+This granular approach allows administrators to optimize costs while maintaining flexibility and control over system resources.
+
+
+
+```json
+        {
+            "provider": "ollama",
+            "model_name": "gemma2:2b-instruct-q6_K",
+            "location": "/ollama/gemma2/2b/",
+            "proxy_pass": "http://m1:11434/api/chat",
+            "api_key": "NA",
+            "disabled_groups": "",
+            "blacklist_words": "confidential mycorp",
+            "pii_protection_url": "http://m1:8001/check-pii-base64",
+            "quotas": {
+                "max_tokens": {"week": 100000,
+                               "day": 1000,
+                               "hour": 50},
+        
+            }
+        }
+```
+
 
 
