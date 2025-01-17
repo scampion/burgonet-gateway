@@ -1,11 +1,29 @@
 
-## Concept relations
+# Technical Architecture
+
+## System Components
+
+```mermaid
+graph TD
+    A[User] -->|Authenticates| B(LDAP)
+    B --> C[Redis]
+    C --> D[NGINX]
+    D --> E{Model Providers}
+    E --> F[OpenAI]
+    E --> G[DeepSeek]
+    E --> H[Ollama]
+    E --> I[Azure]
+    D --> J[Logging]
+    J --> K[Audit System]
+```
+
+## Core Concepts
 
 ```mermaid
 classDiagram
     class User {
         +String id
-        +String name
+        +String username
         +Set~Group~ groups
         +addGroup(Group group)
         +removeGroup(Group group)
@@ -19,12 +37,6 @@ classDiagram
         +removeUser(User user)
     }
 
-    class Route {
-        +String path
-        +Set~Group~ disabledGroups
-    }
-
-
     class Token {
         +String id
         +String userId
@@ -33,13 +45,20 @@ classDiagram
         +revoke()
     }
 
+    class Route {
+        +String path
+        +Set~Group~ disabledGroups
+        +Set~String~ blacklistWords
+        +Map~String,Integer~ quotas
+    }
+
     User "1" *-- "many" Group : belongs to
     Group "1" *-- "many" User : contains
     User "1" *-- "many" Token : manages
     Route "1" *-- "many" Group : disables access for
 ```
 
-## NGINX Configuration file example 
+## NGINX Integration
 
 ```
 log_format bgn_combined escape=json '{' '"time_local":"$time_local",' '"remote_addr":"$remote_addr",' '"remote_user":"$remote_user",' '"request":"$request",' '"status": "$status",' '"body_bytes_sent":"$body_bytes_sent",' '"request_time":"$request_time",' '"http_referrer":"$http_referer",' '"http_user_agent":"$http_user_agent",' '"http_x_forwarded_for":"$http_x_forwarded_for",' '"host":"$host",' '"upstream_addr":"$upstream_addr",' '"request_method":"$request_method",' '"http_version":"$server_protocol",' '"request_body":"$request_body",' '"response_body":"$resp_body",' '"provider":"$provider",' '"model_name":"$model_name",' '"model_version":"$model_version"' '}';

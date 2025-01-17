@@ -2,18 +2,43 @@ site_name: Burgonet Gateway Documentation
 
 nav:
   - Home: index.md
-  - Technical Overview: technical.md
-  - Screenshots: screenshots.md
+  - Getting Started: getting-started.md
+  - User Guide:
+    - Use Cases: use-cases.md
+    - Configuration: configuration.md
+    - API Reference: api-reference.md
+  - Technical Documentation:
+    - Architecture: technical.md
+    - NGINX Configuration: nginx-config.md
+  - Administration:
+    - Monitoring: monitoring.md
+    - Security: security.md
   - About: about.md
 
 theme:
-  name: readthedocs
-  analytics:
-    gtag: GTM-TSWFRGBR
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.indexes
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: blue
+    - scheme: slate
+      primary: blue
+      accent: blue
 
 plugins:
   - search
   - mermaid2
+  - mkdocstrings
+  - git-revision-date-localized
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed
 
 
 

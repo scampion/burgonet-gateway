@@ -1,14 +1,45 @@
 ![Burgonet Gateway](images/logo_small.png)
-# Welcome to Burgonet Gateway's documentation
-
+# Welcome to Burgonet Gateway Documentation
 
 Burgonet Gateway is an enterprise LLM gateway that provides secure access and compliance controls for AI systems.
 
+> ⚠️ This project is still under active development
 
-    ⚠️ This project is still under development. 
+## Quick Links
+- [Getting Started](#getting-started)
+- [Core Features](#core-features)
+- [Use Cases](#use-cases)
+- [Technical Architecture](#technical-architecture)
+- [Configuration](#configuration)
+- [API Reference](#api-reference)
 
-# A simple use case of governance
-Let's consider the following use case: in an organization, we have three employees - Alice, Bob, and Charlie - distributed across different departments:
+## Getting Started
+Learn how to set up and configure Burgonet Gateway for your organization.
+
+## Core Features
+- **Access Control**: Granular permissions for users and groups
+- **Quota Management**: Set usage limits per user/group
+- **Content Filtering**: PII detection and keyword blocking
+- **Audit Logging**: Detailed request/response tracking
+- **Multi-Provider Support**: OpenAI, DeepSeek, Ollama, and more
+
+## Use Cases
+Explore common scenarios and configurations:
+
+- [Departmental Access Control](#departmental-access-control)
+- [Cost Management with Quotas](#cost-management)
+- [Preventing Data Leakage](#data-leakage-prevention)
+
+### Departmental Access Control
+Let's consider an organization with three departments:
+
+| Department | Access Level | Restrictions |
+|------------|--------------|--------------|
+| IT         | All models   | Quotas & rate limits |
+| Finance    | Self-hosted only | No external models |
+| HR         | All models   | Unlimited budget |
+
+![overview](images/overview.png)
 
 
 
