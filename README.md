@@ -86,11 +86,18 @@ The main configuration file is located at `flask_app/app/config.py`. Key setting
 - Nginx configuration paths
 - Security settings
 
-## License
+## License & Fair-code Status
 
-This project is licensed under the GNU Affero General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the Business Source License 1.1 (see [LICENSE](LICENSE) file for details) and follows the [Fair-code](https://faircode.io) principles:
 
-## Author & Entreprise support 
+- Free to use and distribute
+- Source code openly available
+- Can be extended by anyone
+- Commercial use requires permission
+
+The license allows free non-production use and will convert to AGPLv3 on 2029-01-17. For commercial use or production deployments, please contact the author to discuss licensing options.
+
+## Author & Enterprise Support 
 
 Sébastien Campion - sebastien.campion@foss4.eu
 
