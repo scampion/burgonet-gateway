@@ -1,4 +1,7 @@
 #!/bin/bash
+
+# Test Ollama Gemma2 2B model with a simple greeting
+echo "Testing Ollama Gemma2 2B model with greeting..."
 curl http://127.0.0.1:8080/ollama/gemma2/2b/  \
 -H "Authorization: Bearer your-token-here" \
 -d '{
@@ -12,8 +15,7 @@ curl http://127.0.0.1:8080/ollama/gemma2/2b/  \
 }' | jq
 
 echo "----------------------------------------------------"
-echo " LLAMACPP  LLAMACPP  LLAMACPP  LLAMACPP  LLAMACPP  LLAMACPP "
-
+echo "Testing LlamaCPP Phi4 model with yes/no question..."
 
 curl http://127.0.0.1:8080/llamacpp/phi4/  \
 -H "Authorization: Bearer your-token-here" \
@@ -25,7 +27,8 @@ curl http://127.0.0.1:8080/llamacpp/phi4/  \
 
 echo "----------------------------------------------------"
 
-
+# Test Ollama Gemma2 2B model with confidential information question
+echo "Testing Ollama Gemma2 2B model with confidential information question..."
 curl http://127.0.0.1:8080/ollama/gemma2/2b/  \
 -H "Authorization: Bearer your-token-here" \
 -d '{
@@ -40,7 +43,8 @@ curl http://127.0.0.1:8080/ollama/gemma2/2b/  \
 
 echo "----------------------------------------------------"
 
-
+# Test Ollama Gemma2 2B model with personal information question
+echo "Testing Ollama Gemma2 2B model with personal information question..."
 curl http://127.0.0.1:8080/ollama/gemma2/2b/  \
 -H "Authorization: Bearer your-token-here" \
 -d '{
@@ -55,7 +59,9 @@ curl http://127.0.0.1:8080/ollama/gemma2/2b/  \
 
 echo "----------------------------------------------------"
 
-
+# Test LlamaCPP Phi4 model with information sharing question
+# Note: This appears to be using the wrong endpoint/model combination
+echo "Testing LlamaCPP Phi4 model with information sharing question (potential misconfiguration)..."
 curl http://127.0.0.1:8080/llamacpp/phi4//  \
 -H "Authorization: Bearer your-token-here" \
 -d '{
