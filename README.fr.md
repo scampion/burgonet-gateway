@@ -1,4 +1,4 @@
-# Burgonet - Passerelle d'Entreprise pour l'IA
+# Burgonet - Enterprise AI Gateway
 
 <p align="center">
   <img src="frontend/app/static/images/logo.png?raw=true" style="width: 200px; height: auto;" />
