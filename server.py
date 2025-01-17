@@ -8,10 +8,12 @@ The logs are expected to be in the syslog format and sent via UDP to the server.
 """
 import json
 import logging
+import os
 import re
 import socket
 import socketserver
 import sys
+import traceback
 from datetime import datetime
 from typing import NamedTuple, Optional
 
@@ -19,9 +21,11 @@ import redis
 
 from frontend.app.config import REDIS_HOST, REDIS_PORT, SYSLOG_HOST, SYSLOG_PORT, RESPONSES_LOGFILE
 from frontend.app.models import DeepSeek, OpenAI, Anthropic, Azure, Ollama
+from functools import lru_cache
 
 rd = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
 out = open(RESPONSES_LOGFILE, 'a')
+CONFIG = None
 
 parsers = {
     'deepseek': DeepSeek.parse_response,
@@ -32,7 +36,9 @@ parsers = {
 }
 
 # set logging level at INFO
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    level=os.environ.get('LOGLEVEL', 'INFO').upper()
+)
 
 class SyslogMessage(NamedTuple):
     facility: int
@@ -127,6 +133,63 @@ class SyslogParser:
             return None
 
 
+@lru_cache(maxsize=128)
+def get_quotas_config(uri):
+    for model in CONFIG['models']:
+        if model['location'] == uri:
+            return model.get('quotas', {})
+
+
+def quota(data):
+    quotas = get_quotas_config(data['uri'])
+    logging.debug(f"quotas: {quotas}")
+    # Manage quotas for tokens
+    for period, value in quotas.get('max_tokens', {}).items():
+        user = rd.get(f"token:{data['token']}")
+        logging.debug(f"checking quota for {user} {period} {value}")
+        if period == "hour":
+            current_hour = datetime.now().strftime("%Y-%m-%d-%H")
+            # add total tokens used in the hour to redis quota:<user>:<hour>
+            total_tokens = data['tokens_input'] + data['tokens_output']
+            rd.incr(f"quota:{user}:{current_hour}", total_tokens)
+            rd.expire(f"quota:{user}:{current_hour}", 3600)
+
+            # check if the total tokens used in the hour is greater than the max tokens allowed
+            if int(rd.get(f"quota:{user}:{current_hour}") or 0) > value:
+                # set the quota exceeded flag to quota:<user>:exceeded and expire it after 1 hour
+                timeout = 3600 - (datetime.now().minute * 60 + datetime.now().second)
+                rd.setex(f"quota:{user}:exceeded", timeout, f'hour {current_hour}')
+                logging.info(f"📊 quota exceeded for {user} {period} {value}")
+
+        if period == "day":
+            current_day = datetime.now().strftime("%Y-%m-%d")
+            # add total tokens used in the day to redis quota:<user>:<day>
+            total_tokens = data['tokens_input'] + data['tokens_output']
+            rd.incr(f"quota:{user}:{current_day}", total_tokens)
+            rd.expire(f"quota:{user}:{current_day}", 86400)
+
+            # check if the total tokens used in the day is greater than the max tokens allowed
+            if int(rd.get(f"quota:{user}:{current_day}") or 0) > value:
+                # set the quota exceeded flag to quota:<user>:exceeded and expire it after 1 day
+                timeout = 86400 - (datetime.now().hour * 3600 + datetime.now().minute * 60 + datetime.now().second)
+                rd.setex(f"quota:{user}:exceeded", timeout, f"day {current_day}")
+                logging.info(f"📊 quota exceeded for {user} {period} {value}")
+
+        if period == "week":
+            current_week = datetime.now().strftime("%Y-%W")
+            # add total tokens used in the week to redis quota:<user>:<week>
+            total_tokens = data['tokens_input'] + data['tokens_output']
+            rd.incr(f"quota:{user}:{current_week}", total_tokens)
+            rd.expire(f"quota:{user}:{current_week}", 604800)
+            # check if the total tokens used in the week is greater than the max tokens allowed
+            if int(rd.get(f"quota:{user}:{current_week}") or 0) > value:
+                # set the quota exceeded flag to quota:<user>:exceeded and expire it after 1 week
+                timeout = 604800 - (datetime.now().weekday() * 86400 + datetime.now().hour * 3600 +
+                                    datetime.now().minute * 60 + datetime.now().second)
+                rd.setex(f"quota:{user}:exceeded", timeout, f'week {current_week}')
+                logging.info(f"📊 quota exceeded for {user} {period} {value}")
+
+
 def dispatch(line):
     rd.publish('responses', line)  # duplicate the stream for future purposes
     data = json.loads(line)
@@ -134,7 +197,7 @@ def dispatch(line):
         # Clean up the data and prepare it
         token = data['authorization'][7:]
         data['token'] = token
-        keys_to_keep = ['time', 'request_body', 'response_body', 'provider', 'model_name', 'model_version']
+        keys_to_keep = ['time', 'uri', 'request_body', 'response_body', 'provider', 'model_name', 'model_version']
         data = {k: v for k, v in data.items() if k in keys_to_keep}
         request_body = json.loads(data['request_body'])
         response_body = json.loads(data['response_body'])
@@ -146,7 +209,11 @@ def dispatch(line):
         parsed_response = parsers[provider_name](data)
         parsed_response['provider'] = provider_name
         parsed_response['time'] = data['time']
+        parsed_response['uri'] = data['uri']
         parsed_response['token'] = token
+
+        # Check for quota
+        quota(parsed_response)
         out.write(json.dumps(parsed_response) + '\n')
         logging.info(f"🚀 response parsed: {parsed_response}")
     else:
@@ -160,7 +227,9 @@ class SyslogUDPHandler(socketserver.BaseRequestHandler):
         if parsed:
             try:
                 dispatch(parsed.message)
+                logging.debug(f"syslog message parsed: {self.client_address[0]}: {parsed.message}")
             except Exception as e:
+                traceback.print_exc()
                 logging.error(f"🚨️ Error:{e.__class__.__name__}  {str(e)} {data}")
         else:
             logging.error(f"syslog message unparsed : {self.client_address[0]} (UNPARSED): {data}")
@@ -169,8 +238,8 @@ class SyslogUDPHandler(socketserver.BaseRequestHandler):
 def run_server(host='0.0.0.0', port=514):
     try:
         server = socketserver.UDPServer((host, port), SyslogUDPHandler)
-        print(f"Starting syslog server on {host}:{port}")
-        print("Waiting for messages... (Press Ctrl+C to stop)")
+        logging.info(f"Starting syslog server on {host}:{port}")
+        logging.info("Waiting for messages... (Press Ctrl+C to stop)")
         server.serve_forever()
 
     except PermissionError:
@@ -183,6 +252,7 @@ def run_server(host='0.0.0.0', port=514):
 
 
 if __name__ == "__main__":
+    CONFIG = json.load(open(sys.argv[1]))
     if socket.gethostname() != SYSLOG_HOST and SYSLOG_HOST != socket.gethostname().split(".")[0]:
         raise Exception(
             f"SYSLOG_HOST ({SYSLOG_HOST}) does not match the host running the script ({socket.gethostname()})")

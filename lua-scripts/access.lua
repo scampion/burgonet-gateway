@@ -77,6 +77,15 @@ for _, group_id in ipairs(user_groups) do
     end
 end
 
+-- Check quota
+local quota_exceeded = red:exists("quota:" .. user_id .. ":exceeded")
+if quota_exceeded == 1 then
+    ngx.status = ngx.HTTP_TOO_MANY_REQUESTS
+    ngx.header.content_type = "text/plain"
+    ngx.say("Quota exceeded, please contact your administrator")
+    ngx.exit(ngx.HTTP_TOO_MANY_REQUESTS)
+end
+
 
 local pii_protection_url = ngx.var.pii_protection_url or ""
 

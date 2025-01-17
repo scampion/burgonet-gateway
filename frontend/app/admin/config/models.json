@@ -29,7 +29,11 @@
             "api_key": "NA",
             "disabled_groups": "",
             "blacklist_words": "confidential mycorp",
-            "pii_protection_url": "http://m1:8001/check-pii-base64"
+            "pii_protection_url": "http://m1:8001/check-pii-base64",
+            "quotas": {
+                "max_tokens": {"value": 1000000, "period": "day"},
+                "max_requests": {"value": 10, "period": "hour"}
+            }
         }
     ]
 }
