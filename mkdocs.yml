@@ -16,7 +16,7 @@ nav:
   - About: about.md
 
 theme:
-  name: material
+  name: readthedocs
   features:
     - navigation.tabs
     - navigation.indexes
@@ -27,20 +27,18 @@ theme:
     - scheme: slate
       primary: blue
       accent: blue
+  analytics:
+    gtag: GTM-TSWFRGBR
 
 plugins:
   - search
   - mermaid2
-  - mkdocstrings
   - git-revision-date-localized
 
 markdown_extensions:
   - admonition
+  - pymdownx.snippets
   - pymdownx.details
-  - pymdownx.superfences
   - pymdownx.tabbed
-
-
-
-
+  - pymdownx.tasklist
 

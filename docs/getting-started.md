@@ -3,26 +3,31 @@
 ## Installation
 
 1. Clone the repository:
-   ```bash
-   git clone https://github.com/your-repo/burgonet-gateway.git
-   cd burgonet-gateway
-   ```
+
+```bash
+git clone https://github.com/your-repo/burgonet-gateway.git
+cd burgonet-gateway
+```
 
 2. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
+
+```bash
+pip install -r requirements.txt
+```
 
 3. Configure the application by editing `frontend/app/config.py`
 
 4. Run the application:
-   ```bash
-   python wsgi.py
-   ```
+
+```bash
+python wsgi.py
+```
 
 ## Configuration
 
-The main configuration file is located at `frontend/app/config.py`. Key settings include:
+The main configuration file is located at `frontend/app/config.py`.
+
+Key settings include:
 
 - **LDAP**: Authentication and user management
 - **Redis**: Token storage and caching
@@ -30,6 +35,7 @@ The main configuration file is located at `frontend/app/config.py`. Key settings
 - **Security**: Secret keys and access controls
 
 Example configuration:
+
 ```python
 # LDAP Settings
 LDAP_HOST = 'ldap://localhost'

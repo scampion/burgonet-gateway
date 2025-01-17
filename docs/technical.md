@@ -24,7 +24,7 @@ classDiagram
     class User {
         +String id
         +String username
-        +Set~Group~ groups
+        +Group[] groups
         +addGroup(Group group)
         +removeGroup(Group group)
     }
@@ -32,7 +32,7 @@ classDiagram
     class Group {
         +String id
         +String name
-        +Set~User~ members
+        +User[] members
         +addUser(User user)
         +removeUser(User user)
     }
@@ -47,9 +47,9 @@ classDiagram
 
     class Route {
         +String path
-        +Set~Group~ disabledGroups
-        +Set~String~ blacklistWords
-        +Map~String,Integer~ quotas
+        +Group[] disabledGroups
+        +String[] blacklistWords
+        +String~Integer~ quotas
     }
 
     User "1" *-- "many" Group : belongs to
