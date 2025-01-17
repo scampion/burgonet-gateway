@@ -50,7 +50,7 @@
     <table class="table">
         <thead>
             <tr>
-                <th>Provider</th>
+                <th style="width: 13%;">Provider</th>
                 <th>Model Name</th>
                 <th>Location</th>
                 <th>Proxy Pass</th>
@@ -79,6 +79,9 @@
                             </option>
                             <option value="ollama" {% if model.provider == 'ollama' %}selected{% endif %}>
                                 Ollama
+                            </option>
+                            <option value="llamacpp" {% if model.provider == 'llamacpp' %}selected{% endif %}>
+                                Llamacpp
                             </option>
                         </select>
                     </td>

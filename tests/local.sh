@@ -29,7 +29,7 @@ echo "----------------------------------------------------"
 
 # Test Ollama Gemma2 2B model with confidential information question
 echo "Testing Ollama Gemma2 2B model with confidential information question..."
-curl http://127.0.0.1:8080/ollama/gemma2/2b/  \
+curl -vv http://127.0.0.1:8080/ollama/gemma2/2b/  \
 -H "Authorization: Bearer your-token-here" \
 -d '{
   "model": "gemma2:2b-instruct-q6_K",                                                                                                                        "messages": [
@@ -45,7 +45,7 @@ echo "----------------------------------------------------"
 
 # Test Ollama Gemma2 2B model with personal information question
 echo "Testing Ollama Gemma2 2B model with personal information question..."
-curl http://127.0.0.1:8080/ollama/gemma2/2b/  \
+curl -vv http://127.0.0.1:8080/ollama/gemma2/2b/  \
 -H "Authorization: Bearer your-token-here" \
 -d '{
   "model": "gemma2:2b-instruct-q6_K",                                                                                                                        "messages": [
@@ -62,7 +62,7 @@ echo "----------------------------------------------------"
 # Test LlamaCPP Phi4 model with information sharing question
 # Note: This appears to be using the wrong endpoint/model combination
 echo "Testing LlamaCPP Phi4 model with information sharing question (potential misconfiguration)..."
-curl http://127.0.0.1:8080/llamacpp/phi4//  \
+curl -vv http://127.0.0.1:8080/llamacpp/phi4//  \
 -H "Authorization: Bearer your-token-here" \
 -d '{
   "model": "gemma2:2b-instruct-q6_K",                                                                                                                        "messages": [

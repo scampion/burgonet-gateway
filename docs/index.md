@@ -27,5 +27,6 @@ Learn how to set up and configure Burgonet Gateway for your organization.
     - [ ] OpenAI
     - [ ] Azure
     - [ ] Bedrock
+    - [X] Llamma.cpp
 
 --8<-- "docs/use-cases.md"

@@ -29,11 +29,18 @@
             "api_key": "NA",
             "disabled_groups": "",
             "blacklist_words": "confidential mycorp",
-            "pii_protection_url": "http://m1:8001/check-pii-base64",
+            "pii_protection_url": "http://piiserver:8000/check-pii-base64",
             "quotas": {
                 "max_tokens": {"value": 1000000, "period": "day"},
                 "max_requests": {"value": 10, "period": "hour"}
             }
+        },
+        {
+            "provider": "llamacpp",
+            "model_name": "phi4-GGUF-Q4_K",
+            "location": "/llamacpp/phi4/",
+            "proxy_pass": "http://m1:8081/completion"
         }
+
     ]
 }

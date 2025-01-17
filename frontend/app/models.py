@@ -114,6 +114,9 @@ class Provider:
     model_name: str = 'deepseek'
     model_version: str = 'v3'
     pii_protection_url: str = ''
+    disabled_groups: list = None
+    blacklist_words: list = None
+    quotas: dict = None
 
     def __repr__(self):
         return f'<Provider {self}>'
@@ -138,7 +141,7 @@ class Provider:
                 {'directive': 'set', 'args': ['$model_version', self.model_version]},
                 {'directive': 'set', 'args': ['$provider', provider]},
                 {'directive': 'access_by_lua_file', 'args': ['/etc/nginx/lua-scripts/access.lua']},
-                {'directive': 'pii_protection_url', 'args': [self.pii_protection_url]},
+                {'directive': 'set', 'args': ['$pii_protection_url', self.pii_protection_url]},
                 {'directive': 'proxy_pass', 'args': [self.proxy_pass]},
                 {'directive': 'proxy_ssl_server_name', 'args': ['on']},
                 {'directive': 'proxy_set_header', 'args': ['Host', 'api.deepseek.com']},
@@ -164,7 +167,6 @@ class DeepSeek(Provider):
             "tokens_input": response['response_body']['usage']['prompt_tokens'],
             "tokens_output": response['response_body']['usage']['completion_tokens']
         }
-
 
 @dataclass
 class OpenAI(Provider):
@@ -206,4 +208,15 @@ class Ollama(Provider):
         return {
             "tokens_input": response['response_body']['prompt_eval_count'],
             "tokens_output": response['response_body']['eval_count']
+        }
+
+
+
+@dataclass
+class LLamaCPP(Provider):
+
+    def parse_response(response):
+        return {
+            "tokens_input": response['response_body']['tokens_evaluated'],
+            "tokens_output": response['response_body']['tokens_predicted']
         }

@@ -40,8 +40,9 @@ end
 local route_path = ngx.var.uri
 local route_key = "routes:" .. route_path
 local blacklist_words = red:hget(route_key, "blacklist_words")
+
 -- log the blacklist words
-if blacklist_words then
+if blacklist_words and blacklist_words ~= ngx.null  then
     -- Read the request body first
     ngx.req.read_body()
     local request_body, err = ngx.req.get_body_data()
