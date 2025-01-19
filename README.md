@@ -99,6 +99,8 @@ This project is licensed under the Business Source License 1.1 (see [LICENSE](LI
 
 The license allows free non-production use and will convert to AGPLv3 on 2029-01-17. For commercial use or production deployments, please contact the author to discuss licensing options.
 
+Other licensing is possible, contact the author.
+
 ## Author & Enterprise Support 
 
 Sébastien Campion - sebastien.campion@foss4.eu
