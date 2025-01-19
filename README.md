@@ -19,6 +19,8 @@ cloud based LLL providers or self-hosted models via that single entrypoint.
 
 The complete documentation is available at [https://burgonet.eu/](https://burgonet.eu/)
 
+    👉 a Rust 🦀 implentation is in progress, Redis and  Ngnix dependencies will be removed
+
 Users can:
 - request new tokens easily in a self-service approach 
 - monitor they consumption 
