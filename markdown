@@ -20,7 +20,7 @@ For production deployments or commercial use, enterprise licenses and support pa
 - Security audits
 - Compliance consulting
 
-Contact [sebastien.campion@foss4.eu](mailto:sebastien.campion@foss4.eu) to discuss licensing options and enterprise support.
+Contact <a href="mailto:sebastien.campion@foss4.eu">sebastien.campion@foss4.eu</a> to discuss licensing options and enterprise support.
 
 ## Copyright
 
