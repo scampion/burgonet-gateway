@@ -19,7 +19,7 @@
 - 🗑️ Legacy Python implementation
 - 🚫 Deprecated configuration options
 
----
+g---
 
 *This project follows [Semantic Versioning](https://semver.org/)*
 
