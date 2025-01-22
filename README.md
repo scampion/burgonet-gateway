@@ -30,6 +30,8 @@ cloud based LLM providers or self-hosted models via that single entrypoint.
 - 🚫 **Content Filtering**: Block requests containing blacklisted words (e.g. "confidential")
 - 🚷 **Group Access Control**: Restrict access by user groups with disabled_groups configuration
 
+Need another feature? Don't hesitate to send an email to sebastien.campion@foss4.eu or create a GitHub ticket!
+
 
 ## Documentation 
 
