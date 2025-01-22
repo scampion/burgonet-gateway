@@ -28,6 +28,7 @@ cloud based LLL providers or self-hosted models via that single entrypoint.
 - 📈 **Prometheus Metrics**: Built-in Prometheus endpoint for monitoring and alerting
 - 🔐 **Trusted Header Authentication**: Support for authentication via trusted HTTP headers
 - 🚫 **Content Filtering**: Block requests containing blacklisted words (e.g. "confidential")
+- 🚷 **Group Access Control**: Restrict access by user groups with disabled_groups configuration
 
 
 ## Documentation 
