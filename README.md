@@ -17,13 +17,13 @@ cloud based LLL providers or self-hosted models via that single entrypoint.
 
 ## Features
 
-- **Token Management**: Generate, view, and delete API tokens
-- **Quota Management**: Set token quotas per user, group or project
-- **Usage Monitoring**: Real-time usage tracking and analytics
-- **Provider Management**: Configure multiple LLM providers (OpenAI, Claude, DeepSeek, Ollama, etc.)
-- **Rate Limiting**: Built-in rate limiting with configurable thresholds
-- **Audit Logs**: Detailed logging of API requests and responses
-- **Embedded Web UI**: Built-in admin interface for configuration and monitoring
+- 🔑 **Token Management**: Generate, view, and delete API tokens
+- 🎯 **Quota Management**: Set token quotas per user, group or project
+- 📊 **Usage Monitoring**: Real-time usage tracking and analytics
+- 🤖 **Provider Management**: Configure multiple LLM providers (OpenAI, Claude, DeepSeek, Ollama, etc.)
+- ⏱️ **Rate Limiting**: Built-in rate limiting with configurable thresholds
+- 📝 **Audit Logs**: Detailed logging of API requests and responses
+- 🖥️ **Embedded Web UI**: Built-in admin interface for configuration and monitoring
 
 
 ## Documentation 
