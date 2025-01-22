@@ -1,3 +1,8 @@
+// Copyright (c) 2025 Sébastien Campion, FOSS4. All rights reserved.
+//
+// This software is provided under the Commons Clause License Condition v1.0.
+// See the LICENSE file for full license details.
+
 use serde::Deserialize;
 use std::fs;
 use std::path::Path;
