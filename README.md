@@ -2,13 +2,15 @@
 [in French](README.fr.md)
 
 <p align="center">
-  <img src="frontend/app/static/images/logo.png?raw=true" style="width: 200px; height: auto;" />
+  <img src="docs/images/logo.png?raw=true" style="width: 200px; height: auto;" />
 </p>
 
 
 ## About
 
-Burgonet Gateway is a DevSecOps AI enterprise gateway that provides secure access to LLM and compliance controls for AI systems.​​​​​​​​​​​​​​​​
+   Burgonet Gateway is an AI enterprise gateway that provides secure access to LLM and compliance controls for AI systems.
+   It will help organizations to manage their AI governance in a secure and compliant way.
+
 
 The goal is to provide for employees, unit and project access to
 cloud based LLL providers or self-hosted models via that single entrypoint.
