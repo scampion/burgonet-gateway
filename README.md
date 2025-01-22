@@ -46,6 +46,8 @@ Download the binary in the [packages](https://github.com/burgonet-eu/gateway/rel
 
 Open in your browser the URL [http://127.0.0.1:6189/](http://127.0.0.1:6189/)
 
+![Screenshot](docs/images/screenshot.png)
+
 
 ## License
 

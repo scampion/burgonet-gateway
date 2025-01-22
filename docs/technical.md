@@ -7,7 +7,7 @@ Burgonet Gateway uses several ports for different services:
 
 | Port | Service                | Description                                                                 |
 |------|------------------------|-----------------------------------------------------------------------------|
-| 6190 | Admin Service          | Provides web UI and API for configuration and monitoring |
+| 6189 | Admin Service          | Provides web UI and API for configuration and monitoring |
 | 6191 | Main Gateway Service   | Handles all API requests and routing (default)                             |
 | 6192 | Prometheus Metrics     | Exposes monitoring metrics for scraping                                    |
 
