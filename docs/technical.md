@@ -10,20 +10,23 @@
 ```mermaid
 sequenceDiagram
     participant User
-    participant NGINX
-    participant Redis
-    participant Auth
+    participant Gateway
+    participant Database
     participant Provider
     
-    User->>NGINX: API Request
-    NGINX->>Redis: Check token validity
-    Redis-->>NGINX: Token status
-    NGINX->>Auth: Validate permissions
-    Auth-->>NGINX: Permission status
-    NGINX->>Provider: Forward request
-    Provider-->>NGINX: Response
-    NGINX->>Redis: Log request
-    NGINX-->>User: Return response
+    User->>Gateway: API Request
+    Gateway->>Database: Validate token
+    Database-->>Gateway: Token status
+    Gateway->>Gateway: Check rate limits
+    Gateway->>Gateway: Check token quotas
+    Gateway->>Gateway: Verify group access
+    Gateway->>Gateway: Scan for PII
+    Gateway->>Gateway: Check blacklisted words
+    Gateway->>Provider: Forward request
+    Provider-->>Gateway: Response
+    Gateway->>Database: Log usage metrics
+    Gateway->>Prometheus: Export metrics
+    Gateway-->>User: Return response
 ```
 
 ## Core Concepts
