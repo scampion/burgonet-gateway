@@ -90,7 +90,7 @@ The main configuration file is located at `flask_app/app/config.py`. Key setting
 
 ## License & Fair-code Status
 
-This project is licensed under the Business Source License 1.1 (see [LICENSE](LICENSE) file for details) and follows the [Fair-code](https://faircode.io) principles:
+This project is provided under the Commons Clause License Condition v1.0 (see [LICENSE](LICENSE) file for details) and follows the [Fair-code](https://faircode.io) principles:
 
 - Free to use and distribute
 - Source code openly available

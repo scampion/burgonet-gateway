@@ -78,7 +78,7 @@ Le fichier de configuration principal se trouve dans `flask_app/app/config.py`. 
 
 ## Licence & Statut Fair-code
 
-Ce projet est sous licence Business Source License 1.1 (voir fichier [LICENSE](LICENSE) pour plus de détails) et suit les principes [Fair-code](https://faircode.io) :
+Ce projet est fourni sous la licence Commons Clause License Condition v1.0 (voir fichier [LICENSE](LICENSE) pour plus de détails) et suit les principes [Fair-code](https://faircode.io) :
 
 - Libre d'utilisation et de distribution
 - Code source ouvertement disponible
