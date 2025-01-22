@@ -48,6 +48,46 @@ Open in your browser the URL [http://127.0.0.1:6189/](http://127.0.0.1:6189/)
 
 ![Screenshot](docs/images/screenshot.png)
 
+## Configuration 
+
+The configuration file `conf.yml` is used to define the models, the quotas, the providers, the tokens, the rate limits, 
+the groups, the PII protection, the blacklisted words and the Prometheus metrics.
+
+Here is an example of part of a configuration file:
+```yaml
+models:
+  - location: "/echo/chat/completions"
+    model_name: "echo"
+    proxy_pass: "http://localhost:9999"
+    api_key: "$DEEPSEEK_API_KEY"
+    parser: "ollama"
+    disabled_groups: "mammals, birds"
+    blacklist_words: "confidential, mycorp"
+    pii_protection_url: "http://127.0.0.1:8001/check-pii-base64"
+    quotas:
+      - max_tokens:
+          minute: 500
+          hour: 6000
+          day: 10000
+          week: 40000
+      - max_requests:
+          second: 1
+          minute: 15
+```
+
+Here is an example of a curl request to the gateway:
+
+```bash
+curl -X POST http://localhost:6189/echo/chat/completions \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "echo",
+    "messages": [{"role": "user", "content": "Bonjour le monde"}]
+  }'
+```
+
+
 
 ## License
 
