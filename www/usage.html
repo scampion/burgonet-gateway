@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Usage Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; }
+        .navbar {
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .navbar img {
+            height: 40px;
+            margin-right: 20px;
+        }
+        .navbar a {
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+            margin-right: 20px;
+        }
+        .navbar a:hover {
+            text-decoration: underline;
+        }
+        .content {
+            padding: 20px;
+        }
+        .chart-container {
+            width: 80%;
+            height: 320px;
+            margin: 20px auto;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .period-selector {
+            margin: 20px 0;
+        }
+        .period-selector button {
+            margin-right: 10px;
+            padding: 5px 15px;
+            cursor: pointer;
+        }
+    </style>
+    <script src="chart.js"></script>
+</head>
+<body>
+    <div class="navbar">
+        <img src="logo.png" alt="Burgonet Gateway Logo">
+        <a href="index.html">Home</a>
+        <a href="tokens.html">Tokens</a>
+        <a href="usage.html" style="color: #000;">Usage</a>
+    </div>
+    <div class="content">
+        <h1>Usage Dashboard</h1>
+        
+        <div class="period-selector">
+            <button onclick="loadUsage('minutely')">Minutely</button>
+            <button onclick="loadUsage('hourly')">Hourly</button>
+            <button onclick="loadUsage('daily')">Daily</button>
+            <button onclick="loadUsage('weekly')">Weekly</button>
+            <button onclick="loadUsage('monthly')">Monthly</button>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="usageChart"></canvas>
+        </div>
+
+        <table id="usageTable">
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>User</th>
+                    <th>Input Tokens</th>
+                    <th>Output Tokens</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data will be populated here -->
+            </tbody>
+        </table>
+
+        <script>
+            let usageChart;
+            const chartColors = {
+                input: 'rgba(54, 162, 235, 0.5)',
+                output: 'rgba(255, 99, 132, 0.5)'
+            };
+
+            async function loadUsage(period) {
+                try {
+                    const response = await fetch(`/usage/${period}`);
+                    const data = await response.json();
+                    processUsageData(data);
+                } catch (error) {
+                    console.error('Error loading usage data:', error);
+                }
+            }
+
+            function processUsageData(data) {
+                // Group data by timestamp and user
+                const groupedData = {};
+                data.forEach(entry => {
+                    const [key, value] = Object.entries(entry)[0];
+                    const [prefix, timestamp, user, type] = key.split(':');
+                    
+                    if (!groupedData[timestamp]) {
+                        groupedData[timestamp] = {};
+                    }
+                    if (!groupedData[timestamp][user]) {
+                        groupedData[timestamp][user] = {
+                            input: 0,
+                            output: 0
+                        };
+                    }
+                    
+                    if (type === 'in') {
+                        groupedData[timestamp][user].input = value;
+                    } else if (type === 'out') {
+                        groupedData[timestamp][user].output = value;
+                    }
+                });
+
+                // Prepare data for chart and table
+                const timestamps = Object.keys(groupedData).sort();
+                const users = new Set();
+                const chartData = {
+                    labels: timestamps,
+                    datasets: []
+                };
+
+                const tableBody = document.querySelector('#usageTable tbody');
+                tableBody.innerHTML = '';
+
+                // Process each timestamp
+                timestamps.forEach(timestamp => {
+                    const usersData = groupedData[timestamp];
+                    Object.entries(usersData).forEach(([user, values]) => {
+                        users.add(user);
+                        
+                        // Add row to table
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${formatTimestamp(timestamp)}</td>
+                            <td>${user}</td>
+                            <td>${values.input}</td>
+                            <td>${values.output}</td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                });
+
+                // Calculate totals across all users
+                const totalInput = timestamps.map(t => 
+                    Object.values(groupedData[t]).reduce((sum, user) => sum + (user.input || 0), 0)
+                );
+                const totalOutput = timestamps.map(t => 
+                    Object.values(groupedData[t]).reduce((sum, user) => sum + (user.output || 0), 0)
+                );
+
+                // Add total datasets with solid lines
+                chartData.datasets.push({
+                    label: 'Total Input Tokens',
+                    data: totalInput,
+                    backgroundColor: 'rgba(54, 162, 235, 0.3)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 2
+                });
+
+                chartData.datasets.push({
+                    label: 'Total Output Tokens',
+                    data: totalOutput,
+                    backgroundColor: 'rgba(255, 99, 132, 0.3)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 2
+                });
+
+                // Update or create chart
+                if (usageChart) {
+                    usageChart.destroy();
+                }
+                
+                const ctx = document.getElementById('usageChart').getContext('2d');
+                usageChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: chartData,
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Tokens'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Time'
+                                }
+                            }
+                        },
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+            }
+
+            function formatTimestamp(timestamp) {
+                // Format timestamp based on its prefix and length
+                if (timestamp.length === 12) {
+                    return `${timestamp.slice(0,4)}-${timestamp.slice(4,6)}-${timestamp.slice(6,8)} ${timestamp.slice(8,10)}:${timestamp.slice(10,12)}`;
+                } else if (timestamp.length === 10) { // YYYYMMDDHH
+                    return `${timestamp.slice(0,4)}-${timestamp.slice(4,6)}-${timestamp.slice(6,8)} ${timestamp.slice(8,10)}:00`;
+                }
+                return timestamp; // Fallback for other formats
+            }
+
+            // Load hourly data by default
+            document.addEventListener('DOMContentLoaded', () => loadUsage('hourly'));
+        </script>
+    </div>
+</body>
+</html>

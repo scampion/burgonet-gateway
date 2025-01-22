@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Token Management</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; }
+        .navbar {
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .navbar img {
+            height: 40px;
+            margin-right: 20px;
+        }
+        .navbar a {
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+        }
+        .navbar a:hover {
+            text-decoration: underline;
+        }
+        .content {
+            padding: 20px;
+        }
+        table { border-collapse: collapse; width: 50%; margin-bottom: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; }
+        .form-group input { width: 200px; padding: 5px; }
+        button { padding: 5px 15px; margin-right: 10px; }
+        .error { color: red; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <img src="logo.png" alt="Burgonet Gateway Logo">
+        <a href="index.html">Home</a>
+    </div>
+    <div class="content">
+        <h1>Token Management</h1>
+    
+    <h2>Current Tokens</h2>
+    <table id="tokens-table">
+        <thead>
+            <tr>
+                <th>Token</th>
+                <th>User</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Tokens will be populated here -->
+        </tbody>
+    </table>
+
+    <h2>Add New Token</h2>
+    <div class="form-group">
+        <label for="token">Token:</label>
+        <input type="text" id="token" placeholder="Enter token">
+    </div>
+    <div class="form-group">
+        <label for="user">User:</label>
+        <input type="text" id="user" placeholder="Enter user">
+    </div>
+    <button onclick="addToken()">Add Token</button>
+    <div id="error-message" class="error"></div>
+
+    <script>
+        // Load tokens when page loads
+        document.addEventListener('DOMContentLoaded', fetchTokens);
+
+        async function fetchTokens() {
+            try {
+                const response = await fetch('/tokens');
+                const tokens = await response.json();
+                updateTokenTable(tokens);
+            } catch (error) {
+                console.error('Error fetching tokens:', error);
+            }
+        }
+
+        function updateTokenTable(tokens) {
+            const tbody = document.querySelector('#tokens-table tbody');
+            tbody.innerHTML = ''; // Clear existing rows
+            
+            tokens.forEach(tokenObj => {
+                const [token, user] = Object.entries(tokenObj)[0];
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td>${token}</td>
+                    <td>${user}</td>
+                    <td>
+                        <button onclick="deleteToken('${token}')">Delete</button>
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+
+        async function addToken() {
+            const token = document.getElementById('token').value;
+            const user = document.getElementById('user').value;
+            
+            if (!token || !user) {
+                showError('Both token and user are required');
+                return;
+            }
+
+            try {
+                const response = await fetch('/tokens', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        tokens: {
+                            [token]: user
+                        }
+                    })
+                });
+
+                if (response.ok) {
+                    // Clear inputs and refresh table
+                    document.getElementById('token').value = '';
+                    document.getElementById('user').value = '';
+                    showError('');
+                    fetchTokens();
+                } else {
+                    throw new Error('Failed to add token');
+                }
+            } catch (error) {
+                console.error('Error adding token:', error);
+                showError('Failed to add token');
+            }
+        }
+
+        async function deleteToken(token) {
+            if (confirm(`Are you sure you want to delete token ${token}?`)) {
+                try {
+                    // Get the user associated with this token
+                    const tokenRow = Array.from(document.querySelectorAll('#tokens-table tr'))
+                        .find(row => {
+                            const tokenCell = row.querySelector('td:first-child');
+                            return tokenCell && tokenCell.textContent === token;
+                        });
+                    
+                    if (!tokenRow) {
+                        throw new Error('Token not found in table');
+                    }
+                    
+                    const userCell = tokenRow.querySelector('td:nth-child(2)');
+                    if (!userCell) {
+                        throw new Error('User cell not found for token');
+                    }
+                    const user = userCell.textContent;
+                    
+                    const response = await fetch('/tokens', {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            tokens: {
+                                [token]: user
+                            }
+                        })
+                    });
+
+                    if (response.ok) {
+                        fetchTokens();
+                    } else {
+                        throw new Error('Failed to delete token');
+                    }
+                } catch (error) {
+                    console.error('Error deleting token:', error);
+                    showError('Failed to delete token');
+                }
+            }
+        }
+
+        function showError(message) {
+            document.getElementById('error-message').textContent = message;
+        }
+    </script>
+    </div>
+</body>
+</html>
