@@ -25,6 +25,7 @@ cloud based LLL providers or self-hosted models via that single entrypoint.
 - 📝 **Audit Logs**: Detailed logging of API requests and responses
 - 🖥️ **Embedded Web UI**: Built-in admin interface for configuration and monitoring
 - 🔒 **PII Protection**: Built-in Personally Identifiable Information detection and blocking
+- 📈 **Prometheus Metrics**: Built-in Prometheus endpoint for monitoring and alerting
 
 
 ## Documentation 
