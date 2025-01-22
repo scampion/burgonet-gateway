@@ -58,8 +58,12 @@ planned:
 
 - **Token Management**: Generate, view, and delete API tokens
 - **LDAP Authentication**: Integrated with enterprise LDAP systems
-- **Redis Storage**: Secure token storage with Redis
-- **Nginx Integration**: Manage Nginx configurations through web interface
+- **Quota Management**: Set token quotas per user, group or project
+- **Usage Monitoring**: Real-time usage tracking and analytics
+- **Provider Management**: Configure multiple LLM providers (OpenAI, Claude, DeepSeek, Ollama, etc.)
+- **Rate Limiting**: Built-in rate limiting with configurable thresholds
+- **Audit Logs**: Detailed logging of API requests and responses
+- **Embedded Web UI**: Built-in admin interface for configuration and monitoring
 
 ## Installation
 
