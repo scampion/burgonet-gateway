@@ -8,7 +8,7 @@
 It will help organizations to manage their **AI governance** in a secure and compliant way.
 
 The goal is to provide for employees, unit and project access to
-cloud based LLL providers or self-hosted models via that single entrypoint.
+cloud based LLM providers or self-hosted models via that single entrypoint.
 
 <p align="center">
   <img src="docs/images/overview.png?raw=true" />
@@ -37,7 +37,7 @@ The complete documentation is available at [https://burgonet.eu/](https://burgon
 
 ## Quickstart 
 
-Download the binary in the [packages](packages) and the configuration file [conf.yml](conf.yml) file,  run it : 
+Download the binary in the [packages](https://github.com/burgonet-eu/gateway/releases/) and the configuration file [conf.yml](conf.yml) file,  run it : 
 
     ./burgonet-gw -c conf.yml 
 
