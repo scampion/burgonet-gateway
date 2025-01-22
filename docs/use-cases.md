@@ -39,7 +39,9 @@ The organization's governance rules are configured as follows:
 
 ### Prevent leakage of personal idenfier & information leak
 
-	⚠️ Implemented, to be documented 
+
+!!! note 
+    ⚠️ Implemented, to be documented
 
 
 ```bash
@@ -76,23 +78,25 @@ This granular approach allows administrators to optimize costs while maintaining
 
 
 
-```json
-        {
-            "provider": "ollama",
-            "model_name": "gemma2:2b-instruct-q6_K",
-            "location": "/ollama/gemma2/2b/",
-            "proxy_pass": "http://m1:11434/api/chat",
-            "api_key": "NA",
-            "disabled_groups": "",
-            "blacklist_words": "confidential mycorp",
-            "pii_protection_url": "http://m1:8001/check-pii-base64",
-            "quotas": {
-                "max_tokens": {"week": 100000,
-                               "day": 1000,
-                               "hour": 50},
-        
-            }
-        }
+```yaml
+models:
+  - location: "/echo"
+    model_name: "echo"
+    proxy_pass: "http://localhost:9999"
+    api_key: "$DEEPSEEK_API_KEY"
+    parser: "ollama"
+    disabled_groups: "mammals, birds"
+    blacklist_words: "confidential, mycorp"
+    pii_protection_url: "http://127.0.0.1:8001/check-pii-base64"
+    quotas:
+      - max_tokens:
+          minute: 500
+          hour: 6000
+          day: 10000
+          week: 40000
+      - max_requests:
+          second: 1
+          minute: 15
 ```
 
 
