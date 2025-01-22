@@ -30,7 +30,7 @@ cloud based LLM providers or self-hosted models via that single entrypoint.
 - 🚫 **Content Filtering**: Block requests containing blacklisted words (e.g. "confidential")
 - 🚷 **Group Access Control**: Restrict access by user groups with disabled_groups configuration
 
-Need another feature? Don't hesitate to send an email to <a href="mailto:sebastien.campion@foss4.eu">sebastien.campion@foss4.eu</a> or <a href="https://github.com/burgonet-eu/gateway/issues">create a GitHub ticket</a>!
+Need another feature? Don't hesitate to [send an email](mailto:sebastien.campion@foss4.eu) or [create a GitHub ticket](https://github.com/burgonet-eu/gateway/issues)!
 
 
 ## Documentation 
