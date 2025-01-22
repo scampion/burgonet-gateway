@@ -1,5 +1,4 @@
 # Burgonet - AI Enterprise Gateway
-[in French](README.fr.md)
 
 <p align="center">
   <img src="docs/images/logo.png?raw=true" style="width: 200px; height: auto;" />
@@ -8,7 +7,7 @@
 
 ## About
 
-   Burgonet Gateway is an AI enterprise gateway that provides secure access to LLM and compliance controls for AI systems.
+   Burgonet Gateway is an AI enterprise gateway implemented in Rust 🦀 that provides secure access to LLM and compliance controls for AI systems.
    It will help organizations to manage their AI governance in a secure and compliant way.
 
 
@@ -19,51 +18,22 @@ cloud based LLL providers or self-hosted models via that single entrypoint.
   <img src="docs/images/overview.png?raw=true" " />
 </p>
 
-The complete documentation is available at [https://burgonet.eu/](https://burgonet.eu/)
-
-    👉 a Rust 🦀 implentation is in progress, Redis and  Ngnix dependencies will be removed
-
-Users can:
-- request new tokens easily in a self-service approach 
-- monitor they consumption 
-
-Administrators can :
-- configure providers (OpenAI, Claude, DeepSeek, Ollama, ...)
-in one place
-- set quotas by tokens or balance per user, group or project.
-- monitor usage
-- audit logs input/outputs
-- create access list by rules 
-
-
-
-It provides:
-
-- Token-based API authentication
-- User management via LDAP
-- Nginx configuration management
-- Secure token generation and storage
-
-planned: 
-- Websso integration
-- Quota management (per group / per user)
-- Access Control List to dispatch on permise and cloud providers 
-- Semantic routing 
-- Keywords and PII filtering
-
-
 
 
 ## Features
 
 - **Token Management**: Generate, view, and delete API tokens
-- **LDAP Authentication**: Integrated with enterprise LDAP systems
 - **Quota Management**: Set token quotas per user, group or project
 - **Usage Monitoring**: Real-time usage tracking and analytics
 - **Provider Management**: Configure multiple LLM providers (OpenAI, Claude, DeepSeek, Ollama, etc.)
 - **Rate Limiting**: Built-in rate limiting with configurable thresholds
 - **Audit Logs**: Detailed logging of API requests and responses
 - **Embedded Web UI**: Built-in admin interface for configuration and monitoring
+
+
+## Documentation 
+
+The complete documentation is available at [https://burgonet.eu/](https://burgonet.eu/)
 
 ## Installation
 
