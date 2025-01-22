@@ -1,6 +1,0 @@
-Flask==2.3.2
-Flask-Login
-Flask-LDAP3-Login
-crossplane
-python-dotenv==1.0.0
-gunicorn==21.2.0
