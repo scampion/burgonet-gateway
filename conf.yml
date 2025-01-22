@@ -1,0 +1,62 @@
+---
+version: 1
+threads: 3
+pid_file: /tmp/burgonet.pid
+error_log: /tmp/load_balancer_err.log
+upgrade_sock: /tmp/load_balancer.sock
+db_filepath: database.redb
+port: 6191
+host: localhost
+prometheus_host: 127.0.0.1
+prometheus_port: 6192
+
+trust_header_authentication:
+    - Tailscale-User-Login
+    - Cf-Access-Authenticated-User-Email
+    - X-Forwarded-Email
+
+models:
+  - location: "/echo"
+    model_name: "echo"
+    proxy_pass: "http://localhost:9999"
+    api_key: "$DEEPSEEK_API_KEY"
+
+  - location: "/ollama/gemma2/2b/"
+    model_name: "gemma2:2b-instruct-q6_K"
+    parser: "ollama"
+    proxy_pass: "http://127.0.0.1:11434/api/chat"
+    api_key: "NA"
+    disabled_groups: "mammals, birds.aaa"
+    blacklist_words: "confidential, mycorp"
+    pii_protection_url: "http://127.0.0.1:8001/check-pii-base64"
+    quotas:
+      - max_tokens:
+          minute: 50000
+          hour: 60000
+          day: 1000000
+          week: 10000
+      - max_requests:
+          second: 1
+          minute: 15
+
+  - location: "/llamacpp/"
+    provider: "llamacpp"
+    model_name: "phi4-GGUF-Q4_K"
+    proxy_pass: "http://m1:8081/completion"
+
+
+  - location: "/deepseek/chat/completions"
+    model_name: "deepseek"
+    proxy_pass: "https://api.deepseek.com/chat/completions"
+    api_key: "$DEEPSEEK_API_KEY"
+
+  - location: "/api.openai.com/v1/chat/completions"
+    model_name: "gpt4o"
+    proxy_pass: "https://api.openai.com"
+    api_key: "YOUR_API_KEY"
+
+  - location: "/openai.azure.com/v1/chat/completions"
+    model_name: "azuregpt4"
+    proxy_pass: "https://YOUR_RESOURCE_NAME.openai.azure.com/openai/deployments/YOUR_DEPLOYMENT_ID-id/completions?api-version=2024-10-21"
+    api_key: "YOUR_API_KEY"
+
