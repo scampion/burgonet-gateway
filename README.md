@@ -24,6 +24,7 @@ cloud based LLL providers or self-hosted models via that single entrypoint.
 - ⏱️ **Rate Limiting**: Built-in rate limiting with configurable thresholds
 - 📝 **Audit Logs**: Detailed logging of API requests and responses
 - 🖥️ **Embedded Web UI**: Built-in admin interface for configuration and monitoring
+- 🔒 **PII Protection**: Built-in Personally Identifiable Information detection and blocking
 
 
 ## Documentation 
