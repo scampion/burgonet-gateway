@@ -5,13 +5,11 @@
 
 Burgonet Gateway uses several ports for different services:
 
-| Port  | Service                     | Description                                                                 |
-|-------|-----------------------------|-----------------------------------------------------------------------------|
-| 6191  | Main Gateway Service        | Handles all API requests and routing (default)                             |
-| 6192  | Prometheus Metrics          | Exposes monitoring metrics for scraping                                    |
-| 11434 | Ollama Integration          | Used for local Ollama model inference                                       |
-| 8001  | PII Protection Service      | External service for Personally Identifiable Information detection         |
-| 8081  | llama.cpp Integration       | Used for local llama.cpp model inference                                    |
+| Port | Service                | Description                                                                 |
+|------|------------------------|-----------------------------------------------------------------------------|
+| 6190 | Admin Service          |                              |
+| 6191 | Main Gateway Service   | Handles all API requests and routing (default)                             |
+| 6192 | Prometheus Metrics     | Exposes monitoring metrics for scraping                                    |
 
 These ports can be configured in the `conf.yml` file:
 
