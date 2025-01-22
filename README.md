@@ -2,13 +2,14 @@
 [in French](README.fr.md)
 
 <p align="center">
-  <img src="frontend/app/static/images/logo.png?raw=true" style="width: 200px; height: auto;" />
+  <img src="docs/images/logo.png?raw=true" style="width: 200px; height: auto;" />
 </p>
 
+Burgonet Gateway is an AI enterprise gateway that provides secure access to LLM and compliance controls for AI systems.
+It will help organizations to manage their AI governance in a secure and compliant way.
 
-## About
+Implement in Rust 🦀
 
-Burgonet Gateway is a DevSecOps AI enterprise gateway that provides secure access to LLM and compliance controls for AI systems.​​​​​​​​​​​​​​​​
 
 The goal is to provide for employees, unit and project access to
 cloud based LLL providers or self-hosted models via that single entrypoint.
@@ -19,7 +20,7 @@ cloud based LLL providers or self-hosted models via that single entrypoint.
 
 The complete documentation is available at [https://burgonet.eu/](https://burgonet.eu/)
 
-    👉 a Rust 🦀 implentation is in progress, Redis and  Ngnix dependencies will be removed
+   
 
 Users can:
 - request new tokens easily in a self-service approach 
@@ -54,39 +55,16 @@ planned:
 
 ## Features
 
-- **Token Management**: Generate, view, and delete API tokens
-- **LDAP Authentication**: Integrated with enterprise LDAP systems
-- **Redis Storage**: Secure token storage with Redis
-- **Nginx Integration**: Manage Nginx configurations through web interface
 
-## Installation
+## Quickstart 
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/your-repo/burgonet-gateway.git
-   cd burgonet-gateway
-   ```
+Download the binary in the [packages](packages) and the configuration file [conf.yml](conf.yml) file,  run it : 
 
-2. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
+    ./burgonet-gw -c conf.yml 
 
-3. Configure the application by editing `frontend/app/config.py`
 
-4. Run the application:
-   ```bash
-   python wsgi.py
-   ```
+Open in your browser the URL [http://127.0.0.1:6189/](http://127.0.0.1:6189/)
 
-## Configuration
-
-The main configuration file is located at `flask_app/app/config.py`. Key settings include:
-
-- LDAP connection details
-- Redis connection settings
-- Nginx configuration paths
-- Security settings
 
 ## License & Fair-code Status
 
