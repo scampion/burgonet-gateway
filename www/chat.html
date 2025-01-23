@@ -118,8 +118,17 @@
             conversationHistory = [];
             chatContainer.innerHTML = '';
             
-            // Remove active class from all conversation items
-            document.querySelectorAll('.conversation-item').forEach(el => el.classList.remove('active'));
+            // Create new conversation item
+            const newConversation = {
+                id: Date.now(),
+                timestamp: new Date().toLocaleString(),
+                messages: []
+            };
+            allConversations.push(newConversation);
+            localStorage.setItem('allConversations', JSON.stringify(allConversations));
+            
+            // Update conversations list
+            renderConversations();
             
             // Focus on input
             messageInput.focus();
