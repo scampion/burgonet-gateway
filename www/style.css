@@ -55,8 +55,8 @@ body {
 /* Chat specific styles */
 body.chat {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background-color: #343541;
-    color: white;
+    background-color: #f8f9fa;
+    color: #333;
 }
 
 #chat-container {
@@ -64,6 +64,7 @@ body.chat {
     overflow-y: auto;
     padding: 20px;
     padding-bottom: 100px;
+    background-color: #ffffff;
 }
 
 .message {
@@ -75,11 +76,14 @@ body.chat {
 }
 
 .message.user {
-    background-color: #444654;
+    background-color: #f0f0f0;
+    color: #333;
 }
 
 .message.assistant {
-    background-color: #343541;
+    background-color: #ffffff;
+    color: #333;
+    border: 1px solid #e0e0e0;
 }
 
 .avatar {
