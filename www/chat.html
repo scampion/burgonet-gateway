@@ -126,7 +126,10 @@
             };
             allConversations.push(newConversation);
             localStorage.setItem('allConversations', JSON.stringify(allConversations));
-            
+
+            console.log('New chat started:', newConversation);
+            console.log('All conversations:', allConversations);
+
             // Update conversations list
             renderConversations();
             
@@ -154,7 +157,6 @@
                     })
                 });
 
-                console.log(response);
                 if (!response.ok) {
                     const errorData = await response.text();
                     throw new Error(`HTTP error! status: ${response.status}, body: ${errorData}`);
