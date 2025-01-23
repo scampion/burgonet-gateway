@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.1] - 2025-01-23
+
+### Added
+- ✅ Support to OpenAI API
+- 🔧 Manage upstream content encoding with gzip
+- 🛠️ Continuous integration with GitHub Actions
+
+
 ## [0.1.0] - 2025-01-22
 
 ### Added
@@ -19,7 +27,7 @@
 - 🗑️ Legacy Python implementation
 - 🚫 Deprecated configuration options
 
-g---
+---
 
 *This project follows [Semantic Versioning](https://semver.org/)*
 
