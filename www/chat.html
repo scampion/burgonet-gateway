@@ -99,6 +99,7 @@
             allConversations.forEach(conv => {
                 const item = document.createElement('div');
                 item.className = 'conversation-item';
+                item.dataset.id = conv.id;
                 
                 // Get first message preview or default text
                 const preview = conv.messages[0]?.content || 'New conversation';
@@ -191,6 +192,16 @@
             
                 // Save the conversation and update preview
                 saveConversation();
+                
+                // If this was the first message, update the preview in the UI
+                const currentConversation = allConversations[allConversations.length - 1];
+                const conversationItem = document.querySelector(`.conversation-item[data-id="${currentConversation.id}"]`);
+                if (conversationItem) {
+                    const previewDiv = conversationItem.querySelector('.preview');
+                    if (previewDiv && previewDiv.textContent === 'New conversation') {
+                        previewDiv.textContent = message.split(' ').slice(0, 10).join(' ');
+                    }
+                }
             } catch (error) {
                 let errorMessage = 'Sorry, there was an error processing your message.';
                 console.error('Full error:', error);
