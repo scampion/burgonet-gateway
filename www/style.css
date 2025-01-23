@@ -108,6 +108,21 @@ body.chat {
     margin: 0 auto;
     display: flex;
     gap: 10px;
+    align-items: center;
+}
+
+#model-select {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #555;
+    background-color: #40414f;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+#model-select:hover {
+    background-color: #4a4b5a;
 }
 
 #message-input {

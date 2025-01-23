@@ -19,6 +19,11 @@
     
     <div id="input-container">
         <form id="input-form">
+            <select id="model-select">
+                <option value="llama2">Llama 2</option>
+                <option value="gemma2:2b-instruct-q6_K">Gemma 2B (Q6_K)</option>
+                <option value="mistral">Mistral</option>
+            </select>
             <textarea id="message-input" placeholder="Type your message..." required></textarea>
             <button type="submit" id="send-button">Send</button>
         </form>
@@ -52,13 +57,14 @@
             messageInput.value = '';
             
             try {
+                const model = document.getElementById('model-select').value;
                 const response = await fetch('http://127.0.0.1:11434/api/chat', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        model: 'llama2',  // Default model, can be changed
+                        model: model,
                         messages: [
                             {
                                 role: 'user',
