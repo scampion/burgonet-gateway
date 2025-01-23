@@ -20,8 +20,8 @@
     <div id="input-container">
         <form id="input-form">
             <select id="model-select">
-                <option value="llama2">Llama 2</option>
                 <option value="gemma2:2b-instruct-q6_K">Gemma 2B (Q6_K)</option>
+                <option value="llama2">Llama 2</option>
                 <option value="mistral">Mistral</option>
             </select>
             <textarea id="message-input" placeholder="Type your message..." required></textarea>
@@ -60,12 +60,10 @@
                 const model = document.getElementById('model-select').value;
                 const response = await fetch('http://127.0.0.1:11434/api/chat', {
                     method: 'POST',
-                    mode: 'cors',
+                    mode: 'no-cors',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Access-Control-Allow-Origin': '*',
                     },
-                    credentials: 'include',
                     body: JSON.stringify({
                         model: model,
                         messages: [
@@ -77,7 +75,8 @@
                         stream: false
                     })
                 });
-                
+
+                console.log(response);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
