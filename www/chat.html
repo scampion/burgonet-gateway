@@ -60,9 +60,12 @@
                 const model = document.getElementById('model-select').value;
                 const response = await fetch('http://127.0.0.1:11434/api/chat', {
                     method: 'POST',
+                    mode: 'cors',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*',
                     },
+                    credentials: 'include',
                     body: JSON.stringify({
                         model: model,
                         messages: [
@@ -75,10 +78,19 @@
                     })
                 });
                 
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
                 const data = await response.json();
                 addMessage('assistant', data.message.content);
             } catch (error) {
-                addMessage('assistant', 'Sorry, there was an error processing your message.');
+                let errorMessage = 'Sorry, there was an error processing your message.';
+                if (error.message.includes('404')) {
+                    errorMessage = 'Ollama server not found. Please make sure it\'s running on port 11434.';
+                } else if (error.message.includes('CORS')) {
+                    errorMessage = 'Connection blocked by browser security. Try opening this page from a local web server.';
+                }
+                addMessage('assistant', errorMessage);
                 console.error('Error:', error);
             }
         }
