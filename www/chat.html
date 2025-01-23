@@ -68,12 +68,21 @@
                 const currentConversation = allConversations[allConversations.length - 1];
                 // Update the messages
                 currentConversation.messages = [...conversationHistory];
+                
+                // Update preview with first message content if available
+                if (conversationHistory.length > 0) {
+                    const firstMessage = conversationHistory[0].content;
+                    currentConversation.preview = firstMessage.split(' ').slice(0, 10).join(' ');
+                }
             } else {
                 // If no conversations exist, create a new one
                 allConversations.push({
                     id: Date.now(),
                     timestamp: new Date().toLocaleString(),
-                    messages: [...conversationHistory]
+                    messages: [...conversationHistory],
+                    preview: conversationHistory.length > 0 ? 
+                        conversationHistory[0].content.split(' ').slice(0, 10).join(' ') : 
+                        'New conversation'
                 });
             }
             localStorage.setItem('allConversations', JSON.stringify(allConversations));
@@ -180,10 +189,8 @@
                 conversationHistory.push(assistantMessage);
                 addMessage('assistant', data.message.content);
             
-                // Save the conversation when assistant replies
-                if (conversationHistory.length >= 2) {
-                    saveConversation();
-                }
+                // Save the conversation and update preview
+                saveConversation();
             } catch (error) {
                 let errorMessage = 'Sorry, there was an error processing your message.';
                 console.error('Full error:', error);
