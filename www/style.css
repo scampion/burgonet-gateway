@@ -142,10 +142,12 @@ body.chat {
     background-color: #10a37f;
     color: white;
     border: none;
-    padding: 0 20px;
+    padding: 12px 24px;
     border-radius: 5px;
     cursor: pointer;
     font-size: 16px;
+    height: 48px;
+    min-width: 100px;
 }
 
 #send-button:hover {
