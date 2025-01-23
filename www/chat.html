@@ -60,11 +60,9 @@
                 const model = document.getElementById('model-select').value;
                 const response = await fetch('http://127.0.0.1:11434/api/chat', {
                     method: 'POST',
-                    mode: 'cors',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    credentials: 'include',
                     body: JSON.stringify({
                         model: model,
                         messages: [
@@ -79,15 +77,10 @@
 
                 console.log(response);
                 if (!response.ok) {
-                    // Check if we got a JSON error response
-                    try {
-                        const errorData = await response.json();
-                        throw new Error(`API Error: ${errorData.error || 'Unknown error'}`);
-                    } catch (jsonError) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
+                    const errorData = await response.text();
+                    throw new Error(`HTTP error! status: ${response.status}, body: ${errorData}`);
                 }
-                
+
                 const data = await response.json();
                 if (!data.message || !data.message.content) {
                     throw new Error('Invalid response format from API');
