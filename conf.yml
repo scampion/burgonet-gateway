@@ -6,7 +6,7 @@ error_log: /tmp/load_balancer_err.log
 upgrade_sock: /tmp/load_balancer.sock
 db_filepath: database.redb
 port: 6191
-host: localhost
+host: 127.0.0.1
 prometheus_host: 127.0.0.1
 prometheus_port: 6192
 
@@ -18,7 +18,7 @@ trust_header_authentication:
 models:
   - location: "/echo"
     model_name: "echo"
-    proxy_pass: "http://localhost:9999"
+    proxy_pass: "http://127.0.0.1:6190"
     api_key: "$DEEPSEEK_API_KEY"
 
   - location: "/ollama/gemma2/2b/"
@@ -44,9 +44,15 @@ models:
     model_name: "phi4-GGUF-Q4_K"
     proxy_pass: "http://m1:8081/completion"
 
+  - location: "/api.openai.com/v1/chat/completions"
+    model_name: "openai"
+    parser: "openai"
+    proxy_pass: "https://api.openai.com/v1/chat/completions"
+    api_key: "$OPENAI_API_KEY"
 
-  - location: "/deepseek/chat/completions"
+  - location: "/api.deepseek.com/chat/completions"
     model_name: "deepseek"
+    parser: "deepseek"
     proxy_pass: "https://api.deepseek.com/chat/completions"
     api_key: "$DEEPSEEK_API_KEY"
 

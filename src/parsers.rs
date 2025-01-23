@@ -42,6 +42,21 @@ pub fn parser_llamacpp(response: &Value) -> Result<(u64, u64)> {
     Ok((tokens_input, tokens_output))
 }
 
+pub fn parser_openai(response: &Value) -> Result<(u64, u64)> {
+    //   "usage": {
+    //     "prompt_tokens": 28,
+    let tokens_input = response["usage"]["prompt_tokens"]
+        .as_u64()
+        .ok_or_else(|| anyhow!("Missing or invalid prompt_tokens"))?;
+
+    //     "completion_tokens": 28
+    let tokens_output = response["usage"]["completion_tokens"]
+        .as_u64()
+        .ok_or_else(|| anyhow!("Missing or invalid completion_tokens"))?;
+
+    Ok((tokens_input, tokens_output))
+}
+
 pub fn parse(
     json_body: &Value,
     parser: &str,
@@ -60,6 +75,11 @@ pub fn parse(
         "llamacpp" => {
             let (input_tokens, output_tokens) = parser_llamacpp(&json_body)?;
             log::info!("LLamaCPP tokens - input: {}, output: {}", input_tokens, output_tokens);
+            Ok((input_tokens, output_tokens))
+        }
+        "openai" => {
+            let (input_tokens, output_tokens) = parser_openai(&json_body)?;
+            log::info!("OpenAI tokens - input: {}, output: {}", input_tokens, output_tokens);
             Ok((input_tokens, output_tokens))
         }
         _ => {

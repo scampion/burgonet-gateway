@@ -244,6 +244,7 @@ dependencies = [
  "chrono",
  "clap",
  "env_logger",
+ "flate2",
  "http 1.2.0",
  "log",
  "moka",

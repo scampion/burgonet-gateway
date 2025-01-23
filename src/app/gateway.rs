@@ -113,7 +113,7 @@ impl ProxyHttp for BurgonetGateway {
             output_tokens: 0,
             usage_input: QuotaPeriod::new(),
             usage_output: QuotaPeriod::new(),
-            upstream_headers: ResponseHeader::build_no_case(200, 0).expect("Failed to build response header"),
+            upstream_headers: ResponseHeader::build_no_case(200, Some(0)).expect("Failed to build response header"),
         }
     }
 
@@ -347,6 +347,9 @@ impl ProxyHttp for BurgonetGateway {
             .unwrap();
         // Because we don't support h3
         upstream_response.remove_header("alt-svc");
+
+        upstream_response.remove_header("Content-Encoding");
+        upstream_response.remove_header("content-encoding");
 
         upstream_response.remove_header("Content-Length");
         upstream_response

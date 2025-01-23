@@ -46,6 +46,17 @@ fn main() {
     env_logger::init();
 
     let db = Arc::new(Database::create("database.redb").expect("Failed to create database"));
+    // create table if not exists
+    let write_txn = db.begin_write().expect("Failed to begin write transaction");
+    {
+        const TOKENS: TableDefinition<&str, &str> = TableDefinition::new("tokens");
+        const GROUPS: TableDefinition<&str, &str> = TableDefinition::new("groups");
+        const USAGE: TableDefinition<&str, u64> = TableDefinition::new("usage");
+        write_txn.open_table(TOKENS);
+        write_txn.open_table(GROUPS);
+        write_txn.open_table(USAGE);
+    }
+    write_txn.commit().expect("Failed to commit write transaction");
 
     if std::env::var("BURGONET_MODE").is_ok() && std::env::var("BURGONET_MODE").unwrap() == "dev" {
         warn!("🛠️ Development mode: populating database with test data 🛠️");
@@ -88,7 +99,7 @@ fn main() {
     );
     bgn_gateway.add_tcp(&format!("{}:{}", conf.host, conf.port));
     bgn_server.add_service(bgn_gateway);
-    info!("Burgonet Gateway started on port {}", conf.port);
+    info!("Burgonet Gateway started on port http://{}:{}", conf.host, conf.port);
 
     let mut prometheus_service_http = pingora_core::services::listening::Service::prometheus_http_service();
     prometheus_service_http.add_tcp(&format!("{}:{}", conf.prometheus_host, conf.prometheus_port));
@@ -96,17 +107,19 @@ fn main() {
     info!("Prometheus service started on port {}", conf.prometheus_port);
 
     let mut echo_service_http = service::echo::echo_service_http();
+    let echo_host = "127.0.0.1";
     let echo_port = 6190;
-    echo_service_http.add_tcp(&format!("127.0.0.1:{}", echo_port));
+    echo_service_http.add_tcp(&format!("{}:{}", echo_host, echo_port));
     bgn_server.add_service(echo_service_http);
-    info!("Echo service started on port {}", echo_port);
+    info!("Echo service started on http://{}:{}", echo_host, echo_port);
 
 
     let mut admin_service_http = service::admin::admin_service_http(db);
+    let admin_host = "127.0.0.1";
     let admin_port = 6189;
-    admin_service_http.add_tcp(&format!("127.0.0.1:{}", admin_port));
+    admin_service_http.add_tcp(&format!("{}:{}", admin_host, admin_port));
     bgn_server.add_service(admin_service_http);
-    info!("Admin service started on port {}", admin_port);
+    info!("Admin service started on http://{}:{}", admin_host, admin_port);
 
 
     bgn_server.run_forever();

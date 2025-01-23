@@ -2,22 +2,32 @@ import json
 import requests
 
 headers = {
+    'Content-Type': 'application/json',
     'Authorization': 'Bearer your_token_here',
-    'Content-Type': 'application/json'
 }
-
 
 def test_deepseek():
     print("Testing Deepseek")
-    data = {
-        "model": "deepseek-chat",
-        "messages": [
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": "Hello!"}
+    json_data = {
+        'model': 'deepseek-chat',
+        'messages': [
+            {
+                'role': 'system',
+                'content': 'You are a helpful assistant.',
+            },
+            {
+                'role': 'user',
+                'content': 'Hello!',
+            },
         ],
-        "stream": False
+        'stream': False,
     }
-    response = requests.post('http://localhost:6191/deepseek/chat/completions', headers=headers, data=json.dumps(data))
+    response = requests.post(
+        'http://127.0.0.1:6191/api.deepseek.com/chat/completions',
+        headers=headers,
+        json=json_data,
+        verify=False
+      )
 
     assert response.status_code == 200, response.text
     assert response.json()["model"] == "deepseek-chat", response.json()
@@ -31,11 +41,11 @@ def test_openai():
         ]
     }
     response = requests.post(
-        'http://localhost:6191/api.openai.com/v1/chat/completions',
+        'http://127.0.0.1:6191/api.openai.com/v1/chat/completions',
         headers=headers,
         json=data
     )
 
     assert response.status_code == 200, response.text
-    assert response.json()["model"] == "gpt-4o-mini", response.json()
+    assert "gpt-4o-mini" in response.json()["model"], response.json()
 
