@@ -57,8 +57,6 @@ fn contains_word_case_insensitive(text: &[u8], word: &str) -> bool {
     // Convert the text to lowercase
     let lowercase_text = String::from_utf8_lossy(text).to_lowercase();
 
-    info!("lowercase_text: {:?}", lowercase_text);
-    info!("lowercase_word: {:?}", lowercase_word);
     // Check if the lowercase word exists in the lowercase text
     let result = lowercase_text.contains(&lowercase_word);
     info!("result: {:?}", result);

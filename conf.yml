@@ -28,7 +28,16 @@ models:
     parser: "ollama"
     proxy_pass: "http://127.0.0.1:11434/api/chat"
     api_key: "NA"
-    disabled_groups: "mammals, birds.aaa"
+    disabled_groups: "mammals, birds"
+    blacklist_words: "confidential, mycorp"
+    pii_protection_url: "http://127.0.0.1:8001/check-pii-base64"
+
+  - location: "/quotas/test"
+    model_name: "gemma2:2b-instruct-q6_K"
+    parser: "ollama"
+    proxy_pass: "http://127.0.0.1:11434/api/chat"
+    api_key: "NA"
+    disabled_groups: "mammals, birds"
     blacklist_words: "confidential, mycorp"
     pii_protection_url: "http://127.0.0.1:8001/check-pii-base64"
     quotas:
