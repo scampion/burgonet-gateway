@@ -5,17 +5,13 @@ env:
   RUST_BACKTRACE: 1
   CARGO_TERM_COLOR: always
 
-on:
-  push:
-  pull_request:
-
 permissions:
   contents: write
 
-#on:
-#  push:
-#    tags:
-#      - v[0-9]+.*
+on:
+  push:
+    tags:
+      - v[0-9]+.*
 
 jobs:
   create-release:
