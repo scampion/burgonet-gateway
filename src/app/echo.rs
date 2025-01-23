@@ -20,7 +20,7 @@ use pingora::protocols::http::ServerSession;
 use pingora::protocols::Stream;
 use pingora::server::ShutdownWatch;
 
-static REQ_COUNTER: Lazy<IntCounter> =
+static ECHO_REQ_COUNTER: Lazy<IntCounter> =
     Lazy::new(|| register_int_counter!("reg_counter", "Number of requests").unwrap());
 
 pub struct HttpEchoApp;
@@ -28,7 +28,7 @@ pub struct HttpEchoApp;
 #[async_trait]
 impl ServeHttp for HttpEchoApp {
     async fn response(&self, http_stream: &mut ServerSession) -> Response<Vec<u8>> {
-        REQ_COUNTER.inc();
+        ECHO_REQ_COUNTER.inc();
         // read timeout of 2s
         let read_timeout = 2000;
         let body = match timeout(

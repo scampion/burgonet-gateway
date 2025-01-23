@@ -112,6 +112,14 @@ impl ServeHttp for HttpAdminApp {
                 self.json_response(StatusCode::NOT_FOUND, serde_json::json!({"error": "Not Found"}))
             }
         }
+        // // Explicitly close the connection for error responses
+        // if response.status().is_client_error() || response.status().is_server_error() {
+        //     if let Some(stream) = http_stream.downcast_mut::<Stream>() {
+        //         self.json_response(StatusCode::NOT_FOUND, serde_json::json!({"error": "Not Found"}));
+        //         let _ = stream.shutdown().await; // Gracefully close the TCP stream
+        //     }
+        // }
+        //return self.json_response(StatusCode::NOT_FOUND, serde_json::json!({"error": "Not Found"}))
     }
 }
 
@@ -146,28 +154,39 @@ impl HttpAdminApp {
         {
             Ok(res) => match res.unwrap() {
                 Some(bytes) => bytes,
-                None => Bytes::from("no body!"),
+                None => Bytes::from("{}"), // Return an empty JSON object if no body is present
             },
             Err(_) => {
                 return Err(Response::builder()
                     .status(StatusCode::REQUEST_TIMEOUT)
-                    .body(Bytes::from("Request Timeout").to_vec())
+                    .body(format!("Timed out after {}ms", read_timeout).into_bytes())
                     .unwrap());
             }
         };
-        
-        serde_json::from_slice(&body).map_err(|_| {
-            Response::builder()
-                .status(StatusCode::BAD_REQUEST)
-                .body(Bytes::from("Invalid JSON").to_vec())
-                .unwrap()
-        })
+
+        println!("Body: {:?}", body);
+
+        // Attempt to parse the body as JSON
+        match serde_json::from_slice(&body) {
+            Ok(json_value) => Ok(json_value),
+            Err(e) => {
+                error!("Failed to parse JSON: {}", e);
+                // If parsing fails, return a 400 Bad Request response with the error message
+                Err(Response::builder()
+                    .status(StatusCode::BAD_REQUEST)
+                    .body(format!("Failed to parse JSON: {}", e).into_bytes())
+                    .unwrap())
+            }
+        }
     }
+
 
     async fn handle_post_tokens(&self, http_stream: &mut ServerSession) -> Response<Vec<u8>> {
         let json = match self.read_json_body(http_stream).await {
             Ok(json) => json,
-            Err(response) => return response,
+            Err(response) => {
+                return self.json_response(StatusCode::BAD_REQUEST, serde_json::json!({"error": "Invalid JSON"}));
+            }
         };
         {
             let write_txn = self.db.begin_write().expect("Failed to begin write transaction");
@@ -176,8 +195,14 @@ impl HttpAdminApp {
                 if let Some(tokens) = json.get("tokens").and_then(|v| v.as_object()) {
                     for (token, user) in tokens {
                         if let Some(user_str) = user.as_str() {
-                            table.insert(token.as_str(), user_str).expect("Failed to insert token");
-                            info!("Token {} inserted for user {}", token.as_str(), user_str);
+                            // test if token length is greater than 32 otherwise return error
+                            if token.as_str().len() < 32 {
+                                error!("Token {} is too short", token.as_str());
+                                return self.json_response(StatusCode::BAD_REQUEST, serde_json::json!({"error": "Token is too short"}));
+                            } else {
+                                table.insert(token.as_str(), user_str).expect("Failed to insert token");
+                                info!("Token {} inserted for user {}", token.as_str(), user_str);
+                            }
                         }
                     }
                 }
@@ -191,18 +216,18 @@ impl HttpAdminApp {
     async fn handle_delete_tokens(&self, http_stream: &mut ServerSession) -> Response<Vec<u8>> {
         let json = match self.read_json_body(http_stream).await {
             Ok(json) => json,
-            Err(response) => return response,
+            Err(response) => {
+                return self.json_response(StatusCode::BAD_REQUEST, serde_json::json!({"error": "Invalid JSON"}));
+            }
         };
         {
             let write_txn = self.db.begin_write().expect("Failed to begin write transaction");
             {
                 let mut table = write_txn.open_table(TOKENS).expect("Failed to open table");
-                if let Some(tokens) = json.get("tokens").and_then(|v| v.as_object()) {
-                    for (token, user) in tokens {
-                        if let Some(user_str) = user.as_str() {
-                            table.remove(token.as_str()).expect("Failed to remove token");
-                            info!("Token {} removed for user {}", token.as_str(), user_str);
-                        }
+                for token in json.get("tokens").and_then(|v| v.as_array()).unwrap() {
+                    if let Some(token_str) = token.as_str() {
+                        table.remove(token_str).expect("Failed to remove token");
+                        info!("Token {} removed", token_str);
                     }
                 }
             }
