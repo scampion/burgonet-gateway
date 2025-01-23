@@ -60,10 +60,11 @@
                 const model = document.getElementById('model-select').value;
                 const response = await fetch('http://127.0.0.1:11434/api/chat', {
                     method: 'POST',
-                    mode: 'no-cors',
+                    mode: 'cors',
                     headers: {
                         'Content-Type': 'application/json',
                     },
+                    credentials: 'include',
                     body: JSON.stringify({
                         model: model,
                         messages: [
@@ -78,16 +79,35 @@
 
                 console.log(response);
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    // Check if we got a JSON error response
+                    try {
+                        const errorData = await response.json();
+                        throw new Error(`API Error: ${errorData.error || 'Unknown error'}`);
+                    } catch (jsonError) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
                 }
+                
                 const data = await response.json();
+                if (!data.message || !data.message.content) {
+                    throw new Error('Invalid response format from API');
+                }
                 addMessage('assistant', data.message.content);
             } catch (error) {
                 let errorMessage = 'Sorry, there was an error processing your message.';
+                console.error('Full error:', error);
+                
                 if (error.message.includes('404')) {
                     errorMessage = 'Ollama server not found. Please make sure it\'s running on port 11434.';
-                } else if (error.message.includes('CORS')) {
-                    errorMessage = 'Connection blocked by browser security. Try opening this page from a local web server.';
+                } else if (error.message.includes('CORS') || error.message.includes('status: 0')) {
+                    errorMessage = `Connection issue detected. Please ensure:
+1. Ollama is running on port 11434
+2. You're accessing this page through a local web server
+3. The server allows CORS requests`;
+                } else if (error.message.includes('API Error')) {
+                    errorMessage = `Server error: ${error.message}`;
+                } else if (error.message.includes('Invalid response format')) {
+                    errorMessage = 'Received unexpected response format from server';
                 }
                 addMessage('assistant', errorMessage);
                 console.error('Error:', error);
