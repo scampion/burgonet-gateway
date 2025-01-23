@@ -13,6 +13,7 @@ use prometheus::register_int_counter;
 use redb::{Database, TableDefinition};
 use reqwest::Client;
 use reqwest::Error as ReqwestError;
+use flate2::read::GzDecoder;
 
 // Pingora-related imports
 use pingora::prelude::*;
@@ -36,6 +37,7 @@ use rate_limit::check_rate_limits;
 
 // Constants and lazy statics
 use std::sync::Arc;
+use std::io::Read;
 
 
 
@@ -85,6 +87,7 @@ pub struct GatewayContext {
     pub output_tokens: u64,
     pub usage_input: QuotaPeriod,
     pub usage_output: QuotaPeriod,
+    pub upstream_headers: ResponseHeader,
 
 }
 
@@ -110,20 +113,21 @@ impl ProxyHttp for BurgonetGateway {
             output_tokens: 0,
             usage_input: QuotaPeriod::new(),
             usage_output: QuotaPeriod::new(),
-
+            upstream_headers: ResponseHeader::build_no_case(200, 0),
         }
     }
 
 
     async fn request_filter(&self, session: &mut Session, ctx: &mut Self::CTX) -> Result<bool> {
-
-
+        info!("request_filter");
+        trace!("Start of request_filter: {:?}", session.req_header().uri.path());
         // test if the request contain a bearer token
         let token = session.req_header().headers.get("Authorization")
             .and_then(|v| v.to_str().ok())
             .and_then(|s| s.strip_prefix("Bearer "));
 
         debug!("token: {:?}", token);
+
 
         if let Some(token) = token {
             if let Some(read_txn) = &ctx.read_txn {
@@ -162,6 +166,8 @@ impl ProxyHttp for BurgonetGateway {
             .find(|m| m.location == session.req_header().uri.path())
             .cloned()
             .map(Arc::new);
+
+        println!("URI {}", session.req_header().uri.path());
 
         if model.is_none() {
             let _ = session.respond_error(404).await;
@@ -222,6 +228,10 @@ impl ProxyHttp for BurgonetGateway {
             return Ok(true);
         }
 
+        // change the accept header to  "text/plain"
+        let _ = session.req_header_mut().insert_header("Accept", "text/plain");
+
+        trace!("End of request_filter: {:?}", session.req_header().uri.path());
         Ok(false)
     }
 
@@ -329,6 +339,7 @@ impl ProxyHttp for BurgonetGateway {
     where
         Self::CTX:  Send + Sync,
     {
+        _ctx.upstream_headers = upstream_response.clone();
 
         // Replace existing header if any
         upstream_response
@@ -360,6 +371,16 @@ impl ProxyHttp for BurgonetGateway {
             b.clear();
         }
         if end_of_stream {
+
+            // test if _ctx.upstream_headers contains the header "content-encoding" with value "gzip"
+            if let Some(content_encoding) = _ctx.upstream_headers.headers.get("content-encoding") {
+                if content_encoding == "gzip" {
+                    let mut decoder = flate2::read::GzDecoder::new(&_ctx.buffer[..]);
+                    let mut decoded = Vec::new();
+                    decoder.read_to_end(&mut decoded).unwrap();
+                    _ctx.buffer = decoded;
+                }
+            }
             let json_body = serde_json::de::from_slice(&_ctx.buffer).unwrap();
             *body = Some(Bytes::from(std::mem::take(&mut _ctx.buffer)));
 
