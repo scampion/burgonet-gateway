@@ -63,6 +63,10 @@ pub struct ServerConf {
     pub prometheus_host: String,
     #[serde(default = "default_prometheus_port")]
     pub prometheus_port: u16,
+    #[serde(default = "default_admin_host")]
+    pub admin_host: String,
+    #[serde(default = "default_admin_port")]
+    pub admin_port: u16,
     #[serde(default = "default_trust_headers")]
     pub trust_header_authentication: Vec<String>,
 }
@@ -89,6 +93,14 @@ fn default_prometheus_port() -> u16 {
 
 fn default_db_filepath() -> String {
     "database.redb".to_string()
+}
+
+fn default_admin_host() -> String {
+    "127.0.0.1".to_string()
+}
+
+fn default_admin_port() -> u16 {
+    6189
 }
 
 

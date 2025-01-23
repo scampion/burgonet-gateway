@@ -9,6 +9,8 @@ port: 6191
 host: 127.0.0.1
 prometheus_host: 127.0.0.1
 prometheus_port: 6192
+admin_host: 127.0.0.1
+admin_port: 6189
 
 trust_header_authentication:
     - Tailscale-User-Login
