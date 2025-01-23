@@ -52,8 +52,12 @@
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
+        let conversationHistory = [];
+
         async function sendMessage(message) {
+            const userMessage = { role: 'user', content: message };
             addMessage('user', message);
+            conversationHistory.push(userMessage);
             messageInput.value = '';
             
             try {
@@ -65,12 +69,7 @@
                     },
                     body: JSON.stringify({
                         model: model,
-                        messages: [
-                            {
-                                role: 'user',
-                                content: message
-                            }
-                        ],
+                        messages: conversationHistory,
                         stream: false
                     })
                 });
@@ -85,6 +84,8 @@
                 if (!data.message || !data.message.content) {
                     throw new Error('Invalid response format from API');
                 }
+                const assistantMessage = { role: 'assistant', content: data.message.content };
+                conversationHistory.push(assistantMessage);
                 addMessage('assistant', data.message.content);
             } catch (error) {
                 let errorMessage = 'Sorry, there was an error processing your message.';
