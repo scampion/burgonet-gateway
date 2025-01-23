@@ -63,12 +63,19 @@
         let allConversations = JSON.parse(localStorage.getItem('allConversations') || '[]');
         
         function saveConversation() {
-            const conversation = {
-                id: Date.now(),
-                timestamp: new Date().toLocaleString(),
-                messages: [...conversationHistory]
-            };
-            allConversations.push(conversation);
+            // Find the current conversation (last one in array)
+            if (allConversations.length > 0) {
+                const currentConversation = allConversations[allConversations.length - 1];
+                // Update the messages
+                currentConversation.messages = [...conversationHistory];
+            } else {
+                // If no conversations exist, create a new one
+                allConversations.push({
+                    id: Date.now(),
+                    timestamp: new Date().toLocaleString(),
+                    messages: [...conversationHistory]
+                });
+            }
             localStorage.setItem('allConversations', JSON.stringify(allConversations));
             renderConversations();
         }
