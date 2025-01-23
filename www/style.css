@@ -110,6 +110,14 @@ body.chat {
     transition: background-color 0.2s;
 }
 
+.conversation-header {
+    padding: 15px;
+    margin: 10px 0;
+    background-color: #e9ecef;
+    border-radius: 5px;
+    cursor: default;
+}
+
 .conversation-item:hover {
     background-color: #e9ecef;
 }

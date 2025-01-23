@@ -77,27 +77,36 @@
             const list = document.getElementById('conversations-list');
             list.innerHTML = '';
             
-            allConversations.reverse().forEach(conv => {
-                const item = document.createElement('div');
-                item.className = 'conversation-item';
-                item.innerHTML = `
-                    <div class="timestamp">${conv.timestamp}</div>
-                    <div class="preview">${conv.messages[0]?.content || 'New conversation'}</div>
-                `;
+            // Create single conversation item
+            const item = document.createElement('div');
+            item.className = 'conversation-item';
+            
+            // Show total number of conversations
+            const totalConversations = allConversations.length;
+            item.innerHTML = `
+                <div class="timestamp">${totalConversations} conversation${totalConversations !== 1 ? 's' : ''}</div>
+                <div class="preview">Click to view all conversations</div>
+            `;
+            
+            item.addEventListener('click', () => {
+                // Clear current chat
+                chatContainer.innerHTML = '';
                 
-                item.addEventListener('click', () => {
-                    // Remove active class from all items
-                    document.querySelectorAll('.conversation-item').forEach(el => el.classList.remove('active'));
-                    item.classList.add('active');
+                // Show all conversations in chronological order
+                allConversations.sort((a, b) => a.id - b.id).forEach(conv => {
+                    const conversationHeader = document.createElement('div');
+                    conversationHeader.className = 'conversation-header';
+                    conversationHeader.innerHTML = `
+                        <div class="timestamp">${conv.timestamp}</div>
+                        <div class="preview">${conv.messages[0]?.content || 'New conversation'}</div>
+                    `;
+                    chatContainer.appendChild(conversationHeader);
                     
-                    // Load the conversation
-                    conversationHistory = [...conv.messages];
-                    chatContainer.innerHTML = '';
                     conv.messages.forEach(msg => addMessage(msg.role, msg.content));
                 });
-                
-                list.appendChild(item);
             });
+            
+            list.appendChild(item);
         }
         
         // Initial render
