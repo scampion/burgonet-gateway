@@ -115,11 +115,9 @@ fn main() {
 
 
     let mut admin_service_http = service::admin::admin_service_http(db);
-    let admin_host = "127.0.0.1";
-    let admin_port = 6189;
-    admin_service_http.add_tcp(&format!("{}:{}", admin_host, admin_port));
+    admin_service_http.add_tcp(&format!("{}:{}", conf.admin_host, conf.admin_port));
     bgn_server.add_service(admin_service_http);
-    info!("Admin service started on http://{}:{}", admin_host, admin_port);
+    info!("Admin service started on http://{}:{}", conf.admin_host, conf.admin_port);
 
 
     bgn_server.run_forever();
