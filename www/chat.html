@@ -159,12 +159,9 @@
                 console.error('Full error:', error);
                 
                 if (error.message.includes('404')) {
-                    errorMessage = 'Ollama server not found. Please make sure it\'s running on port 11434.';
+                    errorMessage = 'Server not found. Please make sure it\'s running.';
                 } else if (error.message.includes('CORS') || error.message.includes('status: 0')) {
-                    errorMessage = `Connection issue detected. Please ensure:
-1. Ollama is running on port 11434
-2. You're accessing this page through a local web server
-3. The server allows CORS requests`;
+                    errorMessage = `Connection issue detected. Please make sure the server is running and accessible.`;
                 } else if (error.message.includes('API Error')) {
                     errorMessage = `Server error: ${error.message}`;
                 } else if (error.message.includes('Invalid response format')) {
