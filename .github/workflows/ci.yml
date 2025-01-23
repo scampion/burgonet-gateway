@@ -1,5 +1,9 @@
 name: Cargo Build & Test
 
+env:
+  GITHUB_TOKEN: ${{ github.token }}
+  RUST_BACKTRACE: 1
+
 on:
   push:
   pull_request:
