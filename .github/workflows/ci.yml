@@ -25,9 +25,7 @@ jobs:
         with:
           path: target/release/burgonet-gw
 #      - run: cargo test --verbose
-  
 
-jobs:
   release:
     name: Release - ${{ matrix.platform.release_for }}
     strategy:
