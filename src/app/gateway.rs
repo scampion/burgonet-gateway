@@ -113,7 +113,7 @@ impl ProxyHttp for BurgonetGateway {
             output_tokens: 0,
             usage_input: QuotaPeriod::new(),
             usage_output: QuotaPeriod::new(),
-            upstream_headers: ResponseHeader::build_no_case(200, 0),
+            upstream_headers: ResponseHeader::build_no_case(200, 0).expect("Failed to build response header"),
         }
     }
 
