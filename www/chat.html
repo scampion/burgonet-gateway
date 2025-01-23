@@ -115,10 +115,20 @@
             }
         });
 
-        // Auto-resize textarea
+        // Auto-resize textarea and handle Enter key
         messageInput.addEventListener('input', () => {
             messageInput.style.height = 'auto';
             messageInput.style.height = `${Math.min(messageInput.scrollHeight, 200)}px`;
+        });
+
+        messageInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                const message = messageInput.value.trim();
+                if (message) {
+                    sendMessage(message);
+                }
+            }
         });
     </script>
 </body>
