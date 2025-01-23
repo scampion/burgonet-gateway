@@ -61,6 +61,7 @@
 
         let conversationHistory = [];
         let allConversations = JSON.parse(localStorage.getItem('allConversations') || '[]');
+        let currentConversationId = null;
         
         function saveConversation() {
             // Find the current conversation (last one in array)
@@ -115,6 +116,7 @@
                     
                     // Load selected conversation
                     conversationHistory = [...conv.messages];
+                    currentConversationId = conv.id;
                     conv.messages.forEach(msg => addMessage(msg.role, msg.content));
                     
                     // Set active state
@@ -145,6 +147,7 @@
                 messages: []
             };
             allConversations.push(newConversation);
+            currentConversationId = newConversation.id;
             localStorage.setItem('allConversations', JSON.stringify(allConversations));
 
             console.log('New chat started:', newConversation);
@@ -194,8 +197,8 @@
                 saveConversation();
                 
                 // If this was the first message, update the preview in the UI
-                const currentConversation = allConversations[allConversations.length - 1];
-                const conversationItem = document.querySelector(`.conversation-item[data-id="${currentConversation.id}"]`);
+                const currentConversation = allConversations.find(c => c.id === currentConversationId);
+                const conversationItem = document.querySelector(`.conversation-item[data-id="${currentConversationId}"]`);
                 if (conversationItem) {
                     const previewDiv = conversationItem.querySelector('.preview');
                     if (previewDiv && previewDiv.textContent === 'New conversation') {
