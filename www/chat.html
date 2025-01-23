@@ -13,6 +13,12 @@
         <a href="tokens.html" style="margin-left: 20px;">Tokens</a>
         <a href="usage.html" style="margin-left: 20px;">Usage</a>
     </div>
+    <div id="sidebar">
+        <h2>Conversations</h2>
+        <div id="conversations-list">
+            <!-- Conversation items will be added here -->
+        </div>
+    </div>
     <div id="chat-container">
         <!-- Chat messages will be appended here -->
     </div>
@@ -53,6 +59,48 @@
         }
 
         let conversationHistory = [];
+        let allConversations = JSON.parse(localStorage.getItem('allConversations') || '[]');
+        
+        function saveConversation() {
+            const conversation = {
+                id: Date.now(),
+                timestamp: new Date().toLocaleString(),
+                messages: [...conversationHistory]
+            };
+            allConversations.push(conversation);
+            localStorage.setItem('allConversations', JSON.stringify(allConversations));
+            renderConversations();
+        }
+        
+        function renderConversations() {
+            const list = document.getElementById('conversations-list');
+            list.innerHTML = '';
+            
+            allConversations.reverse().forEach(conv => {
+                const item = document.createElement('div');
+                item.className = 'conversation-item';
+                item.innerHTML = `
+                    <div class="timestamp">${conv.timestamp}</div>
+                    <div class="preview">${conv.messages[0]?.content || 'New conversation'}</div>
+                `;
+                
+                item.addEventListener('click', () => {
+                    // Remove active class from all items
+                    document.querySelectorAll('.conversation-item').forEach(el => el.classList.remove('active'));
+                    item.classList.add('active');
+                    
+                    // Load the conversation
+                    conversationHistory = [...conv.messages];
+                    chatContainer.innerHTML = '';
+                    conv.messages.forEach(msg => addMessage(msg.role, msg.content));
+                });
+                
+                list.appendChild(item);
+            });
+        }
+        
+        // Initial render
+        renderConversations();
 
         async function sendMessage(message) {
             const userMessage = { role: 'user', content: message };
@@ -87,6 +135,11 @@
                 const assistantMessage = { role: 'assistant', content: data.message.content };
                 conversationHistory.push(assistantMessage);
                 addMessage('assistant', data.message.content);
+            
+                // Save the conversation when assistant replies
+                if (conversationHistory.length >= 2) {
+                    saveConversation();
+                }
             } catch (error) {
                 let errorMessage = 'Sorry, there was an error processing your message.';
                 console.error('Full error:', error);
