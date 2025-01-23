@@ -15,6 +15,7 @@
     </div>
     <div id="sidebar">
         <h2>Conversations</h2>
+        <button id="new-chat-button" style="margin-bottom: 20px;">New Chat</button>
         <div id="conversations-list">
             <!-- Conversation items will be added here -->
         </div>
@@ -101,6 +102,19 @@
         
         // Initial render
         renderConversations();
+
+        // New Chat button functionality
+        document.getElementById('new-chat-button').addEventListener('click', () => {
+            // Clear current conversation
+            conversationHistory = [];
+            chatContainer.innerHTML = '';
+            
+            // Remove active class from all conversation items
+            document.querySelectorAll('.conversation-item').forEach(el => el.classList.remove('active'));
+            
+            // Focus on input
+            messageInput.focus();
+        });
 
         async function sendMessage(message) {
             const userMessage = { role: 'user', content: message };
