@@ -279,6 +279,11 @@ impl ProxyHttp for BurgonetGateway {
         ctx: &mut Self::CTX,
     ) -> Result<Box<HttpPeer>> {
 
+        if session.req_header().uri.path() == "/" {
+            debug!("Returning configuration");
+            return Ok(None);
+        }
+
         let model = ctx.model.as_ref().ok_or_else(|| {
             anyhow::anyhow!("No model found for request")
         }).unwrap();
@@ -333,7 +338,13 @@ impl ProxyHttp for BurgonetGateway {
     where
         Self::CTX:  Send + Sync,
     {
-        _ctx.upstream_headers = upstream_response.clone();
+        if _session.req_header().uri.path() == "/" {
+            debug!("Returning configuration");
+            return Ok(());
+        }
+
+
+            _ctx.upstream_headers = upstream_response.clone();
 
         // Replace existing header if any
         upstream_response
@@ -364,50 +375,49 @@ impl ProxyHttp for BurgonetGateway {
         Self::CTX: Send + Sync,
     {
         if _session.req_header().uri.path() == "/" && end_of_stream {
-            let mut body_vec = Vec::new();
+            debug!("Returning configuration");
             let mut models_published = self.conf.models.clone();
             for model in models_published.iter_mut() {
                 model.api_key = "".to_string();
             }
-            serde_yaml::to_writer(&mut body_vec, &models_published).unwrap();
-            *body = Some(Bytes::from(body_vec));
-            //let _ = session.respond_error(200).await;
+            let json_body = serde_json::to_string(&models_published).unwrap();
+            *body = Some(Bytes::from(json_body));
+
             return Ok(None);
-        }
-
-
-        if let Some(b) = body {
-            _ctx.buffer.extend(&b[..]);
-            b.clear();
-        }
-        if end_of_stream {
-
-            // test if _ctx.upstream_headers contains the header "content-encoding" with value "gzip"
-            if let Some(content_encoding) = _ctx.upstream_headers.headers.get("content-encoding") {
-                if content_encoding == "gzip" {
-                    let mut decoder = flate2::read::GzDecoder::new(&_ctx.buffer[..]);
-                    let mut decoded = Vec::new();
-                    decoder.read_to_end(&mut decoded).unwrap();
-                    _ctx.buffer = decoded;
-                }
+        } else {
+            if let Some(b) = body {
+                _ctx.buffer.extend(&b[..]);
+                b.clear();
             }
-            let json_body = serde_json::de::from_slice(&_ctx.buffer).unwrap();
-            *body = Some(Bytes::from(std::mem::take(&mut _ctx.buffer)));
+            if end_of_stream {
 
-            if let Some(model) = &_ctx.model {
-                match parse(&json_body, &model.parser) {
-                    Ok((input_tokens, output_tokens)) => {
-                        _ctx.input_tokens = input_tokens;
-                        _ctx.output_tokens = output_tokens;
-                    }
-                    Err(e) => {
-                        error!("Error parsing response: {}", e);
-                        return Err(Error::explain(ErrorType::InternalError, "Error parsing response"));
+                // test if _ctx.upstream_headers contains the header "content-encoding" with value "gzip"
+                if let Some(content_encoding) = _ctx.upstream_headers.headers.get("content-encoding") {
+                    if content_encoding == "gzip" {
+                        let mut decoder = flate2::read::GzDecoder::new(&_ctx.buffer[..]);
+                        let mut decoded = Vec::new();
+                        decoder.read_to_end(&mut decoded).unwrap();
+                        _ctx.buffer = decoded;
                     }
                 }
+                let json_body = serde_json::de::from_slice(&_ctx.buffer).unwrap();
+                *body = Some(Bytes::from(std::mem::take(&mut _ctx.buffer)));
+
+                if let Some(model) = &_ctx.model {
+                    match parse(&json_body, &model.parser) {
+                        Ok((input_tokens, output_tokens)) => {
+                            _ctx.input_tokens = input_tokens;
+                            _ctx.output_tokens = output_tokens;
+                        }
+                        Err(e) => {
+                            error!("Error parsing response: {}", e);
+                            return Err(Error::explain(ErrorType::InternalError, "Error parsing response"));
+                        }
+                    }
+                }
             }
+            Ok(None)
         }
-        Ok(None)
     }
 
 
