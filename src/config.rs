@@ -68,6 +68,10 @@ pub struct ServerConf {
     pub admin_host: String,
     #[serde(default = "default_admin_port")]
     pub admin_port: u16,
+    #[serde(default = "default_chat_port")]
+    pub chat_port: u16,
+    #[serde(default = "default_echo_port")]
+    pub echo_port: u16,
     #[serde(default = "default_trust_headers")]
     pub trust_header_authentication: Vec<String>,
 }
@@ -102,6 +106,14 @@ fn default_admin_host() -> String {
 
 fn default_admin_port() -> u16 {
     6189
+}
+
+fn default_chat_port() -> u16 {
+    6190
+}
+
+fn default_echo_port() -> u16 {
+    6193
 }
 
 
