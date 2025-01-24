@@ -364,13 +364,13 @@ impl ProxyHttp for BurgonetGateway {
         Self::CTX: Send + Sync,
     {
         if _session.req_header().uri.path() == "/" && end_of_stream {
-            let mut body = Vec::new();
+            let mut body_vec = Vec::new();
             let mut models_published = self.conf.models.clone();
             for model in models_published.iter_mut() {
                 model.api_key = "".to_string();
             }
-            serde_yaml::to_writer(&mut body, &models_published).unwrap();
-            *body = Some(Bytes::from(body));
+            serde_yaml::to_writer(&mut body_vec, &models_published).unwrap();
+            *body = Some(Bytes::from(body_vec));
             //let _ = session.respond_error(200).await;
             return Ok(None);
         }
