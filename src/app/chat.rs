@@ -32,13 +32,15 @@ static REQ_COUNTER: Lazy<IntCounter> =
 const CHAT_HISTORY: TableDefinition<&str, &str> = TableDefinition::new("chat_history");
 
 pub struct HttpChatApp {
-    pub db: Arc<redb::Database>,
+    pub admin: HttpAdminApp,
 }
 
 pub fn chat_service_http(db: Arc<redb::Database>) -> pingora_core::services::listening::Service<HttpChatApp> {
     pingora_core::services::listening::Service::new(
         "Chat HTTP Service".to_string(),
-        HttpChatApp { db },
+        HttpChatApp { 
+            admin: HttpAdminApp { db } 
+        },
     )
 }
 
@@ -69,31 +71,20 @@ impl ServeHttp for HttpChatApp {
 
 impl HttpChatApp {
     fn is_embedded(&self, uri: &str) -> bool {
-        Asset::get(uri).is_some()
+        self.admin.is_embedded(uri)
     }
 
     fn handle_static_asset(&self, uri: &str) -> Response<Vec<u8>> {
-        if let Some(asset) = Asset::get(uri) {
-            let body = asset.data.as_ref().to_vec();
-            let content_type = match uri {
-                uri if uri.ends_with(".html") => "text/html",
-                uri if uri.ends_with(".css") => "text/css",
-                uri if uri.ends_with(".js") => "application/javascript",
-                _ => &tree_magic::from_u8(&body),
-            };
-            return Response::builder()
-                .status(StatusCode::OK)
-                .header(http::header::CONTENT_TYPE, content_type)
-                .header(http::header::CONTENT_LENGTH, body.len())
-                .body(body).unwrap();
-        }
-        return Response::builder()
-            .status(StatusCode::INTERNAL_SERVER_ERROR)
-            .body("Asset can't be loaded".as_bytes().to_vec())
-            .unwrap();
+        self.admin.handle_static_asset(uri)
     }
 
     async fn read_json_body(&self, http_stream: &mut ServerSession) -> Result<serde_json::Value, Response<Vec<u8>>> {
+        self.admin.read_json_body(http_stream).await
+    }
+
+    fn json_response(&self, status: StatusCode, body: impl serde::Serialize) -> Response<Vec<u8>> {
+        self.admin.json_response(status, body)
+    }
         let read_timeout = 2000;
         let body = match timeout(
             Duration::from_millis(read_timeout),
@@ -192,13 +183,4 @@ impl HttpChatApp {
         self.json_response(StatusCode::OK, serde_json::json!({"status": "ok"}))
     }
 
-    fn json_response(&self, status: StatusCode, body: impl serde::Serialize) -> Response<Vec<u8>> {
-        let body = serde_json::to_vec(&body).expect("Failed to serialize JSON");
-        Response::builder()
-            .status(status)
-            .header(http::header::CONTENT_TYPE, "application/json")
-            .header(http::header::CONTENT_LENGTH, body.len())
-            .body(body)
-            .unwrap()
-    }
 }
