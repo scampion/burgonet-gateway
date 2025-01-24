@@ -253,7 +253,7 @@ body.chat {
 #model-select {
     width: 20%;
     min-width: 120px;
-    margin-right: auto; /* Push other elements to the right */
+    margin-right: 10px;
 }
 
 #message-input {
