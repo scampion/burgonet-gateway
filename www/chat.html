@@ -30,11 +30,7 @@
     
     <div id="input-container">
         <form id="input-form">
-            <select id="model-select">
-                <option value="gemma2:2b-instruct-q6_K">Gemma 2B (Q6_K)</option>
-                <option value="llama2">Llama 2</option>
-                <option value="mistral">Mistral</option>
-            </select>
+            <select id="model-select"></select>
             <textarea id="message-input" placeholder="Type your message..." required></textarea>
             <button type="submit" id="send-button">Send</button>
         </form>
@@ -158,6 +154,52 @@
         if (savedToken) {
             document.getElementById('token').value = savedToken;
         }
+
+        // Fetch available models from gateway
+        async function fetchModels() {
+            try {
+                const serverUrl = document.getElementById('server-url').value;
+                const response = await fetch(serverUrl);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch models');
+                }
+                const models = await response.json();
+                
+                const select = document.getElementById('model-select');
+                select.innerHTML = '';
+                
+                // Create a Set to track unique model names
+                const uniqueModels = new Set();
+                
+                models.forEach(modelObj => {
+                    const modelName = Object.keys(modelObj)[0];
+                    if (!uniqueModels.has(modelName)) {
+                        uniqueModels.add(modelName);
+                        const option = document.createElement('option');
+                        option.value = modelName;
+                        option.textContent = modelName;
+                        select.appendChild(option);
+                    }
+                });
+                
+                // Set default selection to first model
+                if (select.options.length > 0) {
+                    select.selectedIndex = 0;
+                }
+            } catch (error) {
+                console.error('Error fetching models:', error);
+                // Fallback to default options if fetch fails
+                const select = document.getElementById('model-select');
+                select.innerHTML = `
+                    <option value="gemma2:2b-instruct-q6_K">Gemma 2B (Q6_K)</option>
+                    <option value="llama2">Llama 2</option>
+                    <option value="mistral">Mistral</option>
+                `;
+            }
+        }
+
+        // Fetch models when page loads
+        fetchModels();
 
         // New Chat button functionality
         document.getElementById('new-chat-button').addEventListener('click', () => {
