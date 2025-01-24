@@ -57,11 +57,20 @@ pub fn parser_openai(response: &Value) -> Result<(u64, u64)> {
     Ok((tokens_input, tokens_output))
 }
 
+pub fn parser_echo(_response: &Value) -> Result<(u64, u64)> {
+    Ok((0, 0))
+}
+
 pub fn parse(
     json_body: &Value,
     parser: &str,
 ) -> Result<(u64, u64)> {
     match parser {
+        "echo" => {
+            let (input_tokens, output_tokens) = parser_echo(&json_body)?;
+            log::info!("Echo tokens - input: {}, output: {}", input_tokens, output_tokens);
+            Ok((input_tokens, output_tokens))
+        }
         "ollama" => {
             let (input_tokens, output_tokens) = parser_ollama(&json_body)?;
             log::info!("OLLaMA tokens - input: {}, output: {}", input_tokens, output_tokens);
