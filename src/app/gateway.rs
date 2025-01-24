@@ -216,6 +216,8 @@ impl ProxyHttp for BurgonetGateway {
             return Err(response);
         }
 
+
+
         if session.req_header().uri.path().starts_with("/login")
             && !check_login(session.req_header())
         {
@@ -223,6 +225,18 @@ impl ProxyHttp for BurgonetGateway {
                 .respond_error(403)
                 .await;
             // true: early return as the response is already written
+            return Ok(true);
+        }
+
+        // if uri is / or /login, return early a yaml message with the configuration of models
+        if session.req_header().uri.path() == "/"  {
+            let mut body = Vec::new();
+            let mut models_published = self.conf.models.clone();
+            for model in models_published.iter_mut() {
+                model.api_key = "".to_string();
+            }
+            serde_yaml::to_writer(&mut body, &models_published).unwrap();
+            let _ = session.write_response_body(&body, true).await;
             return Ok(true);
         }
 
