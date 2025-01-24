@@ -247,22 +247,22 @@ body.chat {
     display: flex;
     gap: 10px;
     align-items: center;
-    justify-content: space-between;
     width: 100%;
 }
 
 #model-select {
-    width: 30%;
+    width: 20%;
     min-width: 120px;
+    margin-right: auto; /* Push other elements to the right */
 }
 
 #message-input {
-    width: 60%;
+    flex: 1;
     min-width: 200px;
 }
 
 #send-button {
-    width: 10%;
+    width: 100px;
     min-width: 100px;
 }
 
