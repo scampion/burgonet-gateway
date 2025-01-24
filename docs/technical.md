@@ -5,11 +5,13 @@
 
 Burgonet Gateway uses several ports for different services:
 
-| Port | Service                | Description                                                                 |
-|------|------------------------|-----------------------------------------------------------------------------|
-| 6189 | Admin Service          | Provides web UI and API for configuration and monitoring |
-| 6191 | Main Gateway Service   | Handles all API requests and routing (default)                             |
-| 6192 | Prometheus Metrics     | Exposes monitoring metrics for scraping                                    |
+| Port | Service              | Description                                              |
+|------|----------------------|----------------------------------------------------------|
+| 6189 | Admin Service        | Provides web UI and API for configuration and monitoring |
+| 6190 | Chat Service         | Chat web UI with local storage                           |
+| 6191 | Main Gateway Service | Handles all API requests and routing (default)           |
+| 6192 | Prometheus Metrics   | Exposes monitoring metrics for scraping                  |
+| 6193 | Echo Service         | Echo used to configure and tests                         |
 
 These ports can be configured in the `conf.yml` file:
 

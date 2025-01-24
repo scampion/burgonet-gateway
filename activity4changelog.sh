@@ -26,7 +26,9 @@ ACTIVITY_CONTENT=$(cat "$OUTPUT_FILE" | \
     tr -d '\000-\031' | \
     jq -sR . | sed 's/^"\(.*\)"$/\1/')
 
-curl -X POST "https://api.deepseek.com/v1/chat/completions" \
+
+
+MESSAGE=$(curl -X POST "https://api.deepseek.com/v1/chat/completions" \
   -H "Authorization: Bearer $DEEPSEEK_API_KEY" \
   -H "Content-Type: application/json" \
   -d "{
@@ -34,19 +36,8 @@ curl -X POST "https://api.deepseek.com/v1/chat/completions" \
        \"messages\": [
          {\"role\": \"user\", \"content\": \"$DEEPSEEK_PROMPT\n\n$ACTIVITY_CONTENT\"}
        ]
-     }"
+     }" | jq -r '.choices[0].message.content')
 
-#
-#MESSAGE=$(curl -X POST "https://api.deepseek.com/v1/chat/completions" \
-#  -H "Authorization: Bearer $DEEPSEEK_API_KEY" \
-#  -H "Content-Type: application/json" \
-#  -d "{
-#       \"model\": \"deepseek-chat\",
-#       \"messages\": [
-#         {\"role\": \"user\", \"content\": \"$DEEPSEEK_PROMPT\n\n$ACTIVITY_CONTENT\"}
-#       ]
-#     }" | jq -r '.choices[0].message.content')
-#
 
 echo $MESSAGE  | pbcopy
 
