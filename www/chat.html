@@ -238,10 +238,12 @@
                 const model = document.getElementById('model-select').value;
                 const serverUrl = document.getElementById('server-url').value;
                 const modelEndpoint = document.getElementById('model-select').options[document.getElementById('model-select').selectedIndex].dataset.endpoint;
+                const token = document.getElementById('token').value;
                 const response = await fetch(`${serverUrl}${modelEndpoint}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
                     },
                     body: JSON.stringify({
                         model: model,
