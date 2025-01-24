@@ -20,7 +20,7 @@ trust_header_authentication:
 models:
   - location: "/echo"
     model_name: "echo"
-    proxy_pass: "http://127.0.0.1:6190/echo"
+    proxy_pass: "http://127.0.0.1:6193/echo"
     parser: "echo"
     api_key: "$DEEPSEEK_API_KEY"
 
