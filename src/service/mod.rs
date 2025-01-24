@@ -5,3 +5,4 @@
 
 pub mod echo;
 pub mod admin;
+pub mod chat;

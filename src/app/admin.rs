@@ -124,11 +124,11 @@ impl ServeHttp for HttpAdminApp {
 }
 
 impl HttpAdminApp {
-    fn is_embedded(&self, uri: &str) -> bool {
+    pub fn is_embedded(&self, uri: &str) -> bool {
         Asset::get(uri).is_some()
     }
 
-    fn handle_static_asset(&self, uri: &str) -> Response<Vec<u8>> {
+    pub fn handle_static_asset(&self, uri: &str) -> Response<Vec<u8>> {
         if let Some(asset) = Asset::get(uri) {
             let body = asset.data.as_ref().to_vec();
             // if file ends with .html, set content type to text/html
@@ -289,7 +289,7 @@ impl HttpAdminApp {
     }
 
 
-    fn json_response(&self, status: StatusCode, body: impl serde::Serialize) -> Response<Vec<u8>> {
+    pub fn json_response(&self, status: StatusCode, body: impl serde::Serialize) -> Response<Vec<u8>> {
         let body = serde_json::to_vec(&body).expect("Failed to serialize JSON");
         Response::builder()
             .status(status)
