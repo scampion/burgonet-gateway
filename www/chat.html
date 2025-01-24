@@ -247,7 +247,10 @@
                     },
                     body: JSON.stringify({
                         model: model,
-                        messages: conversationHistory,
+                        messages: [{
+                            role: "user",
+                            content: message
+                        }],
                         stream: false
                     })
                 });
