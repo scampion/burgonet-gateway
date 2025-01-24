@@ -36,7 +36,8 @@
         </form>
     </div>
 
-    <script>
+    <script type="module">
+        import { getParser } from './parsers.js';
         const chatContainer = document.getElementById('chat-container');
         const inputForm = document.getElementById('input-form');
         const messageInput = document.getElementById('message-input');
@@ -247,10 +248,10 @@
                     },
                     body: JSON.stringify({
                         model: model,
-                        messages: [{
+                        messages: getParser(model).formatMessages([{
                             role: "user",
                             content: message
-                        }],
+                        }]),
                         stream: false
                     })
                 });
@@ -261,15 +262,14 @@
                 }
 
                 const data = await response.json();
-                if (!data.choices || !data.choices[0]?.message?.content) {
-                    throw new Error('Invalid response format from API');
-                }
-                const assistantMessage = { 
-                    role: 'assistant', 
-                    content: data.choices[0].message.content 
-                };
-                conversationHistory.push(assistantMessage);
-                addMessage('assistant', data.choices[0].message.content);
+                const model = document.getElementById('model-select').value;
+                const parser = getParser(model);
+                
+                const messages = parser.parseResponse(data);
+                messages.forEach(msg => {
+                    conversationHistory.push(msg);
+                    addMessage(msg.role, msg.content);
+                });
             
                 // Save the conversation and update preview
                 saveConversation();
