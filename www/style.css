@@ -19,7 +19,8 @@ body {
 }
 .navbar img {
     height: 40px;
-    margin-right: 20px;
+    margin-right: 200px;
+
 }
 .navbar a {
     text-decoration: none;
@@ -246,6 +247,7 @@ body.chat {
     display: flex;
     gap: 10px;
     align-items: center;
+    justify-content: space-between;
 }
 
 #model-select {
