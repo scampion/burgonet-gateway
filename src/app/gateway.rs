@@ -436,6 +436,7 @@ impl ProxyHttp for BurgonetGateway {
             session.set_keepalive(None);
             let mut resp = ResponseHeader::build(200, Some(4)).unwrap();
             resp.insert_header(header::SERVER, &SERVER_NAME[..]).unwrap();
+            resp.insert_header(header::CONTENT_TYPE, "application/json").unwrap();
             session.write_response_header(Box::new(resp), true).await;
             session.write_response_body(Some(Bytes::from(json_conf.into_bytes())), true).await;
             debug!("Returning configuration from logging");
