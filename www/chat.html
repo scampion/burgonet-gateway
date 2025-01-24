@@ -261,12 +261,15 @@
                 }
 
                 const data = await response.json();
-                if (!data.message || !data.message.content) {
+                if (!data.choices || !data.choices[0]?.message?.content) {
                     throw new Error('Invalid response format from API');
                 }
-                const assistantMessage = { role: 'assistant', content: data.message.content };
+                const assistantMessage = { 
+                    role: 'assistant', 
+                    content: data.choices[0].message.content 
+                };
                 conversationHistory.push(assistantMessage);
-                addMessage('assistant', data.message.content);
+                addMessage('assistant', data.choices[0].message.content);
             
                 // Save the conversation and update preview
                 saveConversation();
