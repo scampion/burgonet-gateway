@@ -119,6 +119,13 @@ impl ProxyHttp for BurgonetGateway {
     async fn request_filter(&self, session: &mut Session, ctx: &mut Self::CTX) -> Result<bool> {
         info!("request_filter");
         trace!("Start of request_filter: {:?}", session.req_header().uri.path());
+
+
+        // if uri is / or /login, return early a yaml message with the configuration of models
+        if session.req_header().uri.path() == "/"  {
+            return Ok(true);
+        }
+
         // test if the request contain a bearer token
         let token = session.req_header().headers.get("Authorization")
             .and_then(|v| v.to_str().ok())
@@ -210,34 +217,9 @@ impl ProxyHttp for BurgonetGateway {
             return Ok(true);
 
         }
-
         // Check token limits
         if let Err(response) = check_token_limits(ctx, session).await {
             return Err(response);
-        }
-
-
-
-        if session.req_header().uri.path().starts_with("/login")
-            && !check_login(session.req_header())
-        {
-            let _ = session
-                .respond_error(403)
-                .await;
-            // true: early return as the response is already written
-            return Ok(true);
-        }
-
-        // if uri is / or /login, return early a yaml message with the configuration of models
-        if session.req_header().uri.path() == "/"  {
-            let mut body = Vec::new();
-            let mut models_published = self.conf.models.clone();
-            for model in models_published.iter_mut() {
-                model.api_key = "".to_string();
-            }
-            serde_yaml::to_writer(&mut body, &models_published).unwrap();
-            let _ = session.write_response_body(Some(Bytes::from(body)), true).await;
-            return Ok(true);
         }
 
         // change the accept header to  "text/plain"
@@ -381,6 +363,19 @@ impl ProxyHttp for BurgonetGateway {
     where
         Self::CTX: Send + Sync,
     {
+        if _session.req_header().uri.path() == "/" && end_of_stream {
+            let mut body = Vec::new();
+            let mut models_published = self.conf.models.clone();
+            for model in models_published.iter_mut() {
+                model.api_key = "".to_string();
+            }
+            serde_yaml::to_writer(&mut body, &models_published).unwrap();
+            *body = Some(Bytes::from(body));
+            //let _ = session.respond_error(200).await;
+            return Ok(None);
+        }
+
+
         if let Some(b) = body {
             _ctx.buffer.extend(&b[..]);
             b.clear();
@@ -439,6 +434,10 @@ impl ProxyHttp for BurgonetGateway {
         //format the time to get the current hour YYYY-MM-DD-HH
         let current_hour = chrono::Utc::now().format("%Y%m%d%H").to_string();
         // store in the table usage the number of tokens used by the user with key current_hour:user:input_tokens
-        update_usage_periods(ctx);
+        if session.req_header().uri.path() == "/" {
+            return;
+        } else {
+            update_usage_periods(ctx);
+        }
     }
 }
