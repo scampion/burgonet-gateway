@@ -107,11 +107,9 @@ fn main() {
     info!("Prometheus service started on port {}", conf.prometheus_port);
 
     let mut echo_service_http = service::echo::echo_service_http();
-    let echo_host = "127.0.0.1";
-    let echo_port = 6190;
-    echo_service_http.add_tcp(&format!("{}:{}", echo_host, echo_port));
+    echo_service_http.add_tcp(&format!("{}:{}", conf.echo_host, conf.echo_port));
     bgn_server.add_service(echo_service_http);
-    info!("Echo service started on http://{}:{}", echo_host, echo_port);
+    info!("Echo service started on http://{}:{}", conf.echo_host, conf.echo_port);
 
     let mut chat_service_http = service::chat::chat_service_http(db.clone());
     chat_service_http.add_tcp(&format!("{}:{}", conf.chat_host, conf.chat_port));
