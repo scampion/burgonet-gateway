@@ -113,6 +113,12 @@ fn main() {
     bgn_server.add_service(echo_service_http);
     info!("Echo service started on http://{}:{}", echo_host, echo_port);
 
+    let mut chat_service_http = service::chat::chat_service_http(db.clone());
+    let chat_host = "127.0.0.1";
+    let chat_port = 6190;
+    chat_service_http.add_tcp(&format!("{}:{}", chat_host, chat_port));
+    bgn_server.add_service(chat_service_http);
+    info!("Chat service started on http://{}:{}", chat_host, chat_port);
 
     let mut admin_service_http = service::admin::admin_service_http(db);
     admin_service_http.add_tcp(&format!("{}:{}", conf.admin_host, conf.admin_port));
