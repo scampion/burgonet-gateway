@@ -25,6 +25,7 @@ use redb::TableDefinition;
 use redb::ReadableTable;
 use log::{error, info, trace, warn};
 use std::collections::HashMap;
+use crate::app::admin::HttpAdminApp;
 
 static REQ_COUNTER: Lazy<IntCounter> =
     Lazy::new(|| register_int_counter!("chat_req_counter", "Number of chat requests").unwrap());
@@ -59,11 +60,8 @@ impl ServeHttp for HttpChatApp {
         match (method, uri) {
             ("GET", "/") => self.handle_static_asset("chat.html"),
             ("GET", path) if self.is_embedded(&path[1..]) => self.handle_static_asset(&path[1..]),
-            ("GET", "/api/conversations") => self.handle_get_conversations(),
-            ("POST", "/api/conversations") => self.handle_post_conversation(http_stream).await,
-            ("DELETE", "/api/conversations") => self.handle_delete_conversation(http_stream).await,
             _ => {
-                self.json_response(StatusCode::NOT_FOUND, serde_json::json!({"error": "Not Found"}))
+                self.admin.json_response(StatusCode::NOT_FOUND, serde_json::json!({"error": "Not Found"}))
             }
         }
     }
@@ -76,111 +74,6 @@ impl HttpChatApp {
 
     fn handle_static_asset(&self, uri: &str) -> Response<Vec<u8>> {
         self.admin.handle_static_asset(uri)
-    }
-
-    async fn read_json_body(&self, http_stream: &mut ServerSession) -> Result<serde_json::Value, Response<Vec<u8>>> {
-        self.admin.read_json_body(http_stream).await
-    }
-
-    fn json_response(&self, status: StatusCode, body: impl serde::Serialize) -> Response<Vec<u8>> {
-        self.admin.json_response(status, body)
-    }
-        let read_timeout = 2000;
-        let body = match timeout(
-            Duration::from_millis(read_timeout),
-            http_stream.read_request_body(),
-        )
-            .await
-        {
-            Ok(res) => match res.unwrap() {
-                Some(bytes) => bytes,
-                None => Bytes::from("{}"),
-            },
-            Err(_) => {
-                return Err(Response::builder()
-                    .status(StatusCode::REQUEST_TIMEOUT)
-                    .body(format!("Timed out after {}ms", read_timeout).into_bytes())
-                    .unwrap());
-            }
-        };
-
-        match serde_json::from_slice(&body) {
-            Ok(json_value) => Ok(json_value),
-            Err(e) => {
-                error!("Failed to parse JSON: {}", e);
-                Err(Response::builder()
-                    .status(StatusCode::BAD_REQUEST)
-                    .body(format!("Failed to parse JSON: {}", e).into_bytes())
-                    .unwrap())
-            }
-        }
-    }
-
-    fn handle_get_conversations(&self) -> Response<Vec<u8>> {
-        let read_txn = self.db.begin_read().expect("Failed to begin read transaction");
-        let table = read_txn.open_table(CHAT_HISTORY).expect("Failed to open table");
-        let mut conversations = Vec::new();
-
-        for entry in table.iter().into_iter().flatten() {
-            if let Ok((key, value)) = entry {
-                let conversation_id = key.value().to_string();
-                let conversation_data = value.value().to_string();
-                let mut conversation_map = std::collections::HashMap::new();
-                conversation_map.insert(conversation_id, conversation_data);
-                conversations.push(conversation_map);
-            }
-        }
-        self.json_response(StatusCode::OK, &conversations)
-    }
-
-    async fn handle_post_conversation(&self, http_stream: &mut ServerSession) -> Response<Vec<u8>> {
-        let json = match self.read_json_body(http_stream).await {
-            Ok(json) => json,
-            Err(response) => {
-                return self.json_response(StatusCode::BAD_REQUEST, serde_json::json!({"error": "Invalid JSON"}));
-            }
-        };
-
-        {
-            let write_txn = self.db.begin_write().expect("Failed to begin write transaction");
-            {
-                let mut table = write_txn.open_table(CHAT_HISTORY).expect("Failed to open table");
-                if let Some(conversation_id) = json.get("id").and_then(|v| v.as_str()) {
-                    if let Some(conversation_data) = json.get("data").and_then(|v| v.as_str()) {
-                        table.insert(conversation_id, conversation_data).expect("Failed to insert conversation");
-                        info!("Conversation {} inserted", conversation_id);
-                    }
-                }
-            }
-            write_txn.commit().expect("Failed to commit write transaction");
-        }
-
-        self.json_response(StatusCode::OK, serde_json::json!({"status": "ok"}))
-    }
-
-    async fn handle_delete_conversation(&self, http_stream: &mut ServerSession) -> Response<Vec<u8>> {
-        let json = match self.read_json_body(http_stream).await {
-            Ok(json) => json,
-            Err(response) => {
-                return self.json_response(StatusCode::BAD_REQUEST, serde_json::json!({"error": "Invalid JSON"}));
-            }
-        };
-
-        {
-            let write_txn = self.db.begin_write().expect("Failed to begin write transaction");
-            {
-                let mut table = write_txn.open_table(CHAT_HISTORY).expect("Failed to open table");
-                for conversation_id in json.get("ids").and_then(|v| v.as_array()).unwrap() {
-                    if let Some(id_str) = conversation_id.as_str() {
-                        table.remove(id_str).expect("Failed to remove conversation");
-                        info!("Conversation {} removed", id_str);
-                    }
-                }
-            }
-            write_txn.commit().expect("Failed to commit write transaction");
-        }
-
-        self.json_response(StatusCode::OK, serde_json::json!({"status": "ok"}))
     }
 
 }
