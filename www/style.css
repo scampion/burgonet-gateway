@@ -242,7 +242,7 @@ body.chat {
 }
 
 #input-form {
-    max-width: 800px;
+    /*max-width: 800px;*/
     margin: 0 auto;
     display: flex;
     gap: 10px;
