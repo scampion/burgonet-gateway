@@ -178,6 +178,7 @@
                         const option = document.createElement('option');
                         option.value = modelName;
                         option.textContent = modelName;
+                        option.dataset.endpoint = modelObj[modelName]; // Store the endpoint
                         select.appendChild(option);
                     }
                 });
@@ -236,8 +237,8 @@
             try {
                 const model = document.getElementById('model-select').value;
                 const serverUrl = document.getElementById('server-url').value;
-                const modelEndpoint = document.getElementById('model-select').value;
-                const response = await fetch(`${serverUrl}/${modelEndpoint}`, {
+                const modelEndpoint = document.getElementById('model-select').options[document.getElementById('model-select').selectedIndex].dataset.endpoint;
+                const response = await fetch(`${serverUrl}${modelEndpoint}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
