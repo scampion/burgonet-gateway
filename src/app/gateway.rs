@@ -440,6 +440,11 @@ impl ProxyHttp for BurgonetGateway {
             let mut resp = ResponseHeader::build(200, Some(4)).unwrap();
             resp.insert_header(header::SERVER, &SERVER_NAME[..]).unwrap();
             resp.insert_header(header::CONTENT_TYPE, "application/json").unwrap();
+            // Add CORS headers
+            resp.insert_header("Access-Control-Allow-Origin", "*").unwrap();
+            resp.insert_header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS").unwrap();
+            resp.insert_header("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept").unwrap();
+            resp.insert_header("Access-Control-Expose-Headers", "Content-Length, Content-Range").unwrap();
             session.write_response_header(Box::new(resp), true).await;
             session.write_response_body(Some(Bytes::from(json_conf.into_bytes())), true).await;
             debug!("Returning configuration from logging");
