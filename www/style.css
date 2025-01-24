@@ -25,6 +25,19 @@ body {
     color: #007bff;
     font-weight: bold;
 }
+
+.navbar input[type="text"] {
+    padding: 5px 10px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    margin-left: 20px;
+    width: 200px;
+}
+
+.navbar input[type="text"]:focus {
+    outline: none;
+    border-color: #007bff;
+}
 .navbar a:hover {
     text-decoration: underline;
 }

@@ -12,8 +12,7 @@
         <a href="index.html">Home</a>
         <a href="tokens.html" style="margin-left: 20px;">Tokens</a>
         <a href="usage.html" style="margin-left: 20px;">Usage</a>
-
-
+        <input type="text" id="server-url" value="http://127.0.0.1:11434" placeholder="Server URL">
     </div>
     <div id="sidebar">
         <h2>Conversations</h2>
@@ -172,7 +171,8 @@
             
             try {
                 const model = document.getElementById('model-select').value;
-                const response = await fetch('http://127.0.0.1:11434/api/chat', {
+                const serverUrl = document.getElementById('server-url').value;
+                const response = await fetch(`${serverUrl}/api/chat`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
