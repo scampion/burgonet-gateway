@@ -160,7 +160,6 @@
             try {
                 const serverUrl = document.getElementById('server-url').value;
                 const response = await fetch(serverUrl);
-                console.log('Response:', response);
                 if (!response.ok) {
                     throw new Error('Failed to fetch models');
                 }
@@ -238,7 +237,7 @@
                 const model = document.getElementById('model-select').value;
                 const serverUrl = document.getElementById('server-url').value;
                 const modelEndpoint = document.getElementById('model-select').value;
-                const response = await fetch(`${serverUrl}${modelEndpoint}`, {
+                const response = await fetch(`${serverUrl}/${modelEndpoint}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
