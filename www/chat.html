@@ -159,7 +159,7 @@
         async function fetchModels() {
             try {
                 const serverUrl = document.getElementById('server-url').value;
-                const response = await fetch(serverUrl, { mode: 'no-cors' });
+                const response = await fetch(serverUrl);
                 console.log('Response:', response);
                 if (!response.ok) {
                     throw new Error('Failed to fetch models');

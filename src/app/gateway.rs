@@ -344,15 +344,18 @@ impl ProxyHttp for BurgonetGateway {
 
         _ctx.upstream_headers = upstream_response.clone();
 
-        // Add CORS headers
+        // Add CORS headers for all responses
         upstream_response
             .insert_header("Access-Control-Allow-Origin", "*")
             .unwrap();
         upstream_response
-            .insert_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+            .insert_header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
             .unwrap();
         upstream_response
-            .insert_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+            .insert_header("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept")
+            .unwrap();
+        upstream_response
+            .insert_header("Access-Control-Expose-Headers", "Content-Length, Content-Range")
             .unwrap();
 
         // Replace existing header if any
