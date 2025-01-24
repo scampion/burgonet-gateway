@@ -236,7 +236,7 @@ impl ProxyHttp for BurgonetGateway {
                 model.api_key = "".to_string();
             }
             serde_yaml::to_writer(&mut body, &models_published).unwrap();
-            let _ = session.write_response_body(&body, true).await;
+            let _ = session.write_response_body(Some(Bytes::from(body)), true).await;
             return Ok(true);
         }
 
