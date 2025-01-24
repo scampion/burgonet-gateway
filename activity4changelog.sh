@@ -24,7 +24,7 @@ DEEPSEEK_PROMPT="create a changelog section to explain what happened in this cod
 # Sanitize the activity content for JSON by escaping special characters
 ACTIVITY_CONTENT=$(cat "$OUTPUT_FILE" | \
     tr -d '\000-\031' | \
-    sed -e 's/\\/\\\\/g' -e 's/"/\\"/g' -e 's/\//\\\//g' -e 's/\$/\\\$/g' -e "s/'/\\\'/g" -e 's/\t/\\t/g' -e 's/\r/\\r/g' -e 's/\n/\\n/g')
+    jq -sR . | sed 's/^"\(.*\)"$/\1/')
 
 curl -X POST "https://api.deepseek.com/v1/chat/completions" \
   -H "Authorization: Bearer $DEEPSEEK_API_KEY" \
