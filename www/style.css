@@ -33,7 +33,6 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding-top: 60px; /* Add padding to account for fixed navbar */
 }
 
 .logo img {
@@ -152,6 +151,7 @@ body.chat {
     background-color: #ffffff;
     margin-left: 300px;
     width: calc(100% - 300px);
+    padding-top: 60px; /* Add padding to account for fixed navbar */
 }
 
 .message {
@@ -160,6 +160,7 @@ body.chat {
     padding: 20px;
     max-width: 800px;
     margin: 0 auto;
+    /*align-items: center;*/
 }
 
 .message.user {
@@ -176,6 +177,13 @@ body.chat {
 .avatar {
     width: 40px;
     height: 40px;
+    border-radius: 3px;
+}
+
+.avatar img {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
     border-radius: 3px;
 }
 

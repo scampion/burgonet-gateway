@@ -12,6 +12,8 @@
         <a href="index.html">Home</a>
         <a href="tokens.html" style="margin-left: 20px;">Tokens</a>
         <a href="usage.html" style="margin-left: 20px;">Usage</a>
+
+
     </div>
     <div id="sidebar">
         <h2>Conversations</h2>
@@ -48,6 +50,7 @@
             const avatar = document.createElement('div');
             avatar.className = 'avatar';
             avatar.style.backgroundImage = `url(${role === 'user' ? 'user.png' : 'bot.png'})`;
+            avatar.innerHTML = `<img src="${role === 'user' ? 'user.png' : 'bot.png'}" alt="${role} avatar" class="avatar-img">`;
             
             const contentDiv = document.createElement('div');
             contentDiv.className = 'content';
@@ -72,7 +75,8 @@
                 
                 // Update preview with first message content if available
                 if (conversationHistory.length > 0) {
-                    const firstMessage = conversationHistory[0].content;
+                    //const firstMessage = conversationHistory[0].content;
+                    const firstMessage = conversationHistory[conversationHistory.length - 1].content;
                     currentConversation.preview = firstMessage.split(' ').slice(0, 10).join(' ');
                 }
             } else {
@@ -81,8 +85,8 @@
                     id: Date.now(),
                     timestamp: new Date().toLocaleString(),
                     messages: [...conversationHistory],
-                    preview: conversationHistory.length > 0 ? 
-                        conversationHistory[0].content.split(' ').slice(0, 10).join(' ') : 
+                    preview: conversationHistory.length > 0 ?
+                        conversationHistory[conversationHistory.length - 1].content.split(' ').slice(0, 10).join(' ') :
                         'New conversation'
                 });
             }
