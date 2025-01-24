@@ -11,7 +11,9 @@ prometheus_host: 127.0.0.1
 prometheus_port: 6192
 admin_host: 127.0.0.1
 admin_port: 6189
+chat_host: 127.0.0.1
 chat_port: 6190
+echo_host: 127.0.0.1
 echo_port: 6193
 
 trust_header_authentication:
