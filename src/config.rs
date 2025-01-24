@@ -4,12 +4,13 @@
 // See the LICENSE file for full license details.
 
 use serde::Deserialize;
+use serde::Serialize;
 use std::fs;
 use std::path::Path;
 use anyhow::{Context, Result};
 use pingora::prelude::*;
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct QuotaPeriod {
     #[serde(default)]
     pub second: u64,
@@ -25,13 +26,13 @@ pub struct QuotaPeriod {
     pub month: u64,
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct Quota {
     pub max_tokens: Option<QuotaPeriod>,
     pub max_requests: Option<QuotaPeriod>,
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Serialize,  Clone)]
 pub struct ModelConfig {
     pub location: String,
     pub model_name: String,
@@ -50,7 +51,7 @@ pub struct ModelConfig {
     pub quotas: Option<Vec<Quota>>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct ServerConf {
     pub models: Vec<ModelConfig>,
     #[serde(default = "default_db_filepath")]

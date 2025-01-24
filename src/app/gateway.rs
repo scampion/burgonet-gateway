@@ -415,17 +415,13 @@ impl ProxyHttp for BurgonetGateway {
     ) {
         debug!("logging uri path: {:?}", session.req_header().uri.path());
         if session.req_header().uri.path() == "/" {
+            let locations: Vec<std::collections::HashMap<String, String>> = self.conf.models.iter().map(|m| {
+                let mut map = std::collections::HashMap::new();
+                map.insert(m.model_name.clone(), m.location.clone());
+                map
+            }).collect();
 
-            let mut processed_models = Vec::new();
-            for model in &self.conf.models {
-                let processed_model = ModelConfig {
-                    api_key: String::new(), // Remove the api_key
-                    ..model.clone()
-                };
-                processed_models.push(processed_model);
-            }
-
-            let json_conf = serde_json::to_string(&processed_models).unwrap();
+            let json_conf = serde_json::to_string(&locations).unwrap();
             session.set_keepalive(None);
             let mut resp = ResponseHeader::build(200, Some(4)).unwrap();
             resp.insert_header(header::SERVER, &SERVER_NAME[..]).unwrap();

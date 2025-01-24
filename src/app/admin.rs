@@ -131,7 +131,13 @@ impl HttpAdminApp {
     fn handle_static_asset(&self, uri: &str) -> Response<Vec<u8>> {
         if let Some(asset) = Asset::get(uri) {
             let body = asset.data.as_ref().to_vec();
-            let content_type = tree_magic::from_u8(&body);
+            // if file ends with .html, set content type to text/html
+            let content_type = match uri {
+                uri if uri.ends_with(".html") => "text/html",
+                uri if uri.ends_with(".css") => "text/css",
+                uri if uri.ends_with(".js") => "application/javascript",
+                _ => &tree_magic::from_u8(&body),
+            };
             return Response::builder()
                 .status(StatusCode::OK)
                 .header(http::header::CONTENT_TYPE, content_type)
