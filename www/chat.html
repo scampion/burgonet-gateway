@@ -245,11 +245,8 @@
                 const model = selectedOption.value;
                 const serverUrl = document.getElementById('server-url').value;
                 const modelEndpoint = selectedOption.dataset.endpoint;
-                const parser = parsers[selectedOption.dataset.parser];
+                const parser = getParser(selectedOption.dataset.parser);
                 const token = document.getElementById('token').value;
-                // const model = document.getElementById('model-select').value;
-                // const parser = getParser(model);
-
 
                 const response = await fetch(`${serverUrl}${modelEndpoint}`, {
                     method: 'POST',
@@ -259,7 +256,7 @@
                     },
                     body: JSON.stringify({
                         model: model,
-                        messages: getParser(model).formatMessages([{
+                        messages: parser.formatMessages([{
                             role: "user",
                             content: message
                         }]),
