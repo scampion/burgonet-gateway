@@ -245,9 +245,12 @@
                 const model = selectedOption.value;
                 const serverUrl = document.getElementById('server-url').value;
                 const modelEndpoint = selectedOption.dataset.endpoint;
-                const parser = selectedOption.dataset.parser;
+                const parser = parsers[selectedOption.dataset.parser];
                 const token = document.getElementById('token').value;
-                
+                // const model = document.getElementById('model-select').value;
+                // const parser = getParser(model);
+
+
                 const response = await fetch(`${serverUrl}${modelEndpoint}`, {
                     method: 'POST',
                     headers: {
@@ -270,9 +273,7 @@
                 }
 
                 const data = await response.json();
-                const model = document.getElementById('model-select').value;
-                const parser = getParser(model);
-                
+
                 const messages = parser.parseResponse(data);
                 messages.forEach(msg => {
                     conversationHistory.push(msg);
