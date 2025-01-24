@@ -174,12 +174,16 @@
                 
                 models.forEach(modelObj => {
                     const modelName = Object.keys(modelObj)[0];
+                    const modelData = modelObj[modelName];
+                    
                     if (!uniqueModels.has(modelName)) {
                         uniqueModels.add(modelName);
                         const option = document.createElement('option');
                         option.value = modelName;
                         option.textContent = modelName;
-                        option.dataset.endpoint = modelObj[modelName]; // Store the endpoint
+                        // Store both location and parser in dataset
+                        option.dataset.endpoint = modelData.location;
+                        option.dataset.parser = modelData.parser || 'openai'; // Default to openai if no parser specified
                         select.appendChild(option);
                     }
                 });
@@ -236,10 +240,14 @@
             messageInput.value = '';
             
             try {
-                const model = document.getElementById('model-select').value;
+                const modelSelect = document.getElementById('model-select');
+                const selectedOption = modelSelect.options[modelSelect.selectedIndex];
+                const model = selectedOption.value;
                 const serverUrl = document.getElementById('server-url').value;
-                const modelEndpoint = document.getElementById('model-select').options[document.getElementById('model-select').selectedIndex].dataset.endpoint;
+                const modelEndpoint = selectedOption.dataset.endpoint;
+                const parser = selectedOption.dataset.parser;
                 const token = document.getElementById('token').value;
+                
                 const response = await fetch(`${serverUrl}${modelEndpoint}`, {
                     method: 'POST',
                     headers: {
