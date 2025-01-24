@@ -122,6 +122,17 @@ impl ProxyHttp for BurgonetGateway {
         info!("request_filter");
         trace!("Start of request_filter: {:?}", session.req_header().uri.path());
 
+        // Handle OPTIONS preflight requests
+        if session.req_header().method == http::Method::OPTIONS {
+            let mut resp = ResponseHeader::build(200, None).unwrap();
+            resp.insert_header("Access-Control-Allow-Origin", "*").unwrap();
+            resp.insert_header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS").unwrap();
+            resp.insert_header("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept").unwrap();
+            resp.insert_header("Access-Control-Max-Age", "86400").unwrap(); // 24 hours
+            session.write_response_header(Box::new(resp), true).await;
+            return Ok(true);
+        }
+
         // if uri is / or /login, return early a yaml message with the configuration of models
         if session.req_header().uri.path() == "/"  {
             debug!("Returning configuration from request_filter");
