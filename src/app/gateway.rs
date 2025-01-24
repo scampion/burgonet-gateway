@@ -126,7 +126,7 @@ impl ProxyHttp for BurgonetGateway {
             debug!("Returning configuration from request_filter");
             // return the configuration of the models in json
             let json_conf = serde_json::to_string(&self.conf.models).unwrap();
-            session.write_response_body(&json_conf.into_bytes(), true).await?;
+            session.write_response_body(Some(Bytes::from(json_conf.into_bytes())), true).await?;
             return Ok(true);
         }
 
