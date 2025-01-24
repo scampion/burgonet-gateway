@@ -138,9 +138,16 @@
 
         // Save button functionality
         document.getElementById('save-button').addEventListener('click', () => {
-            saveConversation();
-            alert('Conversation saved!');
+            const serverUrl = document.getElementById('server-url').value;
+            localStorage.setItem('gatewayUrl', serverUrl);
+            alert('Gateway URL saved!');
         });
+
+        // Load saved URL on page load
+        const savedUrl = localStorage.getItem('gatewayUrl');
+        if (savedUrl) {
+            document.getElementById('server-url').value = savedUrl;
+        }
 
         // New Chat button functionality
         document.getElementById('new-chat-button').addEventListener('click', () => {
