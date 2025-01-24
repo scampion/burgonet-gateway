@@ -280,8 +280,9 @@ impl ProxyHttp for BurgonetGateway {
     ) -> Result<Box<HttpPeer>> {
 
         if session.req_header().uri.path() == "/" {
-            debug!("Returning configuration");
-            return Ok(None);
+            debug!("Returning dummy peer for configuration");
+            // Return a dummy peer since we won't actually use it
+            return Ok(Box::new(HttpPeer::new(("127.0.0.1", 80), false, "localhost".to_string())));
         }
 
         let model = ctx.model.as_ref().ok_or_else(|| {
