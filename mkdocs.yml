@@ -6,6 +6,7 @@ nav:
     - Use Cases: use-cases.md
     - Configuration: configuration.md
     - API Reference: api-reference.md
+    - Chat Interface: chat-interface.md
   - Technical Documentation:
     - Architecture: technical.md
   - Administration:
