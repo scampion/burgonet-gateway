@@ -248,6 +248,22 @@ body.chat {
     gap: 10px;
     align-items: center;
     justify-content: space-between;
+    width: 100%;
+}
+
+#model-select {
+    width: 20%;
+    min-width: 120px;
+}
+
+#message-input {
+    width: 60%;
+    min-width: 200px;
+}
+
+#send-button {
+    width: 20%;
+    min-width: 100px;
 }
 
 #model-select {
