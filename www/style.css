@@ -37,6 +37,10 @@ body {
     font-family: monospace;
 }
 
+.navbar .token-input {
+    width: 150px; /* Slightly narrower for token */
+}
+
 .navbar input[type="text"]:focus {
     outline: none;
     border-color: #007bff;

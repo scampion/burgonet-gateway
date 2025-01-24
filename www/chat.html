@@ -11,6 +11,8 @@
         <img src="logo.png" alt="Burgonet Gateway Logo">
         Gateway URL:
         <input type="text" id="server-url" value="http://127.0.0.1:11434" placeholder="Server URL">
+        Token:
+        <input type="text" id="token" class="token-input" placeholder="API Token">
         <button id="save-button">Save</button>
     </div>
     <div id="sidebar">
@@ -139,14 +141,20 @@
         // Save button functionality
         document.getElementById('save-button').addEventListener('click', () => {
             const serverUrl = document.getElementById('server-url').value;
+            const token = document.getElementById('token').value;
             localStorage.setItem('gatewayUrl', serverUrl);
-            alert('Gateway URL saved!');
+            localStorage.setItem('apiToken', token);
+            alert('Settings saved!');
         });
 
-        // Load saved URL on page load
+        // Load saved settings on page load
         const savedUrl = localStorage.getItem('gatewayUrl');
+        const savedToken = localStorage.getItem('apiToken');
         if (savedUrl) {
             document.getElementById('server-url').value = savedUrl;
+        }
+        if (savedToken) {
+            document.getElementById('token').value = savedToken;
         }
 
         // New Chat button functionality
