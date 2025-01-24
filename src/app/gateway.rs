@@ -14,12 +14,14 @@ use redb::{Database, TableDefinition};
 use reqwest::Client;
 use reqwest::Error as ReqwestError;
 use flate2::read::GzDecoder;
+use http::header;
 
 // Pingora-related imports
 use pingora::prelude::*;
 use pingora_http::ResponseHeader;
 use pingora_limits::rate::Rate;
 use pingora_proxy::{ProxyHttp, Session};
+use pingora::protocols::http::SERVER_NAME;
 
 // Internal modules
 use crate::config;
@@ -120,13 +122,9 @@ impl ProxyHttp for BurgonetGateway {
         info!("request_filter");
         trace!("Start of request_filter: {:?}", session.req_header().uri.path());
 
-
         // if uri is / or /login, return early a yaml message with the configuration of models
         if session.req_header().uri.path() == "/"  {
             debug!("Returning configuration from request_filter");
-            // return the configuration of the models in json
-            let json_conf = serde_json::to_string(&self.conf.models).unwrap();
-            session.write_response_body(Some(Bytes::from(json_conf.into_bytes())), true).await?;
             return Ok(true);
         }
 
@@ -415,26 +413,41 @@ impl ProxyHttp for BurgonetGateway {
         _e: Option<&pingora_core::Error>,
         ctx: &mut Self::CTX,
     ) {
-        let response_code = session
-            .response_written()
-            .map_or(0, |resp| resp.status.as_u16());
-        info!(
-            "{} response code: {response_code}",
-            self.request_summary(session, ctx)
-        );
-
-        self.req_metric.inc();
-        self.input_tokens.inc_by(ctx.input_tokens);
-        self.output_tokens.inc_by(ctx.output_tokens);
-
-        //get the current time in hour
-        let current_time = std::time::SystemTime::now();
-        //format the time to get the current hour YYYY-MM-DD-HH
-        let current_hour = chrono::Utc::now().format("%Y%m%d%H").to_string();
-        // store in the table usage the number of tokens used by the user with key current_hour:user:input_tokens
+        debug!("logging uri path: {:?}", session.req_header().uri.path());
         if session.req_header().uri.path() == "/" {
-            return;
+
+            let mut processed_models = Vec::new();
+            for model in &self.conf.models {
+                let processed_model = ModelConfig {
+                    api_key: String::new(), // Remove the api_key
+                    ..model.clone()
+                };
+                processed_models.push(processed_model);
+            }
+
+            let json_conf = serde_json::to_string(&processed_models).unwrap();
+            session.set_keepalive(None);
+            let mut resp = ResponseHeader::build(200, Some(4)).unwrap();
+            resp.insert_header(header::SERVER, &SERVER_NAME[..]).unwrap();
+            session.write_response_header(Box::new(resp), true).await;
+            session.write_response_body(Some(Bytes::from(json_conf.into_bytes())), true).await;
+            debug!("Returning configuration from logging");
+
         } else {
+            let response_code = session
+                .response_written()
+                .map_or(0, |resp| resp.status.as_u16());
+            info!("{} response code: {response_code}", self.request_summary(session, ctx));
+
+            self.req_metric.inc();
+            self.input_tokens.inc_by(ctx.input_tokens);
+            self.output_tokens.inc_by(ctx.output_tokens);
+
+            //get the current time in hour
+            let current_time = std::time::SystemTime::now();
+            //format the time to get the current hour YYYY-MM-DD-HH
+            let current_hour = chrono::Utc::now().format("%Y%m%d%H").to_string();
+            // store in the table usage the number of tokens used by the user with key current_hour:user:input_tokens
             update_usage_periods(ctx);
         }
     }
