@@ -78,6 +78,8 @@ pub struct ServerConf {
     pub echo_port: u16,
     #[serde(default = "default_trust_headers")]
     pub trust_header_authentication: Vec<String>,
+    #[serde(default = "default_log_config_file")]
+    pub log_config_file: String,
 }
 
 fn default_trust_headers() -> Vec<String> {
@@ -126,6 +128,10 @@ fn default_chat_host() -> String {
 
 fn default_echo_host() -> String {
     "127.0.0.1".to_string()
+}
+
+fn default_log_config_file() -> String {
+    "log4rs.yml".to_string()
 }
 
 

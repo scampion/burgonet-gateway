@@ -16,6 +16,8 @@ chat_port: 6190
 echo_host: 127.0.0.1
 echo_port: 6193
 
+log_config_file: log4rs.yml
+
 trust_header_authentication:
     - Tailscale-User-Login
     - Cf-Access-Authenticated-User-Email

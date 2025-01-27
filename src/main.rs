@@ -58,7 +58,15 @@ fn main() {
     env_logger::init();
 
     #[cfg(not(debug_assertions))]
-    log4rs::init_file("log4rs.yml", Default::default()).unwrap();
+    let conf = ServerConf::from_file_or_exit(
+        Opt::parse_args().conf.unwrap_or_else(|| {
+            log::error!("Error: No configuration file provided");
+            std::process::exit(1);
+        })
+    );
+    
+    #[cfg(not(debug_assertions))]
+    log4rs::init_file(&conf.log_config_file, Default::default()).unwrap();
 
 
     let db = Arc::new(Database::create("database.redb").expect("Failed to create database"));
