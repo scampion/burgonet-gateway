@@ -61,7 +61,8 @@ fn main() {
     let conf = ServerConf::from_file_or_exit(
         Opt::parse_args().conf.unwrap_or_else(|| {
             log::error!("Error: No configuration file provided");
-            std::process::exit(1);
+            //std::process::exit(1);
+            env_logger::init();
         })
     );
     
