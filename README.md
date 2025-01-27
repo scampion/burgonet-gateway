@@ -8,7 +8,7 @@
 It will help organizations to manage their **AI governance** in a secure and compliant way.
 
 The goal is to provide for employees, unit and project access to
-cloud based LLM providers or self-hosted models via that single entrypoint.
+cloud based LLM providers or self-hosted models via that single entrypoint, it can be seen as a reverse firewall.
 
 <p align="center">
   <img src="docs/images/overview.png?raw=true" />
