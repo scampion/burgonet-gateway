@@ -40,6 +40,7 @@ use rate_limit::check_rate_limits;
 // Constants and lazy statics
 use std::sync::Arc;
 use std::io::Read;
+use uuid::Uuid;
 
 
 
@@ -88,6 +89,7 @@ pub struct GatewayContext {
     pub usage_input: QuotaPeriod,
     pub usage_output: QuotaPeriod,
     pub upstream_headers: ResponseHeader,
+    pub request_id: Uuid,
 
 }
 
@@ -114,6 +116,7 @@ impl ProxyHttp for BurgonetGateway {
             usage_input: QuotaPeriod::new(),
             usage_output: QuotaPeriod::new(),
             upstream_headers: ResponseHeader::build_no_case(200, Some(0)).expect("Failed to build response header"),
+            request_id: Uuid::new_v4(),
         }
     }
 
