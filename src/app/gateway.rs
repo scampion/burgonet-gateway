@@ -440,13 +440,14 @@ impl ProxyHttp for BurgonetGateway {
     ) {
         debug!("logging uri path: {:?}", session.req_header().uri.path());
         if session.req_header().uri.path() == "/" {
-            let locations: Vec<std::collections::HashMap<String, String>> = self.conf.models.iter().map(|m| {
-                let mut map = std::collections::HashMap::new();
-                map.insert(m.model_name.clone(), m.location.clone());
-                map
+            let models: std::collections::HashMap<String, std::collections::HashMap<String, String>> = self.conf.models.iter().map(|m| {
+                let mut model_info = std::collections::HashMap::new();
+                model_info.insert("parser".to_string(), m.parser.clone());
+                model_info.insert("location".to_string(), m.location.clone());
+                (m.model_name.clone(), model_info)
             }).collect();
 
-            let json_conf = serde_json::to_string(&locations).unwrap();
+            let json_conf = serde_json::to_string(&models).unwrap();
             session.set_keepalive(None);
             let mut resp = ResponseHeader::build(200, Some(4)).unwrap();
             resp.insert_header(header::SERVER, &SERVER_NAME[..]).unwrap();
