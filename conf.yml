@@ -27,6 +27,7 @@ models:
     proxy_pass: "http://127.0.0.1:6193/echo"
     parser: "echo"
     api_key: "$DEEPSEEK_API_KEY"
+    pii_protection_url: "http://127.0.0.1:8001/check-pii-base64"
 
   - location: "/ollama/gemma2/2b/"
     model_name: "gemma2:2b-instruct-q6_K"

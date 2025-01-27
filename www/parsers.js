@@ -83,9 +83,10 @@ const parsers = {
             return messages;
         },
         parseResponse: (response) => {
+            console.log('Echo response:', response);
             return [{
                 role: 'assistant',
-                content: response.content || 'Echo response'
+                content: response.messages[0].content || 'Echo response'
             }];
         }
     }

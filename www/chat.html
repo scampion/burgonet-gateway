@@ -171,11 +171,8 @@
                 
                 // Create a Set to track unique model names
                 const uniqueModels = new Set();
-                
-                models.forEach(modelObj => {
-                    const modelName = Object.keys(modelObj)[0];
-                    const modelData = modelObj[modelName];
-                    
+
+                Object.entries(models).forEach(([modelName, modelData]) => {
                     if (!uniqueModels.has(modelName)) {
                         uniqueModels.add(modelName);
                         const option = document.createElement('option');
@@ -187,7 +184,7 @@
                         select.appendChild(option);
                     }
                 });
-                
+
                 // Set default selection to first model
                 if (select.options.length > 0) {
                     select.selectedIndex = 0;
