@@ -267,7 +267,7 @@ impl ProxyHttp for BurgonetGateway {
         }
         if _end_of_stream {
             *_body = Some(Bytes::from(std::mem::take(&mut _ctx.buffer)));
-            info!(target: "audit", "{} Request ### {}", _ctx.request_id, &_ctx.buffer);
+            info!(target: "audit", "{} Request ### {}", _ctx.request_id, String::from_utf8_lossy(&_ctx.buffer));
 
             if let Some(model) = &_ctx.model {
                 if let Some(text) = _body.as_ref() {
