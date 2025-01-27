@@ -8,17 +8,22 @@ use async_trait::async_trait;
 use base64::engine::general_purpose;
 use base64::Engine;
 use bytes::Bytes;
-use log::{debug, error, info, trace, warn};
+//use log::{debug, error, info, trace, warn};
 use once_cell::sync::Lazy;
 use prometheus::register_int_counter;
 use redb::{Database, TableDefinition};
 use reqwest::Client;
 use reqwest::Error as ReqwestError;
-use log::LevelFilter;
-use log4rs::append::console::ConsoleAppender;
-use log4rs::append::file::FileAppender;
-use log4rs::encode::pattern::PatternEncoder;
-use log4rs::config::{Appender, Config, Logger, Root};
+use log::{debug, error, info, trace, warn, LevelFilter, SetLoggerError};
+use log4rs::{
+    append::{
+        console::{ConsoleAppender, Target},
+        file::FileAppender,
+    },
+    config::{Appender, Config, Root},
+    encode::pattern::PatternEncoder,
+    filter::threshold::ThresholdFilter,
+};
 use std::io::stdout;
 
 // Pingora-related imports
@@ -49,7 +54,12 @@ use std::sync::Arc;
 
 
 fn main() {
+    #[cfg(debug_assertions)]
     env_logger::init();
+
+    #[cfg(not(debug_assertions))]
+    log4rs::init_file("log4rs.yml", Default::default()).unwrap();
+
 
     let db = Arc::new(Database::create("database.redb").expect("Failed to create database"));
     // create table if not exists
@@ -86,31 +96,6 @@ fn main() {
     );
 
     info!("Configuration loaded with {} models 👌", conf.models.len());
-
-
-    // Logger
-    let requests = FileAppender::builder()
-        .encoder(Box::new(PatternEncoder::new("{d} - {m}{n}")))
-        .build("log/requests.log")
-        .unwrap();
-
-    let console_appender = ConsoleAppender::builder()
-        .encoder(Box::new(PatternEncoder::new("{d} - {m}{n}")))
-        .build()
-        .unwrap();
-
-    let config = Config::builder()
-        .appender(Appender::builder().build("stdout", Box::new(console_appender)))
-        .appender(Appender::builder().build("requests", Box::new(requests)))
-        .logger(Logger::builder().build("app::backend::db", LevelFilter::Info))
-        .logger(Logger::builder()
-            .appender("requests")
-            .additive(false)
-            .build("app::requests", LevelFilter::Info))
-        .build(Root::builder().appender("stdout").build(LevelFilter::Warn))
-        .unwrap();
-
-    let handle = log4rs::init_config(config).unwrap();
 
     // Services
 
