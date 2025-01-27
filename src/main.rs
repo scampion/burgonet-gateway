@@ -14,6 +14,12 @@ use prometheus::register_int_counter;
 use redb::{Database, TableDefinition};
 use reqwest::Client;
 use reqwest::Error as ReqwestError;
+use log::LevelFilter;
+use log4rs::append::console::ConsoleAppender;
+use log4rs::append::file::FileAppender;
+use log4rs::encode::pattern::PatternEncoder;
+use log4rs::config::{Appender, Config, Logger, Root};
+use std::io::stdout;
 
 // Pingora-related imports
 use pingora::prelude::*;
@@ -81,6 +87,27 @@ fn main() {
 
     info!("Configuration loaded with {} models 👌", conf.models.len());
 
+
+    // Logger
+    let requests = FileAppender::builder()
+        .encoder(Box::new(PatternEncoder::new("{d} - {m}{n}")))
+        .build("log/requests.log")
+        .unwrap();
+
+    let config = Config::builder()
+        .appender(Appender::builder().build("stdout", Box::new(stdout)))
+        .appender(Appender::builder().build("requests", Box::new(requests)))
+        .logger(Logger::builder().build("app::backend::db", LevelFilter::Info))
+        .logger(Logger::builder()
+            .appender("requests")
+            .additive(false)
+            .build("app::requests", LevelFilter::Info))
+        .build(Root::builder().appender("stdout").build(LevelFilter::Warn))
+        .unwrap();
+
+    let handle = log4rs::init_config(config).unwrap();
+
+    // Services
 
     let mut bgn_server = Server::new(Some(Opt::parse_args())).unwrap();
     bgn_server.bootstrap();
