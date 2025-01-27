@@ -43,9 +43,14 @@ Download the binary in the [packages](https://github.com/burgonet-eu/gateway/rel
     ./burgonet-gw -c conf.yml 
 
 
-Open in your browser the URL [http://127.0.0.1:6189/](http://127.0.0.1:6189/)
+To access the administration web application, open the following URL in your browser : [http://127.0.0.1:6189/](http://127.0.0.1:6189/)
 
 ![Screenshot](images/screenshot.png)
+
+When you have created you token, you can test it via the convenience chat web app embedded, open the following URL in your browser: [http://127.0.0.1:6190/](http://127.0.0.1:6190/)
+configure the the server url (default port is 6191) and your token: 
+
+![Chat Web UI](images/chat-interface.png)
 
 
 --8<-- "docs/use-cases.md"
