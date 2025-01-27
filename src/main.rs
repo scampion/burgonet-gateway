@@ -94,8 +94,13 @@ fn main() {
         .build("log/requests.log")
         .unwrap();
 
+    let console_appender = ConsoleAppender::builder()
+        .encoder(Box::new(PatternEncoder::new("{d} - {m}{n}")))
+        .build()
+        .unwrap();
+
     let config = Config::builder()
-        .appender(Appender::builder().build("stdout", Box::new(stdout)))
+        .appender(Appender::builder().build("stdout", Box::new(console_appender)))
         .appender(Appender::builder().build("requests", Box::new(requests)))
         .logger(Logger::builder().build("app::backend::db", LevelFilter::Info))
         .logger(Logger::builder()
