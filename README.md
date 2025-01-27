@@ -29,6 +29,7 @@ cloud based LLM providers or self-hosted models via that single entrypoint.
 - 🔐 **Trusted Header Authentication**: Support for authentication via trusted HTTP headers
 - 🚫 **Content Filtering**: Block requests containing blacklisted words (e.g. "confidential")
 - 🚷 **Group Access Control**: Restrict access by user groups with disabled_groups configuration
+- 💬 **Chat Interface Web Application**: Integrated web interface for managing LLM interactions
 
 Need another feature? Don't hesitate to [send an email](mailto:sebastien.campion@foss4.eu) or [create a GitHub ticket](https://github.com/burgonet-eu/gateway/issues)!
 
@@ -39,7 +40,7 @@ The complete documentation is available at [https://burgonet.eu/](https://burgon
 
 ## Quickstart 
 
-Download the binary in the [packages](https://github.com/burgonet-eu/gateway/releases/) and the configuration file [conf.yml](conf.yml) file,  run it : 
+Download the binary in the [packages](https://github.com/burgonet-eu/gateway/releases/) and the configuration file [conf.yml](conf.yml) file, run it : 
 
     ./burgonet-gw -c conf.yml 
 
