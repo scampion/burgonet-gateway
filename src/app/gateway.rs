@@ -241,6 +241,7 @@ impl ProxyHttp for BurgonetGateway {
         // change the accept header to  "text/plain"
         let _ = session.req_header_mut().insert_header("Accept", "text/plain");
 
+        info!(target: "audit", "{} User {} accessed location {}", ctx.request_id, user, model.location);
         trace!("End of request_filter: {:?}", session.req_header().uri.path());
         Ok(false)
     }
@@ -266,6 +267,7 @@ impl ProxyHttp for BurgonetGateway {
         }
         if _end_of_stream {
             *_body = Some(Bytes::from(std::mem::take(&mut _ctx.buffer)));
+            info!(target: "audit", "{} Request ### {}", ctx.request_id, _body);
 
             if let Some(model) = &_ctx.model {
                 if let Some(text) = _body.as_ref() {
@@ -417,6 +419,8 @@ impl ProxyHttp for BurgonetGateway {
             }
             let json_body = serde_json::de::from_slice(&_ctx.buffer).unwrap();
             *body = Some(Bytes::from(std::mem::take(&mut _ctx.buffer)));
+
+            info!(target: "audit", "{} Response ### {}", _ctx.request_id, json_body);
 
             if let Some(model) = &_ctx.model {
                 match parse(&json_body, &model.parser) {
