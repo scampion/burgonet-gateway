@@ -267,7 +267,8 @@ impl ProxyHttp for BurgonetGateway {
         }
         if _end_of_stream {
             *_body = Some(Bytes::from(std::mem::take(&mut _ctx.buffer)));
-            info!(target: "audit", "{} Request ### {}", _ctx.request_id, String::from_utf8_lossy(_body.as_ref().unwrap()));
+            let request = String::from_utf8_lossy(_body.as_ref().unwrap()).replace("\n", "");
+            info!(target: "audit", "{} Request ### {}", _ctx.request_id, request);
 
             if let Some(model) = &_ctx.model {
                 if let Some(text) = _body.as_ref() {
@@ -407,6 +408,10 @@ impl ProxyHttp for BurgonetGateway {
             b.clear();
         }
         if end_of_stream {
+            if _ctx.upstream_headers.status.as_u16() >= 400 {
+                error!(target: "audit", "{} Response ### Error {}", _ctx.request_id, _ctx.upstream_headers.status);
+                return Err(Error::explain(ErrorType::InternalError, "Error in response"));
+            }
 
             // test if _ctx.upstream_headers contains the header "content-encoding" with value "gzip"
             if let Some(content_encoding) = _ctx.upstream_headers.headers.get("content-encoding") {
@@ -419,7 +424,6 @@ impl ProxyHttp for BurgonetGateway {
             }
             let json_body = serde_json::de::from_slice(&_ctx.buffer).unwrap();
             *body = Some(Bytes::from(std::mem::take(&mut _ctx.buffer)));
-
             info!(target: "audit", "{} Response ### {}", _ctx.request_id, json_body);
 
             if let Some(model) = &_ctx.model {

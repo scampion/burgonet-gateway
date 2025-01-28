@@ -60,9 +60,8 @@ fn main() {
     #[cfg(not(debug_assertions))]
     let conf = ServerConf::from_file_or_exit(
         Opt::parse_args().conf.unwrap_or_else(|| {
-            log::error!("Error: No configuration file provided");
-            //std::process::exit(1);
-            env_logger::init();
+            println!("Error: No configuration file provided");
+            std::process::exit(1);
         })
     );
     

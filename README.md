@@ -30,6 +30,8 @@ cloud based LLM providers or self-hosted models via that single entrypoint, it c
 - 🚫 **Content Filtering**: Block requests containing blacklisted words (e.g. "confidential")
 - 🚷 **Group Access Control**: Restrict access by user groups with disabled_groups configuration
 - 💬 **Chat Interface Web Application**: Integrated web interface for managing LLM interactions
+- 📝 Audit Logs: Detailed logging of API requests and responses
+- 💾 Audit Storage: Persistent storage of all gateway exchanges with configurable retention periods
 
 Need another feature? Don't hesitate to [send an email](mailto:sebastien.campion@foss4.eu) or [create a GitHub ticket](https://github.com/burgonet-eu/gateway/issues)!
 

@@ -9,6 +9,7 @@ nav:
     - Chat Interface: chat-interface.md
   - Technical Documentation:
     - Architecture: technical.md
+    - Features: features.md
   - Administration:
     - Monitoring: monitoring.md
   - About: about.md
