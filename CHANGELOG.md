@@ -1,5 +1,44 @@
 # Changelog
 
+## [0.1.3] - 2025-01-24
+
+
+#### 🛠️ **Code Improvements & Bug Fixes**
+
+- **Audit Log Rotation** 🔄
+  - Updated the audit log configuration (`log4rs.yml`) to support rotating logs based on size (50MB limit) and date.
+  - Added a fixed-window roller to maintain up to 5 archived log files.
+  - Ensured logs are stored persistently with configurable retention periods.
+- **Error Handling in Audit Logs** 🚨
+  - Added error logging for responses with HTTP status codes >= 400 in `gateway.rs`.
+  - Improved request logging by removing newline characters for cleaner audit logs.
+- **Configuration File Handling** ⚙️
+  - Fixed an issue in `main.rs` where the program would not exit properly when no configuration file was provided.
+  - Removed redundant `env_logger::init()` call and added a proper error message.
+
+---
+
+#### 📚 **Documentation Updates**
+
+- **Features Documentation** 📝
+  - Added a new section in the documentation (`mkdocs.yml`) to detail the Features of the gateway, including audit logs and storage.
+- **README.md Updates** 📖
+  - Added descriptions for Audit Logs and Audit Storage features in the README.
+
+---
+
+#### 🚀 **New Features**
+
+- **Audit Log Enhancements** 📋
+  - Introduced detailed logging of API requests and responses in `gateway.rs`.
+  - Added persistent storage for all gateway exchanges with configurable retention periods.
+
+---
+
+#### 🧹 **Code Cleanup**
+
+- Removed redundant code and improved readability in `gateway.rs` and `main.rs`.
+
 
 ## [0.1.2] - 2025-01-23
 
