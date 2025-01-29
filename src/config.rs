@@ -37,6 +37,8 @@ pub struct ModelConfig {
     pub location: String,
     pub model_name: String,
     pub proxy_pass: String,
+    #[serde(default = "default_authorization_header")]
+    pub authorization_header: bool,
     #[serde(default)]
     pub api_key: String,
     #[serde(default)]
@@ -80,6 +82,10 @@ pub struct ServerConf {
     pub trust_header_authentication: Vec<String>,
     #[serde(default = "default_log_config_file")]
     pub log_config_file: String,
+}
+
+fn default_authorization_header() -> bool {
+    true
 }
 
 fn default_trust_headers() -> Vec<String> {
@@ -182,19 +188,32 @@ impl ServerConf {
         let mut processed_models = Vec::new();
         for model in conf.models {
             let processed_model = if model.api_key.starts_with('$') {
+                let mut authorization_header = model.authorization_header;
                 let var_name = &model.api_key[1..];
                 let api_key = std::env::var(var_name).unwrap_or_else(|_| {
                     log::error!("Environment variable {} not found", var_name);
                     "".to_string()
                 });
                 log::info!("Location {}: using API key from environment variable {}", model.location,var_name);
+
+                let proxy_pass = if model.proxy_pass.contains(&format!("${}", var_name)) {
+                    log::info!("Location {}: using API key from environment variable {}", model.location,var_name);
+                    authorization_header = false;
+                    model.proxy_pass.replace(&format!("${}", var_name), &api_key)
+                } else {
+                    model.proxy_pass
+                };
+                log::info!("Proxy pass: {}", proxy_pass);
                 ModelConfig {
                     api_key,
+                    proxy_pass,
+                    authorization_header,
                     ..model
                 }
             } else {
                 model
             };
+
             processed_models.push(processed_model);
         }
 

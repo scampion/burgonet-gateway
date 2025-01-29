@@ -41,6 +41,7 @@ use rate_limit::check_rate_limits;
 use std::sync::Arc;
 use std::io::Read;
 use uuid::Uuid;
+use http::Uri;
 
 
 
@@ -314,10 +315,18 @@ impl ProxyHttp for BurgonetGateway {
             .map_err(|e| anyhow::anyhow!("Invalid proxy_pass URL: {}", e));
 
         // extract uri from the proxy_url
-        let uri = proxy_url.as_ref().map(|u| u.path()).unwrap().to_string();
+        let mut path = proxy_url.as_ref().map(|u| u.path()).unwrap().to_string();
+        let query = proxy_url.as_ref().map(|u| u.query().unwrap_or("")).unwrap();
+        if !query.is_empty() {
+            path.push_str("?");
+            path.push_str(query);
+        }
+        let uri = Uri::builder()
+            .path_and_query(path)
+            .build()
+            .unwrap();
+        session.req_header_mut().set_uri(uri);
 
-        // replace the uri with the path from the request
-        session.req_header_mut().set_uri(uri.as_str().parse().unwrap());
 
         let host = proxy_url.as_ref().map(|u| u.host_str().unwrap());
 
@@ -337,7 +346,12 @@ impl ProxyHttp for BurgonetGateway {
 
         // add header Authorization to the request for the peer with the api key
         let api_key = model.api_key.clone();
-        let _ = session.req_header_mut().insert_header("Authorization", "Bearer ".to_string() + &api_key);
+
+        if model.authorization_header {
+            let _ = session.req_header_mut().insert_header("Authorization", "Bearer ".to_string() + &api_key);
+        } else {
+            let _ = session.req_header_mut().remove_header("Authorization");
+        }
         // add Content-Type: application/json
         let _ = session.req_header_mut().insert_header("Content-Type", "application/json");
 

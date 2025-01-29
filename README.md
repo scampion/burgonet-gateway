@@ -1,7 +1,7 @@
 # Burgonet - AI Enterprise Gateway
 
 <p align="center">
-  <img src="docs/images/logo.png?raw=true" style="width: 200px; height: auto;" />
+  <img src="docs/images/logo_draw_name.png"?raw=true" style="width: 200px; height: auto;" />
 </p>
 
 **AI enterprise gateway** implemented in Rust 🦀 that provides secure access to LLM and compliance controls for AI systems.
