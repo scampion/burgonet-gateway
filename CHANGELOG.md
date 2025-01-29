@@ -1,5 +1,38 @@
 # Changelog
 
+## [0.1.4] - 2025-01-25
+
+✨ New Features
+- Added Gemini AI provider support with token counting
+- Added Getting Started guide with installation instructions
+- Added audit logs documentation with example log entries
+
+💄 UI Changes
+- Updated logo across documentation and README
+- Enhanced sequence diagram with emojis for better visualization
+- Improved documentation navigation structure
+
+🔧 Technical Changes
+- Added support for API keys in proxy URLs
+- Implemented configurable authorization header toggle
+- Enhanced URL handling with proper query parameter support
+
+📝 Documentation
+- Updated main landing page with new features
+- Added new sections in documentation:
+  - Getting Started guide
+  - Features overview
+  - Audit logging details
+
+🎨 Assets
+- Added new logo variations
+
+🔄 Updates & Modifications
+- Reorganized documentation structure
+- Updated configuration example with Gemini provider
+- Added extra newlines in configuration file for better readability
+
+
 ## [0.1.3] - 2025-01-24
 
 
