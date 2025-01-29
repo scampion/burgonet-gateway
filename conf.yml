@@ -87,3 +87,9 @@ models:
     proxy_pass: "https://YOUR_RESOURCE_NAME.openai.azure.com/openai/deployments/YOUR_DEPLOYMENT_ID-id/completions?api-version=2024-10-21"
     api_key: "YOUR_API_KEY"
 
+  - location: "/gemini"
+    model_name: "gemini-1.5-flash"
+    parser: "gemini"
+    proxy_pass: "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$GEMINI_API_KEY"
+    api_key: "$GEMINI_API_KEY"
+
