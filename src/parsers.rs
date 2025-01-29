@@ -57,6 +57,18 @@ pub fn parser_openai(response: &Value) -> Result<(u64, u64)> {
     Ok((tokens_input, tokens_output))
 }
 
+pub fn parser_gemini(response: &Value) -> Result<(u64, u64)> {
+    let tokens_input = response["usageMetadata"]["promptTokenCount"]
+        .as_u64()
+        .ok_or_else(|| anyhow!("Missing or invalid promptTokenCount"))?;
+
+    let tokens_output = response["usageMetadata"]["candidatesTokenCount"]
+        .as_u64()
+        .ok_or_else(|| anyhow!("Missing or invalid candidatesTokenCount"))?;
+
+    Ok((tokens_input, tokens_output))
+}
+
 pub fn parser_echo(_response: &Value) -> Result<(u64, u64)> {
     Ok((0, 0))
 }
@@ -89,6 +101,11 @@ pub fn parse(
         "openai" => {
             let (input_tokens, output_tokens) = parser_openai(&json_body)?;
             log::info!("OpenAI tokens - input: {}, output: {}", input_tokens, output_tokens);
+            Ok((input_tokens, output_tokens))
+        }
+        "gemini" => {
+            let (input_tokens, output_tokens) = parser_gemini(&json_body)?;
+            log::info!("Gemini tokens - input: {}, output: {}", input_tokens, output_tokens);
             Ok((input_tokens, output_tokens))
         }
         _ => {
