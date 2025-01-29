@@ -1,9 +1,10 @@
 import json
 import requests
+import os
 
 headers = {
     'Content-Type': 'application/json',
-    'Authorization': 'Bearer your_token_here',
+    'Authorization': f'Bearer {os.environ.get("GEMINI_API_KEY", "your_token_here")}',
 }
 
 def test_deepseek():
@@ -48,35 +49,21 @@ def test_openai():
 
     assert response.status_code == 200, response.text
     assert "gpt-4o-mini" in response.json()["model"], response.json()
-#
-# curl https://api.anthropic.com/v1/messages \
-#      --header "x-api-key: $ANTHROPIC_API_KEY" \
-#      --header "anthropic-version: 2023-06-01" \
-#      --header "content-type: application/json" \
-#      --data \
-# '{
-#     "model": "claude-3-5-sonnet-20241022",
-#     "max_tokens": 1024,
-#     "messages": [
-#         {"role": "user", "content": "Hello, world"}
-#     ]
-# }'
-#
-# {
-#   "content": [
-#     {
-#       "text": "Hi! My name is Claude.",
-#       "type": "text"
-#     }
-#   ],
-#   "id": "msg_013Zva2CMHLNnXjNJJKqJ2EF",
-#   "model": "claude-3-5-sonnet-20241022",
-#   "role": "assistant",
-#   "stop_reason": "end_turn",
-#   "stop_sequence": null,
-#   "type": "message",
-#   "usage": {
-#     "input_tokens": 2095,
-#     "output_tokens": 503
-#   }
-# }
+
+def test_gemini():
+    print("Testing Gemini")
+    json_data = {
+        "model": "gemini-1.5-flash",
+        "prompt": {
+            "content": "Hi"
+        }
+    }
+    response = requests.post(
+        'http://127.0.0.1:6191/gemini',
+        headers=headers,
+        json=json_data,
+    )
+
+    assert response.status_code == 200, response.text
+    assert "gemini-1.5-flash" in response.json()["model"], response.json()
+
