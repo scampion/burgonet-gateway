@@ -58,10 +58,12 @@ models:
           second: 1
           minute: 15
 
+
   - location: "/llamacpp/"
     provider: "llamacpp"
     model_name: "phi4-GGUF-Q4_K"
     proxy_pass: "http://m1:8081/completion"
+
 
   - location: "/api.openai.com/v1/chat/completions"
     model_name: "openai"
