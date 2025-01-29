@@ -4,7 +4,7 @@ import os
 
 headers = {
     'Content-Type': 'application/json',
-    'Authorization': f'Bearer {os.environ.get("GEMINI_API_KEY", "your_token_here")}',
+    'Authorization': f'Bearer your_token_here',
 }
 
 def test_deepseek():
