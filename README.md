@@ -22,7 +22,6 @@ cloud based LLM providers or self-hosted models via that single entrypoint, it c
 - 📊 **Usage Monitoring**: Real-time usage tracking and analytics
 - 🤖 **Provider Management**: Configure multiple LLM providers (OpenAI, Claude, DeepSeek, Ollama, etc.)
 - ⏱️ **Rate Limiting**: Built-in rate limiting with configurable thresholds
-- 📝 **Audit Logs**: Detailed logging of API requests and responses
 - 🖥️ **Embedded Web UI**: Built-in admin interface for configuration and monitoring
 - 🔒 **PII Protection**: Built-in Personally Identifiable Information detection and blocking
 - 📈 **Prometheus Metrics**: Built-in Prometheus endpoint for monitoring and alerting

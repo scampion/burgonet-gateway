@@ -1,5 +1,5 @@
 
-## Use Cases
+# Use Cases
 Explore common scenarios and configurations:
 
 - [Departmental Access Control](#departmental-access-control)

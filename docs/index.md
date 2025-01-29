@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="images/logo_small.png" alt="Burgonet Gateway">
+  <img src="images/logo_draw_name_alpha.png" alt="Burgonet Gateway" style="width: 30%">
 </p>
 
 
@@ -23,6 +23,9 @@ providing centralized control over model access, usage tracking, and security po
 - 🔐 **Trusted Header Authentication**: Support for authentication via trusted HTTP headers
 - 🚫 **Content Filtering**: Block requests containing blacklisted words (e.g. "confidential")
 - 🚷 **Group Access Control**: Restrict access by user groups with disabled_groups configuration
+- 📝 Audit Logs: Detailed logging of API requests and responses
+- 💾 Audit Storage: Persistent storage of all gateway exchanges with configurable retention periods
+
 
 Need another feature? Don't hesitate to [send an email](mailto:sebastien.campion@foss4.eu) or [create a GitHub ticket](https://github.com/burgonet-eu/gateway/issues)!
 
@@ -30,27 +33,11 @@ Need another feature? Don't hesitate to [send an email](mailto:sebastien.campion
 
 ## Quick Links
 - [Getting Started](#getting-started)
-- [Core Features](#core-features)
 - [Use Cases](#use-cases)
 - [Technical Architecture](#technical-architecture)
 - [Configuration](#configuration)
 - [API Reference](#api-reference)
 
-## Quickstart
-
-Download the binary in the [packages](https://github.com/burgonet-eu/gateway/releases/) and the configuration file [conf.yml](https://github.com/burgonet-eu/gateway/blob/main/conf.yml) file,  run it :
-
-    ./burgonet-gw -c conf.yml 
-
-
-To access the administration web application, open the following URL in your browser : [http://127.0.0.1:6189/](http://127.0.0.1:6189/)
-
-![Screenshot](images/screenshot.png)
-
-When you have created you token, you can test it via the convenience chat web app embedded, open the following URL in your browser: [http://127.0.0.1:6190/](http://127.0.0.1:6190/)
-configure the the server url (default port is 6191) and your token: 
-
-![Chat Web UI](images/chat-interface.png)
-
+--8<-- "docs/getting-started.md"
 
 --8<-- "docs/use-cases.md"
