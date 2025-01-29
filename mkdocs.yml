@@ -2,6 +2,7 @@ site_name: Burgonet Gateway Documentation
 
 nav:
   - Home: index.md
+  - Getting Started: getting-started.md
   - User Guide:
     - Use Cases: use-cases.md
     - Configuration: configuration.md
